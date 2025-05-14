@@ -10,9 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.ui.theme.checkedFilter
 import com.unipi.george.chordshub.ui.theme.filterColor
 
@@ -51,7 +53,7 @@ fun MyAppTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
+            containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.95f),
             scrolledContainerColor = Color.Transparent
 
         )
@@ -64,8 +66,8 @@ fun FilterButton(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    selectedColor: Color = checkedFilter,
-    defaultColor: Color = filterColor
+    selectedColor: Color = MaterialTheme.colorScheme.secondary ,
+    defaultColor: Color = MaterialTheme.colorScheme.primary
 ) {
     Button(
         onClick = onClick,

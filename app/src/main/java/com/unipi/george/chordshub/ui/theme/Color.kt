@@ -1,14 +1,16 @@
 package com.unipi.george.chordshub.ui.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.ui.graphics.Color
+import com.unipi.george.chordshub.R
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)
 
-val Purple40 = Color(0xFF6200EE) // Νέο πρωτεύον χρώμα (Material 3 Μωβ)
-val PurpleGrey40 = Color(0xFF03DAC5) // Πιο έντονο δευτερεύον κυανό
-val Pink40 = Color(0xFFFF4081) // Πιο φωτεινό ροζ
+val Purple40 = Color(0xFF6200EE)
+val PurpleGrey40 = Color(0xFF03DAC5)
+val Pink40 = Color(0xFFFF4081)
 
 
 
@@ -47,12 +49,19 @@ val filterColor = Color(0xFFD32F2F) // Κόκκινο (Primary)
 val checkedFilter = Color(0xFF424242) //Color(0xFFFFEBEE) // Απαλό ροζ
 
 */
-/*
-val filterColor = Color(0xFFE0E0E0)
-val checkedFilter = Color(0xFF1976D2) //Color(0xFFFFEBEE)
-*/
+
+
 /*
 val filterColor = Color(0xFFFFF8E1)
-val checkedFilter = Color(0xFFFFA000) //Color(0xFFFFEBEE)*/
-val filterColor = Color(0xFF2E2E2E)
-val checkedFilter = Color(0xFF1DB954)
+val checkedFilter = Color(0xFFFFA000) //Color(0xFFFFEBEE)
+
+
+
+val filterColor = Color(0xFF333333)
+val checkedFilter = Color(0xFF4CAF50)
+*/
+/*val filterColor = Color(0xFF9D9393)
+val checkedFilter = Color(0xFF1976D2) *///Color(0xFFFFEBEE)
+
+val filterColor = Color(0xFFBDBDBD)
+val checkedFilter = Color(0xFF4CAF50)

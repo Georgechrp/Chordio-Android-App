@@ -2,6 +2,8 @@ package com.unipi.george.chordshub.screens.main
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -45,7 +47,6 @@ fun SearchScreen(
     val randomSongs by viewModel.randomSongs.collectAsState()
     val isMenuOpen by mainViewModel.isMenuOpen
     val userViewModel: UserViewModel = viewModel()
-    val profileImage by mainViewModel.profileImageUrl.collectAsState()
 
     LaunchedEffect(searchText.text) {
         if (searchText.text.isEmpty()) {
@@ -62,6 +63,7 @@ fun SearchScreen(
                     Text(
                         text = stringResource(R.string.search_text),
                         style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSecondary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
@@ -74,10 +76,6 @@ fun SearchScreen(
 
         }
     }
-
-
-
-
     BackHandler {
         if (isMenuOpen) {
             Log.d("BackHandler", "Back button pressed - Closing Menu")
@@ -93,7 +91,7 @@ fun SearchScreen(
     }
 
 
-    Box(modifier = Modifier.fillMaxSize().padding(top = 56.dp)) {
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background ).padding(top = 56.dp)) {
         if (selectedSongId == null) {
             SearchContent(
                 searchText = searchText,
@@ -160,11 +158,11 @@ fun RandomSongsList(
 ) {
     Column {
         Text(
-            stringResource(R.string.Discover_something_new_text),
+            text = stringResource(R.string.Discover_something_new_text),
             style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSecondary,
             modifier = Modifier.padding(8.dp)
         )
-
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(
@@ -185,7 +183,14 @@ fun SongCard(song: Pair<String, String>, onSongSelect: (String) -> Unit) {
             .padding(vertical = 6.dp, horizontal = 12.dp)
             .clickable { onSongSelect(song.second) },
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+
+
     ) {
         Row(
             modifier = Modifier
@@ -194,7 +199,7 @@ fun SongCard(song: Pair<String, String>, onSongSelect: (String) -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_music_note), // ✅ Μπορείς να βάλεις εικόνα εδώ
+                painter = painterResource(id = R.drawable.ic_music_note),
                 contentDescription = "Music Icon",
                 modifier = Modifier
                     .size(40.dp)
@@ -229,7 +234,10 @@ fun SearchBar(
     TextField(
         value = searchText,
         onValueChange = onSearchTextChange,
-        label = { Text(stringResource(R.string.Are_u_looking_for_something_text)) },
+        label = { Text(
+            text = stringResource(R.string.Are_u_looking_for_something_text),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        ) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
         leadingIcon = {
@@ -256,7 +264,7 @@ fun SearchResultsList(
         items(searchResults) { song ->
             ListItem(
                 modifier = Modifier.clickable { onSongSelect(song.second) },
-                headlineContent = { Text(song.first) },
+                headlineContent = { Text(song.first, color = MaterialTheme.colorScheme.onSurface)  },
                 supportingContent = { Text("Καλλιτέχνης: ${song.second}\n🔍 Αντιστοίχιση: ${song.third}") }
             )
         }

@@ -2,6 +2,7 @@ package com.unipi.george.chordshub.screens.main
 
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -77,9 +78,11 @@ fun LibraryScreen(navController: NavController, mainViewModel: MainViewModel, on
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background )
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
             FilterRow(
                 selectedFilter = selectedFilter,
                 onFilterChange = { viewModel.fetchFilteredPlaylists(it) },
@@ -104,7 +107,12 @@ fun LibraryScreen(navController: NavController, mainViewModel: MainViewModel, on
                                     selectedPlaylist = playlist
                                     showBottomSheet.value = true
                                 }
-                            )
+                            ),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            contentColor = MaterialTheme.colorScheme.onSurface
+                        )
+
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(
@@ -125,19 +133,6 @@ fun LibraryScreen(navController: NavController, mainViewModel: MainViewModel, on
                                 }
                             }
 
-                            /*songs.forEach { song ->
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    //Text(song, style = MaterialTheme.typography.bodyMedium)
-                                    *//*TextButton(onClick = {
-                                        viewModel.removeSongFromPlaylist(playlist, song) {}
-                                    }) {
-                                        Text("❌")
-                                    }*//*
-                                }
-                            }*/
                         }
                     }
 
@@ -159,10 +154,14 @@ fun LibraryScreen(navController: NavController, mainViewModel: MainViewModel, on
             playlistName = "My Playlist #$nextNumber"
             showDialog = true
         },
-            modifier = Modifier.padding(bottom = 86.dp, end = 16.dp).align(Alignment.BottomEnd)
+            modifier = Modifier
+                .padding(bottom = 86.dp, end = 16.dp)
+                .align(Alignment.BottomEnd),
+            containerColor = MaterialTheme.colorScheme.surface
         )
         {
-            Text("+", style = MaterialTheme.typography.headlineSmall)
+            Text("+", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+
         }
     }
 
@@ -237,9 +236,10 @@ fun LibraryScreen(navController: NavController, mainViewModel: MainViewModel, on
                     LazyColumn {
                         items(searchResults) { song ->
                             ListItem(
-                                headlineContent = { Text(song.first) },
+                                headlineContent = { Text(song.first, color = MaterialTheme.colorScheme.onSurface) },
                                 supportingContent = {
-                                    Text("Καλλιτέχνης: ${song.second}\n🔍 ${song.third}")
+                                    Text("Καλλιτέχνης: ${song.second}\n🔍 ${song.third}",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -334,7 +334,7 @@ fun LibraryScreen(navController: NavController, mainViewModel: MainViewModel, on
                     OutlinedTextField(
                         value = newPlaylistName,
                         onValueChange = { newPlaylistName = it },
-                        label = { Text(stringResource(R.string.new_name_text)) }
+                        label = { Text(stringResource(R.string.new_name_text),color = MaterialTheme.colorScheme.onSurfaceVariant) }
                     )
                     if (newPlaylistName in playlists.keys && newPlaylistName != selectedPlaylist) {
                         Text(

@@ -83,15 +83,22 @@ fun RecentsScreen(
                 }
 
                 recentSongs.isEmpty() -> {
-                    Text("Δεν υπάρχουν πρόσφατα τραγούδια.", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        "Δεν υπάρχουν πρόσφατα τραγούδια.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+
                 }
 
                 else -> {
                     Text(
                         text = "Τα τελευταία τραγούδια που είδες",
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        color = MaterialTheme.colorScheme.onBackground
                     )
+
 
                     LazyColumn(
                         contentPadding = PaddingValues(bottom = 80.dp)
@@ -105,12 +112,17 @@ fun RecentsScreen(
                                         homeViewModel.selectSong(song)
                                     },
                                 shape = RoundedCornerShape(12.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
                             ) {
                                 Text(
                                     text = song,
                                     modifier = Modifier.padding(16.dp),
-                                    fontSize = 18.sp
+                                    fontSize = 18.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }

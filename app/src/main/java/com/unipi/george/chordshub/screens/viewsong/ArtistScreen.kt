@@ -1,5 +1,6 @@
 package com.unipi.george.chordshub.screens.viewsong
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -10,11 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.components.CardsView
 import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.repository.firestore.SongRepository
@@ -78,6 +82,7 @@ fun ArtistScreen(artistName: String, navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(colorResource(id = R.color.main_blue_background))
                 .padding(innerPadding),
             contentAlignment = Alignment.TopCenter
         ) {

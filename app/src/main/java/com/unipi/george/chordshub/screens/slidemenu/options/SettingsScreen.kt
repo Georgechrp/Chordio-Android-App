@@ -56,13 +56,19 @@ fun SettingsScreen(navController: NavController, settingsViewModel: SettingsView
 @Composable
 fun SettingsTopBar(navController: NavController) {
     TopAppBar(
-        title = { Text(stringResource(R.string.settings_text)) },
+        title = {
+            Text(
+                text = stringResource(R.string.settings_text),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "Πίσω")
             }
         }
     )
+
 }
 
 @Composable
@@ -112,7 +118,11 @@ fun LanguageSelection(settingsViewModel: SettingsViewModel) {
                 updateLocale(context, "el")
                 showDialog = true
             },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+
         ) {
             Text("Ελληνικά", color = Color.White)
         }
@@ -134,12 +144,23 @@ fun LanguageSelection(settingsViewModel: SettingsViewModel) {
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("ΟΚ")
+                    Text("ΟΚ", color = MaterialTheme.colorScheme.primary)
                 }
             },
-            title = { Text("Αλλαγή Γλώσσας") },
-            text = { Text("Η αλλαγή γλώσσας θα εφαρμοστεί μετά από επανεκκίνηση της εφαρμογής.") }
+            title = {
+                Text(
+                    text = "Αλλαγή Γλώσσας",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            text = {
+                Text(
+                    text = "Η αλλαγή γλώσσας θα εφαρμοστεί μετά από επανεκκίνηση της εφαρμογής.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         )
+
     }
 
     Divider(modifier = Modifier.padding(vertical = 4.dp))
@@ -164,7 +185,8 @@ fun FontSizeSelection(settingsViewModel: SettingsViewModel) {
     }
     Text(
         text = sampleText,
-        style = TextStyle(fontSize = tempFontSize.sp)
+        style = TextStyle(fontSize = tempFontSize.sp),
+        color = MaterialTheme.colorScheme.onBackground
     )
     IconButton(onClick = { settingsViewModel.changeFontSize(tempFontSize) }) {
         Icon(Icons.Filled.Save, contentDescription = "Αποθήκευση Μεγέθους Γραμματοσειράς")

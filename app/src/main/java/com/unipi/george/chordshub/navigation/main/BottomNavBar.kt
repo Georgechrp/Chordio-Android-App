@@ -18,6 +18,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.res.colorResource
+import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.navigation.AppScreens
 
  /*
@@ -42,7 +44,7 @@ fun BottomNavBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(58.dp),
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+            color = colorResource(id = R.color.bottom_nav).copy(alpha = 0.9f),
             shape = RoundedCornerShape(20.dp),
             shadowElevation = 20.dp,
             tonalElevation = 0.dp

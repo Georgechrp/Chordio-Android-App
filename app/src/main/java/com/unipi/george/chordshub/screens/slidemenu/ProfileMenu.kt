@@ -143,7 +143,11 @@ fun ProfileMenuContent(
 
                 UserProfileSection(username, mainViewModel, navController)
             }
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            Divider(
+                modifier = Modifier.padding(vertical = 8.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+            )
+
             MenuItem(
                 icon = Icons.Filled.AddCircleOutline,
                 text = stringResource(R.string.add_song_text),
@@ -190,8 +194,10 @@ fun UserProfileSection(
     ) {
         Text(
             text = username.value,
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
+
         TextButton(
             onClick = {
                 mainViewModel.setMenuOpen(false)
@@ -200,7 +206,7 @@ fun UserProfileSection(
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier.height(20.dp)
         ) {
-            Text(stringResource(R.string.view_profile_text), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.view_profile_text), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
         }
     }
 
@@ -231,8 +237,19 @@ fun MenuItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(icon, contentDescription = text, modifier = Modifier.size(24.dp))
-                Text(text = text, fontSize = 16.sp)
+                Icon(
+                    icon,
+                    contentDescription = text,
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+
+                Text(
+                    text = text,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
             }
         }
     }

@@ -26,13 +26,13 @@ fun WelcomeScreen() {
 
     // Δημιουργεί animation για το μέγεθος (scale) του logo: από 40% σε 200% σε 3s
     val scale by animateFloatAsState(
-        targetValue = if (visible) 2f else 0.4f,
+        targetValue = if (visible) 2.4f else 0.4f,
         animationSpec = tween(durationMillis = 3000, easing = EaseOutCubic)
     )
 
     // Δημιουργεί animation για τη διαφάνεια (alpha): από 0 (αόρατο) σε 2 (πλήρως ορατό + έξτρα φωτεινότητα)
     val alpha by animateFloatAsState(
-        targetValue = if (visible) 2f else 0f,
+        targetValue = if (visible) 2.4f else 0f,
         animationSpec = tween(durationMillis = 3000)
     )
 
@@ -52,7 +52,7 @@ fun WelcomeScreen() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             // Το λογότυπο με εφέ μεγέθυνσης και ξεθολώματος, βάση των scale & alpha
             Image(
-                painter = painterResource(id = R.drawable.icon3),
+                painter = painterResource(id = R.drawable.chordiologo1),
                 contentDescription = "App Logo",
                 modifier = Modifier
                     .size(180.dp)

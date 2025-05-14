@@ -15,6 +15,7 @@ import com.unipi.george.chordshub.viewmodels.user.SettingsViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.blur
@@ -37,7 +38,11 @@ fun LoadingView() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator(modifier = Modifier.size(50.dp))
+        CircularProgressIndicator(
+            modifier = Modifier.size(50.dp),
+            color = MaterialTheme.colorScheme.primary
+        )
+
     }
 }
 
@@ -45,9 +50,13 @@ fun LoadingView() {
 fun SettingsHeads(text: String, settingsViewModel: SettingsViewModel, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        style = TextStyle(fontSize = settingsViewModel.fontSize.value.sp),
+        style = TextStyle(
+            fontSize = settingsViewModel.fontSize.value.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        ),
         modifier = modifier
     )
+
 }
 
 @Composable
@@ -55,7 +64,7 @@ fun BlurredBackground(onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.6f))
+            .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f))
             .blur(20.dp)
             .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) {
                 onClick()
@@ -78,7 +87,8 @@ fun UserProfileImage(
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .then(if (border) Modifier.border(2.dp, Color.Gray, CircleShape) else Modifier)
+            .then(if (border) Modifier.border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
+            else Modifier)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {

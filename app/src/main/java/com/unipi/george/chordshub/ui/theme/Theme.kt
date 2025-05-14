@@ -12,32 +12,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
+    primary = Color(0xFF90CAF9),         // Bright Blue 200 για primary (αντίστοιχο του #2196F3)
+    secondary = Color(0xFFA5D6A7),       // Soft Green 200 (αντίστοιχο του #4CAF50)
+    tertiary = Color(0xFFEF9A9A),        // Light Red 200 (error/warning)
 
-    background = Color(0xFF121212), // Σκούρο γκρι για το φόντο
-    surface = Color(0xFF1E1E1E), // Ελαφρώς πιο φωτεινό σκούρο για το Card
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color.White, // Κείμενο πάνω στο φόντο
-    onSurface = Color.White // Κείμενο πάνω στο Card
+    background = Color(0xFF121212),      // Dark background (standard Material Dark)
+    surface = Color(0xFF1E1E1E),         // Πιο φωτεινό σκούρο για κάρτες/επιφάνειες
+    onPrimary = Color.Black,             // Text πάνω στο ανοιχτό μπλε
+    onSecondary = Color.Black,           // Text πάνω στο ανοιχτό πράσινο
+    onTertiary = Color.Black,            // Text πάνω στο ροζ
+    onBackground = Color.White,          // Κείμενο πάνω στο dark background
+    onSurface = Color.White              // Κείμενο πάνω σε κάρτες
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Blue40,  // ✅ Πιο μοντέρνο μπλε (Material 3)
-    secondary = Green40, // ✅ Κυανό-πράσινο για contrast
-    tertiary = Red40,  // ✅ Κόκκινο για δυναμικά στοιχεία
+    primary = Color(0xFFFFA726),         // Warm Orange (για κουμπιά/filters)
+    secondary = Color(0xFFB3E5FC),       // Light Blue (για chip highlights, tags)
+    tertiary = Color(0xFFE57373),        // Coral Red (για warnings, secondary accents)
 
-    background = BackgroundLight, // ✅ Καθαρό λευκό
-    surface = SurfaceLight, // ✅ Ανοιχτό γκρι για καλύτερη αισθητική
-    onPrimary = OnPrimary,
-    onSecondary = OnSecondary,
-    onTertiary = OnPrimary,
-    onBackground = OnBackgroundLight,
-    onSurface = OnSurfaceLight
+    background = Color(0xFF0D1B2A),      // Deep Blue Background (navy-night style)
+    surface = Color(0xFF1B263B),         // Λίγο πιο ανοιχτό μπλε (για κάρτες)
+    onPrimary = Color.Black,             // Text πάνω στο πορτοκαλί
+    onSecondary = Color.Black,           // Text πάνω στο ανοιχτό μπλε
+    onTertiary = Color.White,            // Text πάνω στο coral
+    onBackground = Color(0xFFE0E1DD),    // Pale gray – text πάνω στο background
+    onSurface = Color(0xFF121212)        // Text πάνω σε κάρτες
 )
+
 
 
 

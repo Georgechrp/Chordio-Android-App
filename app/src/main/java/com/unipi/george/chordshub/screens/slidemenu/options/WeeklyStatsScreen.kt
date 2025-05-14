@@ -1,5 +1,6 @@
 package com.unipi.george.chordshub.screens.slidemenu.options
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -28,7 +29,7 @@ fun WeeklyStatsScreen(
         viewModel.fetchWeeklyStats(userId)
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(16.dp).background(MaterialTheme.colorScheme.background)) {
         //  Back Button
         Row(
             modifier = Modifier
@@ -37,14 +38,23 @@ fun WeeklyStatsScreen(
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.Start
         ) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
-            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back",
+                tint = MaterialTheme.colorScheme.onBackground
+            )
+
 
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("📊 Weekly Statistics", style = MaterialTheme.typography.titleLarge)
+        Text(
+            "📊 Weekly Statistics",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         weeklyStats.forEach { stat ->
@@ -52,8 +62,9 @@ fun WeeklyStatsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("🕐 ${stat.day}")
-                Text(stat.minutes)
+                Text("🕐 ${stat.day}", color = MaterialTheme.colorScheme.onBackground)
+                Text(stat.minutes, color = MaterialTheme.colorScheme.onBackground)
+
             }
             Spacer(modifier = Modifier.height(8.dp))
         }

@@ -49,6 +49,7 @@ import com.unipi.george.chordshub.models.song.SongLine
 import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.utils.saveCardContentAsPdf
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.filled.QueueMusic
@@ -63,6 +64,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -176,6 +178,7 @@ fun DetailedSongView(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background )
             .clickable {
                 if (isFullScreenState) {
                     homeViewModel.setFullScreen(false)
@@ -195,7 +198,7 @@ fun DetailedSongView(
             Card(
                 modifier = if (isFullScreenState) Modifier.fillMaxSize() else Modifier.fillMaxWidth().padding(16.dp),
                 shape = RoundedCornerShape(if (isFullScreenState) 0.dp else 16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = if (isFullScreenState) 0.dp else 8.dp)
             ) {
                 Column(

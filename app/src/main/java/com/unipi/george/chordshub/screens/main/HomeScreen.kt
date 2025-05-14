@@ -1,40 +1,34 @@
+// package και imports δεν αλλάζουν
 package com.unipi.george.chordshub.screens.main
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.firebase.firestore.FirebaseFirestore
-import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.components.FilterRow
-import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
-import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
-import com.unipi.george.chordshub.viewmodels.MainViewModel
-import com.unipi.george.chordshub.viewmodels.user.UserViewModel
-import kotlin.math.roundToInt
 import com.unipi.george.chordshub.components.CardsView
-import com.unipi.george.chordshub.components.HorizontalArtistCardsView
 import com.unipi.george.chordshub.components.LoadingView
 import com.unipi.george.chordshub.repository.firestore.SongRepository
+import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
+import com.unipi.george.chordshub.utils.ArtistImageOnly
+import com.unipi.george.chordshub.viewmodels.MainViewModel
+import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
+import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 import kotlinx.coroutines.delay
+import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(
@@ -53,9 +47,7 @@ fun HomeScreen(
     var artistList by remember { mutableStateOf<List<String>>(emptyList()) }
     val isMenuOpen by mainViewModel.isMenuOpen
     val isFullScreenState by homeViewModel.isFullScreen.collectAsState()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
     var topBarOffset by rememberSaveable { mutableFloatStateOf(0f) }
-    val profileImage by mainViewModel.profileImageUrl.collectAsState()
     var showNoResults by remember { mutableStateOf(false) }
 
     val nestedScrollConnection = remember {
@@ -69,34 +61,26 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        // Μόνο στην πρώτη εμφάνιση της οθόνης
         selectedFilter = "All"
     }
-
 
     LaunchedEffect(selectedFilter) {
         artistMode = selectedFilter == "Artists"
 
         when (selectedFilter) {
-            "Artists" -> {
-                homeViewModel.getAllArtists()
-            }
+            "Artists" -> homeViewModel.getAllArtists()
             else -> {
                 homeViewModel.fetchFilteredSongs(selectedFilter)
-                homeViewModel.getAllArtists() // προαιρετικό
+                homeViewModel.getAllArtists()
             }
         }
     }
-
-
 
     LaunchedEffect(songList, selectedFilter) {
         showNoResults = false
         if (songList.isEmpty()) {
             delay(5000)
-            if (songList.isEmpty()) {
-                showNoResults = true
-            }
+            if (songList.isEmpty()) showNoResults = true
         }
     }
 
@@ -109,9 +93,7 @@ fun HomeScreen(
             mainViewModel.setTopBarContent {
                 FilterRow(
                     selectedFilter = selectedFilter,
-                    onFilterChange = {
-                        selectedFilter = it
-                    }
+                    onFilterChange = { selectedFilter = it }
                 )
             }
         } else {
@@ -134,9 +116,9 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 40.dp)
+            .padding(top = 60.dp)
             .nestedScroll(nestedScrollConnection)
-            .background(Color.Transparent)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column {
             if (selectedSongId == null) {
@@ -151,58 +133,66 @@ fun HomeScreen(
             Box(modifier = Modifier.fillMaxSize()) {
                 when {
                     selectedSongId == null && songList.isEmpty() && showNoResults -> {
-                        // δείξε μήνυμα
+                        // εμφάνιση μηνύματος No results
                     }
 
                     selectedSongId == null && songList.isEmpty() -> LoadingView()
 
                     selectedSongId == null -> {
                         if (artistMode) {
+                            val artistCards = artistList
+                                .take(6) // μόνο 6 αν θες
+                                .map { it to "artist:$it" }
+
                             CardsView(
-                                songList = artistList.map { it to "artist:$it" },
+                                songList = artistCards,
                                 homeViewModel = homeViewModel,
                                 selectedTitle = selectedTitle,
-                                columns = 2,
-                                cardHeight = 80.dp,
-                                fontSize = 13.sp,
-                                onSongClick = { artistTag ->
-                                    val artist = artistTag.removePrefix("artist:")
+                                onSongClick = { tag ->
+                                    val artist = tag.removePrefix("artist:")
                                     navController.navigate("artist/${Uri.encode(artist)}")
-                                    artistMode = false
-                                    artistList = emptyList()
                                 }
                             )
-                        } else {
+                        }
+                        else {
+                            val combinedList = if (selectedFilter == "All")
+                                artistList.take(6).map { it to "artist:$it" } + songList
+                            else
+                                songList
+
+
                             CardsView(
-                                songList = songList,
+                                songList = combinedList,
                                 homeViewModel = homeViewModel,
-                                selectedTitle = selectedTitle
+                                selectedTitle = selectedTitle,
+                                onSongClick = { tag ->
+                                    if (tag.startsWith("artist:")) {
+                                        val artist = tag.removePrefix("artist:")
+                                        navController.navigate("artist/${Uri.encode(artist)}")
+                                    } else {
+                                        homeViewModel.selectSong(tag)
+                                    }
+                                }
                             )
                         }
                     }
 
-                    else -> {DetailedSongView(
-                        songId = selectedSongId!!,
-                        isFullScreenState = isFullScreenState,
-                        onBack = {
-                            homeViewModel.clearSelectedSong()
-                            homeViewModel.setFullScreen(false)
-                        },
-                        navController = navController,
-                        mainViewModel = mainViewModel,
-                        homeViewModel = homeViewModel,
-                        userViewModel = userViewModel
-                    )
+                    else -> {
+                        DetailedSongView(
+                            songId = selectedSongId!!,
+                            isFullScreenState = isFullScreenState,
+                            onBack = {
+                                homeViewModel.clearSelectedSong()
+                                homeViewModel.setFullScreen(false)
+                            },
+                            navController = navController,
+                            mainViewModel = mainViewModel,
+                            homeViewModel = homeViewModel,
+                            userViewModel = userViewModel
+                        )
                     }
                 }
-
             }
         }
     }
 }
-
-
-
-
-
-

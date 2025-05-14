@@ -1,5 +1,6 @@
 package com.unipi.george.chordshub.screens.slidemenu.options
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,8 +41,14 @@ fun UploadScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {  Text(stringResource(R.string.add_song_text)) },
-                navigationIcon = {
+                title = {
+                    Text(
+                        text = stringResource(R.string.add_song_text),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+
+                        navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Πίσω")
                     }
@@ -54,13 +61,14 @@ fun UploadScreen(navController: NavController) {
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .padding(innerPadding)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Τίτλος") },
+                label = { Text("Τίτλος", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -138,7 +146,11 @@ fun UploadScreen(navController: NavController) {
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Στείλε το τραγούδι")
+                Text(
+                    "Στείλε το τραγούδι",
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+
             }
         }
     }

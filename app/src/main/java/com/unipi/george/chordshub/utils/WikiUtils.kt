@@ -7,6 +7,7 @@ import org.json.JSONObject  //για να διαβάσει τα JSON αποτε�
 import java.net.URL    //για να κατεβασει το περιεχομενο της σελιδας
 import java.net.URLEncoder
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -149,5 +150,43 @@ suspend fun searchWikipediaPage(artistName: String, lang: String): Pair<String?,
             Log.e("WikiSearch", "Σφάλμα αναζήτησης", e)
         }
         null
+    }
+}
+
+
+@Composable
+fun ArtistImageOnly(
+    artistName: String,
+    modifier: Modifier = Modifier
+) {
+    var imageUrl by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(artistName) {
+        coroutineScope.launch {
+            val bestMatch = getWikipediaPageTitle(artistName)
+            if (bestMatch != null) {
+                val (bestMatchTitle, lang) = bestMatch
+                val data = bestMatchTitle?.let { fetchWikipediaData(it, lang) }
+                imageUrl = data?.first
+            }
+        }
+    }
+
+    Box(modifier = modifier) {
+        imageUrl?.let {
+            Image(
+                painter = rememberImagePainter(it),
+                contentDescription = "Artist Image",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .aspectRatio(1f)
+            )
+        } ?: Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(1f)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        )
     }
 }

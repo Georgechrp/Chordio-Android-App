@@ -3,6 +3,7 @@ package com.unipi.george.chordshub.navigation.main
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
