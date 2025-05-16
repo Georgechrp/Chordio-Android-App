@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Default Palette -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -8,13 +9,32 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="main_blue_background">#282828 </color>"
+    <!-- Custom UI Colors -->
+    <color name="main_blue_background">#282828</color>
+    <color name="bottom_nav">#ECEFF1</color>
     <color name="card_background">#F5F5F5</color>
-    <color name="selected_filter">#4CAF50 </color>
-    <color name="unselected_filter">#BDBDBD </color>
+    <color name="selected_filter">#4CAF50</color>
+    <color name="unselected_filter">#BDBDBD</color>
     <color name="topBar_color">#FDF6F0</color>
     <color name="fab_accent">#FF4081</color>
     <color name="home_icon_active">#A0522D</color>
     <color name="title_card">#212121</color>
-    <color name="bottom_nav">#ECEFF1</color>
+
+    <!-- Theme Colors -->
+    <color name="orange_primary">#FFA726</color>
+    <color name="light_blue_secondary">#B3E5FC</color>
+    <color name="coral_tertiary">#E57373</color>
+
+    <color name="navy_background">#0D1B2A</color>
+    <color name="card_surface_light">#1B263B</color>
+
+    <color name="bright_blue_primary_dark">#90CAF9</color>
+    <color name="soft_green_secondary_dark">#A5D6A7</color>
+    <color name="light_red_tertiary_dark">#EF9A9A</color>
+
+    <color name="background_dark">#121212</color>
+    <color name="card_surface_dark">#1E1E1E</color>
+
+    <color name="text_on_background_light">#E0E1DD</color>
+    <color name="text_on_surface_light">#121212</color>
 </resources>

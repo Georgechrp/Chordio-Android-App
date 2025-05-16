@@ -82,7 +82,7 @@ fun ArtistScreen(artistName: String, navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colorResource(id = R.color.main_blue_background))
+                .background(color = MaterialTheme.colorScheme.background)
                 .padding(innerPadding),
             contentAlignment = Alignment.TopCenter
         ) {

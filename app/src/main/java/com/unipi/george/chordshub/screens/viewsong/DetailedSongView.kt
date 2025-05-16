@@ -148,8 +148,6 @@ fun DetailedSongView(
     }
 
 
-
-
     fun applyTranspose() {
         songState.value = songState.value?.lyrics?.map { line ->
             line.copy(
@@ -165,6 +163,9 @@ fun DetailedSongView(
         transposePreferences.saveTransposeValue(songId, transposeValue.value)
         Log.d("TransposeTest", "Saved transpose value: ${transposeValue.value} for songId: $songId")
 
+    }
+    LaunchedEffect(Unit) {
+        homeViewModel.setFullScreen(false) // reset όταν ανοίγει η Library
     }
 
     BackHandler {

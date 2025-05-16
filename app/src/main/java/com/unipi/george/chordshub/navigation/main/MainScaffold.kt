@@ -65,17 +65,18 @@ fun MainScaffold(
             )
 
             // TopBar moved INSIDE the Box
-            if (currentRoute in topBarScreens) {
+            if (currentRoute in topBarScreens && !isFullScreen) {
                 MyAppTopBar(
                     imageUrl = profileImageUrl,
                     onMenuClick = { mainViewModel.setMenuOpen(true) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .zIndex(1f) // TopBar πάνω από MainNavGraph αλλά κάτω από ProfileMenu
+                        .zIndex(1f)
                 ) {
                     topBarContent?.invoke(this)
                 }
             }
+
 
             val showBottomBar by homeViewModel.showBottomBar.collectAsState()
 

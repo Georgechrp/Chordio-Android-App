@@ -44,7 +44,7 @@ fun BottomNavBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(58.dp),
-            color = colorResource(id = R.color.bottom_nav).copy(alpha = 0.9f),
+            color = MaterialTheme.colorScheme.background.copy(alpha = 0.9f),
             shape = RoundedCornerShape(20.dp),
             shadowElevation = 20.dp,
             tonalElevation = 0.dp

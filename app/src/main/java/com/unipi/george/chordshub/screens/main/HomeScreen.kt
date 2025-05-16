@@ -88,8 +88,8 @@ fun HomeScreen(
         mainViewModel.setMenuOpen(false)
     }
 
-    LaunchedEffect(selectedSongId) {
-        if (selectedSongId == null) {
+    LaunchedEffect(selectedSongId, isFullScreenState) {
+        if (selectedSongId == null && !isFullScreenState) {
             mainViewModel.setTopBarContent {
                 FilterRow(
                     selectedFilter = selectedFilter,
@@ -100,6 +100,7 @@ fun HomeScreen(
             mainViewModel.setTopBarContent {}
         }
     }
+
 
     val fetchArtists by homeViewModel.fetchArtists.collectAsState()
     val songRepo = remember { SongRepository(FirebaseFirestore.getInstance()) }
@@ -116,7 +117,7 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 60.dp)
+            .padding(top = if (isFullScreenState) 0.dp else 60.dp)
             .nestedScroll(nestedScrollConnection)
             .background(MaterialTheme.colorScheme.background)
     ) {

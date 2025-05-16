@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.unipi.george.chordshub.R
+import com.unipi.george.chordshub.screens.SwipeableSongViewer
 import com.unipi.george.chordshub.viewmodels.MainViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.main.LibraryViewModel
@@ -38,19 +40,26 @@ fun PlaylistDetailScreen(
     val songs = playlists[playlistName] ?: emptyList()
     var selectedSongId by remember { mutableStateOf<String?>(null) }
 
+
+    DisposableEffect(Unit) {
+        homeViewModel.setFullScreen(false)
+        onDispose {
+            homeViewModel.setFullScreen(false)
+        }
+    }
+
     if (selectedSongId != null) {
-        // ✅ Δείξε τη λεπτομέρεια τραγουδιού
-        DetailedSongView(
-            songId = selectedSongId!!,
-            isFullScreenState = false,
-            onBack = { selectedSongId = null },
+        SwipeableSongViewer(
+            songs = songs,
+            initialSongId = selectedSongId!!,
             navController = navController,
             mainViewModel = mainViewModel,
             homeViewModel = homeViewModel,
-            userViewModel = userViewModel
+            userViewModel = userViewModel,
+            onExit = { selectedSongId = null }
         )
-
-    } else {
+    }
+    else {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -80,7 +89,7 @@ fun PlaylistDetailScreen(
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                                 .clickable {
-                                    // ✅ Όρισε το selectedSongId όταν ο χρήστης πατάει πάνω στο τραγούδι
+
                                     selectedSongId = songTitle
                                 },
                             shape = MaterialTheme.shapes.medium,

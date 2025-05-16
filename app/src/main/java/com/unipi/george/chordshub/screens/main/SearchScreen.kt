@@ -53,11 +53,13 @@ fun SearchScreen(
             viewModel.clearSearchResults()
         }
     }
-    LaunchedEffect(Unit) {
-        mainViewModel.setTopBarContent {
+    LaunchedEffect(isFullScreen) {
+        if (!isFullScreen) {
             mainViewModel.setTopBarContent {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -72,10 +74,11 @@ fun SearchScreen(
                     QRCodeScannerButton(viewModel = viewModel)
                 }
             }
-
-
+        } else {
+            mainViewModel.setTopBarContent {}
         }
     }
+
     BackHandler {
         if (isMenuOpen) {
             Log.d("BackHandler", "Back button pressed - Closing Menu")
@@ -91,7 +94,7 @@ fun SearchScreen(
     }
 
 
-    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background ).padding(top = 56.dp)) {
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background ).padding(top = if (isFullScreen) 0.dp else 56.dp)) {
         if (selectedSongId == null) {
             SearchContent(
                 searchText = searchText,

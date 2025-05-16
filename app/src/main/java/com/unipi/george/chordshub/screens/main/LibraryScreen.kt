@@ -25,6 +25,7 @@ import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.components.FilterRow
 import com.unipi.george.chordshub.viewmodels.main.LibraryViewModel
 import com.unipi.george.chordshub.viewmodels.MainViewModel
+import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.main.SearchViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -37,20 +38,24 @@ fun LibraryScreen(navController: NavController, mainViewModel: MainViewModel, on
     var playlistName by remember { mutableStateOf("") }
     var showAddSongDialog by remember { mutableStateOf(false) }
     var selectedPlaylist by remember { mutableStateOf<String?>(null) }
-    var songTitle by remember { mutableStateOf("") }
     val duplicateError = remember { mutableStateOf(false) }
     val showBottomSheet = remember { mutableStateOf(false) }
-
     var showRenameDialog by remember { mutableStateOf(false) }
     var newPlaylistName by remember { mutableStateOf("") }
-    val profileImage by mainViewModel.profileImageUrl.collectAsState()
-    //var selectedFilter by remember { mutableStateOf("All") }
     val selectedFilter by viewModel.selectedFilter.collectAsState()
-
-
     val searchViewModel: SearchViewModel = viewModel()
     val searchText = remember { mutableStateOf(TextFieldValue("")) }
     val searchResults by searchViewModel.searchResults.collectAsState()
+    val homeViewModel: HomeViewModel = viewModel()
+    val isFullScreenState by homeViewModel.isFullScreen.collectAsState()
+
+
+    DisposableEffect(Unit) {
+        homeViewModel.setFullScreen(false) // ensure TopBar is restored
+        onDispose { }
+    }
+
+
 
     LaunchedEffect(searchText.value.text) {
         if (searchText.value.text.isBlank()) {
@@ -61,20 +66,17 @@ fun LibraryScreen(navController: NavController, mainViewModel: MainViewModel, on
     }
 
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(isFullScreenState) {
         mainViewModel.setTopBarContent {
-            Text(stringResource(R.string.Library_text), style = MaterialTheme.typography.headlineSmall)
+            if (!isFullScreenState) {
+                Text(stringResource(R.string.Library_text), style = MaterialTheme.typography.headlineSmall)
+            }
         }
-    }
-    LaunchedEffect(Unit) {
-        mainViewModel.setTopBarContent {
-            Text(stringResource(R.string.Library_text), style = MaterialTheme.typography.headlineSmall)
-        }
-        viewModel.fetchFilteredPlaylists("All")
     }
 
 
-    Box(modifier = Modifier.fillMaxSize().padding(top = 56.dp)) {
+
+    Box(modifier = Modifier.fillMaxSize().padding(top = if (isFullScreenState) 0.dp else 56.dp)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
