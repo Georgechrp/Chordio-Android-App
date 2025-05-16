@@ -83,6 +83,7 @@ import com.unipi.george.chordshub.utils.QRCodeDialog
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.MainViewModel
 import com.unipi.george.chordshub.viewmodels.main.LibraryViewModel
+import com.unipi.george.chordshub.viewmodels.seconds.SongViewModel
 import com.unipi.george.chordshub.viewmodels.seconds.TempPlaylistViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 import kotlinx.coroutines.delay
@@ -113,6 +114,7 @@ fun DetailedSongView(
     val userId = AuthRepository.getUserId()
     val songRepo = SongRepository(FirebaseFirestore.getInstance())
     val showAddToPlaylistDialog = remember { mutableStateOf(false) }
+    val songViewModel = remember { SongViewModel(SongRepository(FirebaseFirestore.getInstance())) }
 
 
     LaunchedEffect(isScrolling.value, scrollSpeed.floatValue) {
@@ -142,6 +144,13 @@ fun DetailedSongView(
 
         songState.value = songData
 
+        userId?.let { id ->
+            userViewModel.addRecentSong(id, songData.title ?: "Untitled")
+        }
+        // Καταγραφή view
+        songViewModel.registerSongView(songId)
+
+        // Προσθήκη στα πρόσφατα
         userId?.let { id ->
             userViewModel.addRecentSong(id, songData.title ?: "Untitled")
         }

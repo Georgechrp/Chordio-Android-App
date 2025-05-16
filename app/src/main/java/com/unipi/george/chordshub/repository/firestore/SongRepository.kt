@@ -253,4 +253,37 @@ class SongRepository(private val db: FirebaseFirestore) {
     }
 
 
+    suspend fun incrementSongViewCount(songId: String) {
+        try {
+            val songRef = db.collection("songs").document(songId)
+            db.runTransaction { transaction ->
+                val snapshot = transaction.get(songRef)
+                val currentCount = snapshot.getLong("viewsCount") ?: 0
+                transaction.update(songRef, "viewsCount", currentCount + 1)
+            }.await()
+            Log.d("Firestore", "✅ View count incremented for $songId")
+        } catch (e: Exception) {
+            Log.e("Firestore", "❌ Failed to increment view count: ${e.message}")
+        }
+    }
+
+    fun getTopSongs(limit: Int, callback: (List<Pair<String, String>>) -> Unit) {
+        db.collection("songs")
+            .orderBy("viewsCount", Query.Direction.DESCENDING)
+            .limit(limit.toLong())
+            .get()
+            .addOnSuccessListener { result ->
+                val songList = result.documents.mapNotNull { doc ->
+                    val title = doc.getString("title")
+                    val id = doc.id
+                    if (title != null) title to id else null
+                }
+                callback(songList)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Firestore", "❌ Error fetching top songs: ${exception.message}")
+                callback(emptyList())
+            }
+    }
+
 }

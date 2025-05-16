@@ -128,6 +128,31 @@ fun SearchScreen(
 
 
 @Composable
+fun TopSongsList(
+    topSongs: List<Pair<String, String>>,
+    onSongSelect: (String) -> Unit
+) {
+    if (topSongs.isNotEmpty()) {
+        Column {
+            Text(
+                text = "🔥 Δημοφιλέστερα Τραγούδια",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSecondary,
+                modifier = Modifier.padding(8.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                items(topSongs) { song ->
+                    SongCard(song = song, onSongSelect = onSongSelect)
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
 fun SearchContent(
     searchText: TextFieldValue,
     onSearchTextChange: (TextFieldValue) -> Unit,
@@ -137,6 +162,8 @@ fun SearchContent(
     isFullScreen: Boolean,
     randomSongs: List<Pair<String, String>>
 ) {
+    val topSongs by viewModel.topSongs.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -146,8 +173,11 @@ fun SearchContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         if (searchText.text.isEmpty()) {
-            RandomSongsList(randomSongs, onSongSelect)
+            TopSongsList(topSongs = topSongs, onSongSelect = onSongSelect)
             Spacer(modifier = Modifier.height(16.dp))
+
+            //RandomSongsList(randomSongs, onSongSelect)
+            //Spacer(modifier = Modifier.height(16.dp))
         }
 
         SearchResultsList(searchResults, onSongSelect)

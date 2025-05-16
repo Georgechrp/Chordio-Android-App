@@ -20,9 +20,20 @@ class SearchViewModel : ViewModel() {
     private val _randomSongs = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val randomSongs: StateFlow<List<Pair<String, String>>> = _randomSongs
 
+    private val _topSongs = MutableStateFlow<List<Pair<String, String>>>(emptyList())
+    val topSongs: StateFlow<List<Pair<String, String>>> = _topSongs
+
     init {
         fetchRandomSongs() // Φέρνουμε 5 τυχαία τραγούδια κατά την εκκίνηση
+        fetchTopSongs()
     }
+
+    fun fetchTopSongs(limit: Int = 5) {
+        songRepo.getTopSongs(limit) { songs ->
+            _topSongs.value = songs
+        }
+    }
+
 
     fun clearSearchResults() {
         _searchResults.value = emptyList() // Αδειάζει τη λίστα των αποτελεσμάτων

@@ -9,10 +9,15 @@ import java.net.URLEncoder
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import kotlinx.coroutines.launch
@@ -153,7 +158,6 @@ suspend fun searchWikipediaPage(artistName: String, lang: String): Pair<String?,
     }
 }
 
-
 @Composable
 fun ArtistImageOnly(
     artistName: String,
@@ -173,20 +177,27 @@ fun ArtistImageOnly(
         }
     }
 
-    Box(modifier = modifier) {
+    Box(
+        modifier = modifier
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+    ) {
         imageUrl?.let {
             Image(
                 painter = rememberImagePainter(it),
                 contentDescription = "Artist Image",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .aspectRatio(1f)
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
-        } ?: Box(
+        } ?: Icon(
+            imageVector = Icons.Default.Person,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
-                .fillMaxSize()
-                .aspectRatio(1f)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .size(36.dp)
+                .align(Alignment.Center)
         )
     }
 }
+
