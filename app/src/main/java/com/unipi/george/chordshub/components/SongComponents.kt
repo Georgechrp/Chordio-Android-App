@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import com.unipi.george.chordshub.R
@@ -40,10 +41,7 @@ fun CardsView(
     fontSize: TextUnit = 16.sp,
     onSongClick: ((songId: String) -> Unit)? = null
 ) {
-    val colors = listOf(
-        MaterialTheme.colorScheme.surface
-    )
-
+    val colors = listOf(MaterialTheme.colorScheme.surface)
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns),
@@ -56,26 +54,31 @@ fun CardsView(
         itemsIndexed(songList) { index, (title, songId) ->
             val backgroundColor = colors[index % colors.size]
             if (title != null) {
+                val parts = title.split(" - ")
+                val titleText = parts.first()
+                val artistText = if (parts.size > 1) parts[1] else null
+
                 if (songId.startsWith("artist:")) {
-                    val artistName = title
                     ArtistCardWithImage(
-                        artistName = artistName,
+                        artistName = titleText,
                         onClick = {
-                            Log.d("CardsView", "Selected artist: $artistName")
+                            Log.d("CardsView", "Selected artist: $titleText")
                             onSongClick?.invoke(songId)
                         }
                     )
                 } else {
                     SongCard(
-                        title = title,
+                        title = titleText,
+                        artistName = artistText,
                         backgroundColor = backgroundColor,
-                        cardHeight = cardHeight ?: 50.dp,
+                        cardHeight = cardHeight ?: 80.dp,
                         cardElevation = cardElevation,
                         cardPadding = cardPadding,
                         fontSize = fontSize,
                         onClick = {
                             Log.d("CardsView", "Selected song ID: $songId")
                             homeViewModel.selectSong(songId)
+                            homeViewModel.setSelectedSong(emptyList(), artistText)
                             selectedTitle.value = title
                             onSongClick?.invoke(songId)
                         }
@@ -83,13 +86,13 @@ fun CardsView(
                 }
             }
         }
-
     }
 }
 
 @Composable
 fun SongCard(
     title: String,
+    artistName: String? = null,
     backgroundColor: Color,
     cardHeight: Dp? = null,
     cardElevation: Dp = 8.dp,
@@ -101,36 +104,50 @@ fun SongCard(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (cardHeight != null) Modifier.height(cardHeight) else Modifier.aspectRatio(1f))
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(8.dp))
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = cardElevation),
         colors = CardDefaults.cardColors(containerColor = backgroundColor)
-
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(cardPadding),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Start
         ) {
             Text(
                 text = title,
                 fontSize = fontSize,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+
+            if (!artistName.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = artistName,
+                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
 
 
 
+
 @Composable
 fun ArtistCardWithImage(
     artistName: String,
-    cardHeight: Dp = 80.dp,
+    cardHeight: Dp = 60.dp,
     onClick: () -> Unit
 ) {
     Card(
@@ -138,7 +155,7 @@ fun ArtistCardWithImage(
             .fillMaxWidth()
             .height(cardHeight)
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
@@ -153,7 +170,7 @@ fun ArtistCardWithImage(
                 modifier = Modifier
                     .fillMaxHeight()
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
+                    .clip(RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp))
             )
 
             Spacer(modifier = Modifier.width(12.dp))

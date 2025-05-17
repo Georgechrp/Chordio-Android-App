@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import com.google.firebase.firestore.FirebaseFirestore
+import com.unipi.george.chordshub.models.song.SongCardItem
 import com.unipi.george.chordshub.repository.firestore.SearchRepository
 import com.unipi.george.chordshub.repository.firestore.SongRepository
 
@@ -20,8 +21,10 @@ class SearchViewModel : ViewModel() {
     private val _randomSongs = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val randomSongs: StateFlow<List<Pair<String, String>>> = _randomSongs
 
-    private val _topSongs = MutableStateFlow<List<Pair<String, String>>>(emptyList())
-    val topSongs: StateFlow<List<Pair<String, String>>> = _topSongs
+
+    private val _topSongs = MutableStateFlow<List<SongCardItem>>(emptyList())
+    val topSongs: StateFlow<List<SongCardItem>> = _topSongs
+
 
     init {
         fetchRandomSongs() // Φέρνουμε 5 τυχαία τραγούδια κατά την εκκίνηση

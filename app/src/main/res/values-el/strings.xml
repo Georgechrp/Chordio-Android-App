@@ -80,9 +80,9 @@
     <!-- HomeScreene -->
     <string name="unfortunately_text">Δυστυχώς, δεν υπάρχουν αποτελέσματα για αυτο το φίλτρο αυτη την στιγμή</string>
 
-
+    <!--   Search Screen    -->
     <string name="search_text">Αναζήτηση</string>"
-    <string name="Discover_something_new_text">Ανακαλύψτε κάτι νέο</string>
+    <string name="top_song">Δημοφιλέστερα τραγούδια</string>
     <string name="Are_u_looking_for_something_text">Ψάχνεις κάτι;</string>
 
     <string name="create_text">Δημιουργία</string>

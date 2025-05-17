@@ -94,7 +94,7 @@ fun ArtistScreen(artistName: String, navController: NavController) {
                 homeViewModel = homeViewModel,
                 selectedTitle = selectedTitle,
                 columns = 1,
-                cardHeight = 80.dp,
+                cardHeight = 60.dp,
                 cardElevation = 4.dp,
                 cardPadding = 12.dp,
                 gridPadding = 16.dp,

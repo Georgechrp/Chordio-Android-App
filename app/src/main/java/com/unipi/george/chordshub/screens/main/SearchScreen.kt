@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.R
+import com.unipi.george.chordshub.models.song.SongCardItem
 import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
 import com.unipi.george.chordshub.utils.QRCodeScannerButton
 import com.unipi.george.chordshub.viewmodels.main.SearchViewModel
@@ -129,27 +130,37 @@ fun SearchScreen(
 
 @Composable
 fun TopSongsList(
-    topSongs: List<Pair<String, String>>,
+    topSongs: List<SongCardItem>,
     onSongSelect: (String) -> Unit
 ) {
-    if (topSongs.isNotEmpty()) {
-        Column {
-            Text(
-                text = "🔥 Δημοφιλέστερα Τραγούδια",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSecondary,
-                modifier = Modifier.padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+    Column {
+        Text(
+            text = stringResource(R.string.top_song),
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSecondary,
+            modifier = Modifier.padding(8.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(topSongs) { song ->
-                    SongCard(song = song, onSongSelect = onSongSelect)
-                }
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(topSongs) { song ->
+                com.unipi.george.chordshub.components.SongCard(
+                    title = song.title,
+                    artistName = song.artist,
+                    backgroundColor = MaterialTheme.colorScheme.surface,
+                    cardHeight = 80.dp,
+                    onClick = { onSongSelect(song.id) }
+                )
             }
         }
+
     }
 }
+
+
 
 
 @Composable
@@ -173,7 +184,8 @@ fun SearchContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         if (searchText.text.isEmpty()) {
-            TopSongsList(topSongs = topSongs, onSongSelect = onSongSelect)
+            TopSongsList(topSongs, onSongSelect)
+            //TopSongsList(topSongs = topSongs, onSongSelect = onSongSelect)
             Spacer(modifier = Modifier.height(16.dp))
 
             //RandomSongsList(randomSongs, onSongSelect)
@@ -191,7 +203,7 @@ fun RandomSongsList(
 ) {
     Column {
         Text(
-            text = stringResource(R.string.Discover_something_new_text),
+            text = stringResource(R.string.top_song),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSecondary,
             modifier = Modifier.padding(8.dp)

@@ -180,7 +180,6 @@ fun ArtistImageOnly(
     Box(
         modifier = modifier
             .aspectRatio(1f)
-            .clip(RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
     ) {
         imageUrl?.let {

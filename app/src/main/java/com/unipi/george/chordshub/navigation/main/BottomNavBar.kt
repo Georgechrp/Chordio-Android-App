@@ -21,11 +21,12 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.res.colorResource
 import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.navigation.AppScreens
+import com.unipi.george.chordshub.ui.theme.BottomNavBackground
 
- /*
+/*
 *   Main Navigate between Home, Search, Library
 *   Hide the bar when the screen is full-screen
- */
+*/
 
 @Composable
 fun BottomNavBar(
@@ -44,7 +45,7 @@ fun BottomNavBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(58.dp),
-            color = MaterialTheme.colorScheme.background.copy(alpha = 0.9f),
+            color = BottomNavBackground,
             shape = RoundedCornerShape(20.dp),
             shadowElevation = 20.dp,
             tonalElevation = 0.dp

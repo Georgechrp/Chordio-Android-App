@@ -12,3 +12,8 @@ data class Song(
 )
 
 
+data class SongCardItem(
+    val title: String,
+    val artist: String,
+    val id: String
+)

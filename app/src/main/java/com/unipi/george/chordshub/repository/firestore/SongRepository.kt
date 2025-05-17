@@ -8,6 +8,7 @@ import com.google.firebase.firestore.Query
 import com.unipi.george.chordshub.models.song.ChordPosition
 import com.unipi.george.chordshub.models.song.FirestoreSongDTO
 import com.unipi.george.chordshub.models.song.Song
+import com.unipi.george.chordshub.models.song.SongCardItem
 import com.unipi.george.chordshub.models.song.SongLine
 import kotlinx.coroutines.tasks.await
 
@@ -20,9 +21,12 @@ class SongRepository(private val db: FirebaseFirestore) {
                 val titlesAndIds = mutableListOf<Pair<String, String>>()
                 for (document in result) {
                     val title = document.getString("title")
+                    val artist = document.getString("artist") ?: ""
                     val id = document.id
+
+
                     if (title != null && id != null) {
-                        titlesAndIds.add(Pair(title, id))
+                        titlesAndIds.add(Pair("$title - $artist", id))
                     }
                 }
                 callback(titlesAndIds)
@@ -125,10 +129,11 @@ class SongRepository(private val db: FirebaseFirestore) {
             .addOnSuccessListener { result ->
                 val songList = result.documents.mapNotNull { doc ->
                     val title = doc.getString("title")
+                    val artist = doc.getString("artist") ?: ""
                     val id = doc.id
                     val genres = doc.get("genres") as? List<String>
                     println("Genres for song $title: $genres")
-                    if (title != null) title to id else null
+                    if (title != null) "$title - $artist" to id else null
                 }
                 println("🔥 Firestore returned ${songList.size} results for filter: $filter")
                 callback(songList)
@@ -267,7 +272,7 @@ class SongRepository(private val db: FirebaseFirestore) {
         }
     }
 
-    fun getTopSongs(limit: Int, callback: (List<Pair<String, String>>) -> Unit) {
+    fun getTopSongs(limit: Int, callback: (List<SongCardItem>) -> Unit) {
         db.collection("songs")
             .orderBy("viewsCount", Query.Direction.DESCENDING)
             .limit(limit.toLong())
@@ -275,8 +280,9 @@ class SongRepository(private val db: FirebaseFirestore) {
             .addOnSuccessListener { result ->
                 val songList = result.documents.mapNotNull { doc ->
                     val title = doc.getString("title")
+                    val artist = doc.getString("artist") ?: "Άγνωστος Καλλιτέχνης"
                     val id = doc.id
-                    if (title != null) title to id else null
+                    if (title != null) SongCardItem(title, artist, id) else null
                 }
                 callback(songList)
             }
@@ -285,5 +291,6 @@ class SongRepository(private val db: FirebaseFirestore) {
                 callback(emptyList())
             }
     }
+
 
 }
