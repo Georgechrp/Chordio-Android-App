@@ -64,7 +64,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -116,13 +115,16 @@ fun DetailedSongView(
     val showAddToPlaylistDialog = remember { mutableStateOf(false) }
     val songViewModel = remember { SongViewModel(SongRepository(FirebaseFirestore.getInstance())) }
 
-
     LaunchedEffect(isScrolling.value, scrollSpeed.floatValue) {
         while (isScrolling.value) {
             val step = (scrollSpeed.floatValue / 10).coerceIn(1f, 20f)
             listState.animateScrollBy(step)
             delay((1000 / scrollSpeed.floatValue).toLong())
         }
+    }
+
+    LaunchedEffect(songId) {
+       // songRepo.addSampleSongs()
     }
 
     LaunchedEffect(songId) {
@@ -137,8 +139,8 @@ fun DetailedSongView(
         }
 
         if (songData == null) {
-            Log.e("DetailedSongView", "❌ Song not found. Triggering back.")
-            onBack()  // <-- Αυτό επιστρέφει πίσω αν δεν βρέθηκε τραγούδι
+            Log.e("DetailedSongView", " Song not found. Triggering back.")
+            onBack()
             return@LaunchedEffect
         }
 
@@ -173,9 +175,10 @@ fun DetailedSongView(
         Log.d("TransposeTest", "Saved transpose value: ${transposeValue.value} for songId: $songId")
 
     }
-    LaunchedEffect(Unit) {
-        homeViewModel.setFullScreen(false) // reset όταν ανοίγει η Library
+    LaunchedEffect(isFullScreenState) {
+        homeViewModel.setFullScreen(isFullScreenState)
     }
+
 
     BackHandler {
         if (isFullScreenState) {
@@ -351,6 +354,9 @@ fun DetailedSongView(
             }
         }
     }
+
+
+
 }
 
 

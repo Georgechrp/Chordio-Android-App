@@ -11,36 +11,17 @@ class PlaylistRepository(private val db: FirebaseFirestore) {
 
         val newPlaylist = hashMapOf(
             "name" to playlistName,
-            "songs" to emptyList<String>() // Κενή λίστα τραγουδιών αρχικά
+            "songs" to emptyList<String>()
         )
 
         userDocRef.update("playlists", FieldValue.arrayUnion(newPlaylist))
             .addOnSuccessListener {
-                Log.d("Firestore", "✅ Playlist '$playlistName' created successfully.")
+                Log.d("Firestore", "Playlist '$playlistName' created successfully.")
                 callback(true)
             }
             .addOnFailureListener { e ->
-                Log.e("Firestore", "❌ Error creating playlist: ${e.message}")
+                Log.e("Firestore", "Error creating playlist: ${e.message}")
                 callback(false)
-            }
-    }
-
-    fun getUserPlaylists(userId: String, callback: (List<String>) -> Unit) {
-        val userDocRef = db.collection("users").document(userId)
-
-        userDocRef.get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val playlists = document.get("playlists") as? List<Map<String, Any>>
-                    val playlistNames = playlists?.map { it["name"] as? String ?: "Άγνωστη Playlist" } ?: emptyList()
-                    callback(playlistNames)
-                } else {
-                    callback(emptyList())
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("Firestore", "❌ Error fetching playlists: ${e.message}")
-                callback(emptyList())
             }
     }
 
@@ -65,11 +46,10 @@ class PlaylistRepository(private val db: FirebaseFirestore) {
                 }
             }
             .addOnFailureListener { e ->
-                Log.e("Firestore", "❌ Error fetching playlists with songs: ${e.message}")
+                Log.e("Firestore", "Error fetching playlists with songs: ${e.message}")
                 callback(emptyMap())
             }
     }
-
 
     fun addSongToPlaylist(userId: String, playlistName: String, songTitle: String, callback: (Boolean) -> Unit) {
         val userDocRef = db.collection("users").document(userId)
@@ -152,7 +132,6 @@ class PlaylistRepository(private val db: FirebaseFirestore) {
             .addOnFailureListener { callback(false) }
     }
 
-
     fun renamePlaylist(userId: String, oldName: String, newName: String, callback: (Boolean) -> Unit) {
         val userDocRef = db.collection("users").document(userId)
 
@@ -172,8 +151,5 @@ class PlaylistRepository(private val db: FirebaseFirestore) {
             }
             .addOnFailureListener { callback(false) }
     }
-
-
-
 
 }

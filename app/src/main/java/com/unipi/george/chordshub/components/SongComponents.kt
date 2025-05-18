@@ -17,11 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
-import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.utils.ArtistImageOnly
 
 /*
@@ -47,6 +45,7 @@ fun CardsView(
         columns = GridCells.Fixed(columns),
         modifier = Modifier
             .fillMaxSize()
+            .heightIn(min = 100.dp, max = 600.dp)
             .padding(gridPadding),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -140,8 +139,6 @@ fun SongCard(
         }
     }
 }
-
-
 
 
 @Composable

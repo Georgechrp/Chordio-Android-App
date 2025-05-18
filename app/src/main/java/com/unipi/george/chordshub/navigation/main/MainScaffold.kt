@@ -3,7 +3,6 @@ package com.unipi.george.chordshub.navigation.main
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -64,14 +63,10 @@ fun MainScaffold(
                 profileImageUrl = profileImageUrl
             )
 
-            // TopBar moved INSIDE the Box
             if (currentRoute in topBarScreens && !isFullScreen) {
                 MyAppTopBar(
                     imageUrl = profileImageUrl,
-                    onMenuClick = { mainViewModel.setMenuOpen(true) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .zIndex(1f)
+                    onMenuClick = { mainViewModel.setMenuOpen(true) }
                 ) {
                     topBarContent?.invoke(this)
                 }

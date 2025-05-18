@@ -25,13 +25,35 @@ class SearchViewModel : ViewModel() {
     private val _topSongs = MutableStateFlow<List<SongCardItem>>(emptyList())
     val topSongs: StateFlow<List<SongCardItem>> = _topSongs
 
+    private val _genres = MutableStateFlow<List<String>>(emptyList())
+    val genres: StateFlow<List<String>> = _genres
 
-    init {
-        fetchRandomSongs() // Φέρνουμε 5 τυχαία τραγούδια κατά την εκκίνηση
-        fetchTopSongs()
+    private fun fetchGenres() {
+        songRepo.getGenres { genreList ->
+            _genres.value = genreList
+        }
+    }
+    fun searchByGenre(genre: String) {
+        songRepo.getSongsByGenre(genre) { songs ->
+            _searchResults.value = songs.map { (titleArtist, id) ->
+                val parts = titleArtist.split(" - ")
+                val title = parts.getOrNull(0) ?: titleArtist
+                val artist = parts.getOrNull(1) ?: "Άγνωστος"
+                Triple(title, artist, genre)
+            }
+        }
     }
 
-    fun fetchTopSongs(limit: Int = 5) {
+
+
+
+    init {
+        fetchRandomSongs()
+        fetchTopSongs()
+        fetchGenres()
+    }
+
+    private fun fetchTopSongs(limit: Int = 5) {
         songRepo.getTopSongs(limit) { songs ->
             _topSongs.value = songs
         }
@@ -39,7 +61,7 @@ class SearchViewModel : ViewModel() {
 
 
     fun clearSearchResults() {
-        _searchResults.value = emptyList() // Αδειάζει τη λίστα των αποτελεσμάτων
+        _searchResults.value = emptyList()
     }
 
     fun searchSongs(query: String) {

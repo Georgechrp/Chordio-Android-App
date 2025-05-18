@@ -2,7 +2,6 @@ package com.unipi.george.chordshub.screens.main
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,8 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
@@ -23,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.R
+import com.unipi.george.chordshub.components.CardsView
 import com.unipi.george.chordshub.models.song.SongCardItem
 import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
 import com.unipi.george.chordshub.utils.QRCodeScannerButton
@@ -129,41 +127,6 @@ fun SearchScreen(
 
 
 @Composable
-fun TopSongsList(
-    topSongs: List<SongCardItem>,
-    onSongSelect: (String) -> Unit
-) {
-    Column {
-        Text(
-            text = stringResource(R.string.top_song),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onSecondary,
-            modifier = Modifier.padding(8.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(topSongs) { song ->
-                com.unipi.george.chordshub.components.SongCard(
-                    title = song.title,
-                    artistName = song.artist,
-                    backgroundColor = MaterialTheme.colorScheme.surface,
-                    cardHeight = 80.dp,
-                    onClick = { onSongSelect(song.id) }
-                )
-            }
-        }
-
-    }
-}
-
-
-
-
-@Composable
 fun SearchContent(
     searchText: TextFieldValue,
     onSearchTextChange: (TextFieldValue) -> Unit,
@@ -174,101 +137,84 @@ fun SearchContent(
     randomSongs: List<Pair<String, String>>
 ) {
     val topSongs by viewModel.topSongs.collectAsState()
+    val genres by viewModel.genres.collectAsState()
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(if (isFullScreen) 0.dp else 16.dp)
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SearchBar(searchText, onSearchTextChange, viewModel)
-        Spacer(modifier = Modifier.height(8.dp))
+        // SearchBar
+        item {
+            SearchBar(searchText, onSearchTextChange, viewModel)
+        }
 
+        // Only show TopSongs & Genres when no search query
         if (searchText.text.isEmpty()) {
-            TopSongsList(topSongs, onSongSelect)
-            //TopSongsList(topSongs = topSongs, onSongSelect = onSongSelect)
-            Spacer(modifier = Modifier.height(16.dp))
-
-            //RandomSongsList(randomSongs, onSongSelect)
-            //Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        SearchResultsList(searchResults, onSongSelect)
-    }
-}
-
-@Composable
-fun RandomSongsList(
-    randomSongs: List<Pair<String, String>>,
-    onSongSelect: (String) -> Unit
-) {
-    Column {
-        Text(
-            text = stringResource(R.string.top_song),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onSecondary,
-            modifier = Modifier.padding(8.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(randomSongs) { song ->
-                SongCard(song, onSongSelect)
-            }
-        }
-    }
-}
-
-@Composable
-fun SongCard(song: Pair<String, String>, onSongSelect: (String) -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp, horizontal = 12.dp)
-            .clickable { onSongSelect(song.second) },
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-
-
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_music_note),
-                contentDescription = "Music Icon",
-                modifier = Modifier
-                    .size(40.dp)
-                    .padding(end = 12.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-
-            Column(modifier = Modifier.weight(1f)) {
+            item {
                 Text(
-                    text = song.first,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
+                    text = stringResource(R.string.top_song),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
             }
 
-            Icon(
-                painter = painterResource(id = R.drawable.next),
-                contentDescription = "Go to song",
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            items(topSongs) { song ->
+                com.unipi.george.chordshub.components.SongCard(
+                    title = song.title,
+                    artistName = song.artist,
+                    backgroundColor = MaterialTheme.colorScheme.surface,
+                    cardHeight = 80.dp,
+                    onClick = { onSongSelect(song.id) }
+                )
+            }
+
+            if (genres.isNotEmpty()) {
+                item {
+                    Text(
+                        text = "Discover something new 🎧",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSecondary,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                    )
+                }
+
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 100.dp, max = 600.dp)
+                    ) {
+                        CardsView(
+                            songList = genres.map { genre -> genre to "genre:$genre" },
+                            homeViewModel = remember { HomeViewModel() },
+                            selectedTitle = remember { mutableStateOf<String?>(null) },
+                            columns = 2,
+                            onSongClick = { genreId ->
+                                viewModel.searchByGenre(genreId.removePrefix("genre:"))
+                            }
+                        )
+                    }
+                }
+
+            }
+        }
+
+        // Search Results
+        items(searchResults) { song ->
+            ListItem(
+                modifier = Modifier.clickable { onSongSelect(song.second) },
+                headlineContent = { Text(song.first, color = MaterialTheme.colorScheme.onSurface) },
+                supportingContent = {
+                    Text("Καλλιτέχνης: ${song.second}\n🔍 Αντιστοίχιση: ${song.third}")
+                }
             )
         }
     }
+    Spacer(modifier = Modifier.height(16.dp))
 }
+
 
 @Composable
 fun SearchBar(
@@ -296,22 +242,4 @@ fun SearchBar(
             //QRCodeScannerButton(viewModel)
         }
     )
-}
-
-
-
-@Composable
-fun SearchResultsList(
-    searchResults: List<Triple<String, String, String>>,
-    onSongSelect: (String) -> Unit
-) {
-    LazyColumn {
-        items(searchResults) { song ->
-            ListItem(
-                modifier = Modifier.clickable { onSongSelect(song.second) },
-                headlineContent = { Text(song.first, color = MaterialTheme.colorScheme.onSurface)  },
-                supportingContent = { Text("Καλλιτέχνης: ${song.second}\n🔍 Αντιστοίχιση: ${song.third}") }
-            )
-        }
-    }
 }

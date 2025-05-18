@@ -2,7 +2,6 @@ package com.unipi.george.chordshub.navigation.main
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.*
-import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -11,7 +10,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.google.firebase.firestore.FirebaseFirestore
-import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.navigation.AppScreens
 import com.unipi.george.chordshub.repository.AuthRepository
 import com.unipi.george.chordshub.repository.AuthRepository.fullNameState
@@ -66,7 +64,6 @@ fun MainNavGraph(
     val appSettingsPreferences = AppSettingsPreferences(navController.context)
     val settingsViewModel = SettingsViewModel(appSettingsPreferences)
     val isMenuOpen by mainViewModel.isMenuOpen
-    val painter = painterResource(id = R.drawable.user_icon)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val repository = TempPlaylistRepository(FirebaseFirestore.getInstance())
     val factory = TempPlaylistViewModelFactory(repository)
@@ -173,8 +170,6 @@ fun MainNavGraph(
             )
         }
 
-
-
         composable("playlist_detail/{playlistName}") { backStackEntry ->
             val name = backStackEntry.arguments?.getString("playlistName") ?: return@composable
             PlaylistDetailScreen(
@@ -187,7 +182,6 @@ fun MainNavGraph(
                 navController = navController
             )
         }
-
 
         composable("temp_playlist") {
             TempPlaylistManagerScreen(
@@ -203,9 +197,5 @@ fun MainNavGraph(
             )
         }
 
-
-
     }
-
-    //ProfileMenu(mainViewModel, navController = navController)
 }

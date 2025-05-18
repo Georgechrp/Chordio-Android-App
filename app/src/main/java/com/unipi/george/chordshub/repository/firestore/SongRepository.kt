@@ -1,8 +1,6 @@
 package com.unipi.george.chordshub.repository.firestore
 
 import android.util.Log
-import com.google.android.gms.tasks.Tasks
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.unipi.george.chordshub.models.song.ChordPosition
@@ -13,29 +11,6 @@ import com.unipi.george.chordshub.models.song.SongLine
 import kotlinx.coroutines.tasks.await
 
 class SongRepository(private val db: FirebaseFirestore) {
-
-    fun getSongTitles(callback: (List<Pair<String, String>>) -> Unit) {
-        db.collection("songs")
-            .get()
-            .addOnSuccessListener { result ->
-                val titlesAndIds = mutableListOf<Pair<String, String>>()
-                for (document in result) {
-                    val title = document.getString("title")
-                    val artist = document.getString("artist") ?: ""
-                    val id = document.id
-
-
-                    if (title != null && id != null) {
-                        titlesAndIds.add(Pair("$title - $artist", id))
-                    }
-                }
-                callback(titlesAndIds)
-            }
-            .addOnFailureListener { exception ->
-                println("Error getting documents: $exception")
-                callback(emptyList())
-            }
-    }
 
     suspend fun getSongDataAsync(songId: String): Song? {
         Log.d("Firestore", "Fetching song data for ID: $songId")
@@ -161,46 +136,6 @@ class SongRepository(private val db: FirebaseFirestore) {
             }
     }
 
-    fun getSongsByArtist(artistName: String, callback: (List<Song>) -> Unit) {
-        val db = FirebaseFirestore.getInstance()
-
-        db.collection("artists")
-            .document(artistName)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val songIds = document.get("songs") as? List<String>
-                    if (!songIds.isNullOrEmpty()) {
-                        // Fetch each song by its ID
-                        val songs = mutableListOf<Song>()
-                        val tasks = songIds.map { songId ->
-                            db.collection("songs").document(songId).get()
-                        }
-
-                        Tasks.whenAllSuccess<DocumentSnapshot>(tasks)
-                            .addOnSuccessListener { snapshots ->
-                                for (snapshot in snapshots) {
-                                    snapshot.toObject(Song::class.java)?.let { songs.add(it) }
-                                }
-                                callback(songs)
-                            }
-                            .addOnFailureListener { e ->
-                                println("Error fetching song documents: $e")
-                                callback(emptyList())
-                            }
-                    } else {
-                        callback(emptyList())
-                    }
-                } else {
-                    callback(emptyList())
-                }
-            }
-            .addOnFailureListener { e ->
-                println("Error fetching artist document: $e")
-                callback(emptyList())
-            }
-    }
-
     fun getSongsByArtistName(artistName: String, callback: (List<Song>) -> Unit) {
         val db = FirebaseFirestore.getInstance()
 
@@ -241,7 +176,6 @@ class SongRepository(private val db: FirebaseFirestore) {
             }
     }
 
-
     suspend fun getSongByTitle(title: String): Song? {
         return try {
             val querySnapshot = db.collection("songs")
@@ -256,7 +190,6 @@ class SongRepository(private val db: FirebaseFirestore) {
             null
         }
     }
-
 
     suspend fun incrementSongViewCount(songId: String) {
         try {
@@ -290,6 +223,87 @@ class SongRepository(private val db: FirebaseFirestore) {
                 Log.e("Firestore", "❌ Error fetching top songs: ${exception.message}")
                 callback(emptyList())
             }
+    }
+
+    fun getGenres(onResult: (List<String>) -> Unit) {
+        db.collection("songs")
+            .get()
+            .addOnSuccessListener { documents ->
+                val genres = documents
+                    .mapNotNull { it.get("genres") as? List<String> }
+                    .flatten()
+                    .toSet()
+                    .toList()
+                Log.d("Firestore", "✅ Genres fetched: $genres")
+                onResult(genres)
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "❌ Failed to fetch genres: ${e.message}")
+                onResult(emptyList())
+            }
+    }
+
+    fun getSongsByGenre(genre: String, callback: (List<Pair<String, String>>) -> Unit) {
+        db.collection("songs")
+            .whereArrayContains("genres", genre)
+            .get()
+            .addOnSuccessListener { result ->
+                val songs = result.documents.mapNotNull { doc ->
+                    val title = doc.getString("title")
+                    val artist = doc.getString("artist") ?: ""
+                    val id = doc.id
+                    if (title != null) "$title - $artist" to id else null
+                }
+                Log.d("Firestore", "✅ Found ${songs.size} songs for genre: $genre")
+                callback(songs)
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "❌ Failed to fetch songs for genre $genre: ${e.message}")
+                callback(emptyList())
+            }
+    }
+
+    suspend fun addSampleSongs() {
+        val sampleSongs = listOf(
+
+            Song(
+                title = "Let Her Go",
+                artist = "Passenger",
+                key = "C",
+                bpm = 75,
+                genres = listOf("Folk", "Acoustic"),
+                createdAt = System.currentTimeMillis().toString(),
+                creatorId = "admin",
+                lyrics = listOf(
+                    SongLine(1, "Well you only need the light when it's burning low", listOf()),
+                    SongLine(2, "Only miss the sun when it starts to snow", listOf()),
+                    SongLine(3, "Only know you love her when you let her go", listOf())
+                )
+            )
+           ,
+            Song(
+                title = "Raging Fire",
+                artist = "Iron Claw",
+                key = "E",
+                bpm = 190,
+                genres = listOf("Thrash Metal", "Metal"),
+                createdAt = System.currentTimeMillis().toString(),
+                creatorId = "admin",
+                lyrics = listOf(
+                    SongLine(1, "Screaming thunder cracks the sky,", chords = listOf(ChordPosition("E5", 0))),
+                    SongLine(2, "Blazing steel, we ride or die,", chords = listOf(ChordPosition("C5", 1))),
+                    SongLine(3, "No remorse, no turning back,", chords = listOf(ChordPosition("D5", 2))),
+                    SongLine(4, "We attack, we attack!", chords = listOf(ChordPosition("E5", 3))),
+                    SongLine(5, "🔥 Raging fire inside our veins,", chords = emptyList()),
+                    SongLine(6, "Burning madness breaks the chains!", chords = emptyList())
+                )
+            )
+        )
+
+        sampleSongs.forEachIndexed { index, song ->
+            val id = db.collection("songs").document().id
+            addSongData(id, song)
+        }
     }
 
 

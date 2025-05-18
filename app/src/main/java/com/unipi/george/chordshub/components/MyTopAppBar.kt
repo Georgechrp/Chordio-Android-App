@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.sp
 fun MyAppTopBar(
     imageUrl: String?,
     onMenuClick: () -> Unit,
-    modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
     TopAppBar(

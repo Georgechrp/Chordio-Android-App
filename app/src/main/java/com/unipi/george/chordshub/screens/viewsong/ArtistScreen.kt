@@ -45,10 +45,9 @@ fun ArtistScreen(artistName: String, navController: NavController) {
         }
     }
 
-
-
     // Show DetailedSongView if a song is selected
     if (selectedSongId.value != null) {
+
         DetailedSongView(
             songId = selectedSongId.value!!,
             isFullScreenState = false,
@@ -100,8 +99,11 @@ fun ArtistScreen(artistName: String, navController: NavController) {
                 gridPadding = 16.dp,
                 fontSize = 16.sp,
                 onSongClick = { clickedTitle ->
+                    homeViewModel.clearSelectedSong()
+                    homeViewModel.setFullScreen(true)
                     selectedSongId.value = clickedTitle
                 }
+
             )
 
         }

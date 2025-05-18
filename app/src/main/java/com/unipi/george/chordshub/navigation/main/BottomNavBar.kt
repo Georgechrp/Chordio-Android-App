@@ -18,8 +18,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.ui.res.colorResource
-import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.navigation.AppScreens
 import com.unipi.george.chordshub.ui.theme.BottomNavBackground
 

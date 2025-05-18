@@ -45,7 +45,7 @@ fun RootAppEntry(sessionViewModel: SessionViewModel) {
     val isLoading = remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        delay(2000) // ή 3000L
+        delay(2000) // 3000
         AuthRepository.getUserId()?.let {
             storageViewModel.loadProfileImage(it)
         }

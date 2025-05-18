@@ -1,16 +1,9 @@
 package com.unipi.george.chordshub.repository.firestore
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.FirebaseFirestore
-import com.unipi.george.chordshub.models.song.Song
 
 class SearchRepository(private val db: FirebaseFirestore) {
-
-    private val _songs = MutableLiveData<List<Song>>()
-    val songs: LiveData<List<Song>> = _songs
-
 
     fun searchSongs(query: String, callback: (List<Triple<String, String, String>>) -> Unit) {
         if (query.isEmpty()) {

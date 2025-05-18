@@ -10,7 +10,6 @@ import com.unipi.george.chordshub.screens.auth.LoginScreen
 import com.unipi.george.chordshub.screens.auth.SignUpScreen
 import com.unipi.george.chordshub.repository.AuthRepository
 import com.unipi.george.chordshub.screens.auth.ForgotPasswordScreen
-import com.unipi.george.chordshub.screens.auth.welcomeuser.WelcomeScreen
 
 /*
 *   Navigates between the login, sign up & forgot password screens
@@ -38,8 +37,5 @@ fun AuthNav(
         composable(AppScreens.ForgotPassword.route) {
             ForgotPasswordScreen(authRepository = AuthRepository, onBack = { navController.popBackStack() })
         }
-       /* composable(AppScreens.Welcome.route) {
-            WelcomeScreen(navController, sessionViewModel)
-        }*/
     }
 }
