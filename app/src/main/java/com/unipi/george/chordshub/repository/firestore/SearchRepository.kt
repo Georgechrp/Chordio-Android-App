@@ -38,7 +38,7 @@ class SearchRepository(private val db: FirebaseFirestore) {
                 callback(results)
             }
             .addOnFailureListener { exception ->
-                Log.e("Firestore", "❌ Error fetching search results: ${exception.message}")
+                Log.e("Firestore", " Error fetching search results: ${exception.message}")
                 callback(emptyList())
             }
     }

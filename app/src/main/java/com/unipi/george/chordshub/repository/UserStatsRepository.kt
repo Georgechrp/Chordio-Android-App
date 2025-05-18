@@ -21,7 +21,7 @@ class UserStatsRepository(private val db: FirebaseFirestore) {
         }.addOnSuccessListener {
             Log.d("Firestore", "✅ $field updated successfully for user $userId")
         }.addOnFailureListener { e ->
-            Log.e("Firestore", "❌ Error updating $field", e)
+            Log.e("Firestore", "Error updating $field", e)
         }
     }
 
@@ -48,7 +48,7 @@ class UserStatsRepository(private val db: FirebaseFirestore) {
                 Log.d("Firestore", "✅ Last login updated for user $userId")
             }
             .addOnFailureListener { e ->
-                Log.e("Firestore", "❌ Error updating last login", e)
+                Log.e("Firestore", "Error updating last login", e)
             }
     }
 
@@ -65,7 +65,7 @@ class UserStatsRepository(private val db: FirebaseFirestore) {
         }.addOnSuccessListener {
             Log.d("Firestore", "✅ Total time spent updated successfully for user $userId")
         }.addOnFailureListener { e ->
-            Log.e("Firestore", "❌ Error updating total time spent", e)
+            Log.e("Firestore", "Error updating total time spent", e)
         }
     }
 
@@ -83,12 +83,12 @@ class UserStatsRepository(private val db: FirebaseFirestore) {
                             Log.d("Firestore", "✅ Added totalTimeSpent = 0 for user $userId")
                         }
                         .addOnFailureListener { e ->
-                            Log.e("Firestore", "❌ Error adding totalTimeSpent", e)
+                            Log.e("Firestore", " Error adding totalTimeSpent", e)
                         }
                 }
             }
             .addOnFailureListener { e ->
-                Log.e("Firestore", "❌ Error fetching user document", e)
+                Log.e("Firestore", " Error fetching user document", e)
             }
     }
 
@@ -149,7 +149,7 @@ class UserStatsRepository(private val db: FirebaseFirestore) {
                 userStatsRef.set(initialStats, SetOptions.merge())
             }
         }.addOnFailureListener { e ->
-            println("❌ Σφάλμα κατά την ενημέρωση: ${e.message}")
+            println(" Σφάλμα κατά την ενημέρωση: ${e.message}")
         }
     }
 

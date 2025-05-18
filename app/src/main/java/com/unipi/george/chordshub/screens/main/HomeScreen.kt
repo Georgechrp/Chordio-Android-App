@@ -5,6 +5,8 @@ import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -121,7 +123,10 @@ fun HomeScreen(
             .nestedScroll(nestedScrollConnection)
             .background(MaterialTheme.colorScheme.background)
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
             if (selectedSongId == null) {
                 Box(
                     modifier = Modifier
@@ -154,13 +159,13 @@ fun HomeScreen(
                                     navController.navigate("artist/${Uri.encode(artist)}")
                                 }
                             )
-                        }
-                        else {
+                        } else {
                             val combinedList = if (selectedFilter == "All")
                                 artistList.take(6).map { it to "artist:$it" } + songList
                             else
                                 songList
 
+                        Box(modifier = Modifier.padding(bottom = 40.dp)) {
 
                             CardsView(
                                 songList = combinedList,
@@ -176,6 +181,7 @@ fun HomeScreen(
                                 }
                             )
                         }
+                    }
                     }
 
                     else -> {

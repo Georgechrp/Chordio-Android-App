@@ -8,6 +8,7 @@ import com.unipi.george.chordshub.models.song.FirestoreSongDTO
 import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.models.song.SongCardItem
 import com.unipi.george.chordshub.models.song.SongLine
+import com.unipi.george.chordshub.models.song.generateChordLine
 import kotlinx.coroutines.tasks.await
 
 class SongRepository(private val db: FirebaseFirestore) {
@@ -18,7 +19,7 @@ class SongRepository(private val db: FirebaseFirestore) {
         return try {
             val document = db.collection("songs").document(songId).get().await()
             if (!document.exists()) {
-                Log.e("Firestore", "❌ No song found with ID: $songId")
+                Log.e("Firestore", "No song found with ID: $songId")
                 return null
             }
 
@@ -56,7 +57,7 @@ class SongRepository(private val db: FirebaseFirestore) {
                 lyrics = lyrics
             )
         } catch (e: Exception) {
-            Log.e("Firestore", "❌ Firestore Error: ${e.message}")
+            Log.e("Firestore", " Firestore Error: ${e.message}")
             return null
         }
     }
@@ -85,7 +86,7 @@ class SongRepository(private val db: FirebaseFirestore) {
             db.collection("songs").document(songId).set(songMap).await()
             Log.d("Firestore", "✅ Song added successfully: $songId")
         } catch (e: Exception) {
-            Log.e("Firestore", "❌ Error adding song", e)
+            Log.e("Firestore", " Error adding song", e)
         }
     }
 
@@ -114,7 +115,7 @@ class SongRepository(private val db: FirebaseFirestore) {
                 callback(songList)
             }
             .addOnFailureListener { exception ->
-                println("❌ Firestore error: ${exception.message}")
+                println(" Firestore error: ${exception.message}")
             }
     }
 
@@ -131,7 +132,7 @@ class SongRepository(private val db: FirebaseFirestore) {
                 callback(songList)
             }
             .addOnFailureListener { exception ->
-                Log.e("Firestore", "❌ Error fetching random songs: ${exception.message}")
+                Log.e("Firestore", "Error fetching random songs: ${exception.message}")
                 callback(emptyList())
             }
     }
@@ -148,14 +149,14 @@ class SongRepository(private val db: FirebaseFirestore) {
                     try {
                         it.toObject(FirestoreSongDTO::class.java).toSong()
                     } catch (e: Exception) {
-                        println("❌ Error parsing song: ${e.localizedMessage}")
+                        println("Error parsing song: ${e.localizedMessage}")
                         null
                     }
                 }
                 callback(songs)
             }
             .addOnFailureListener { e ->
-                println("❌ Firebase query failed: $e")
+                println("Firebase query failed: $e")
                 callback(emptyList())
             }
     }
@@ -171,7 +172,7 @@ class SongRepository(private val db: FirebaseFirestore) {
                 callback(artists)
             }
             .addOnFailureListener { e ->
-                println("❌ Failed to fetch artists: $e")
+                println(" Failed to fetch artists: $e")
                 callback(emptyList())
             }
     }
@@ -186,7 +187,7 @@ class SongRepository(private val db: FirebaseFirestore) {
             val document = querySnapshot.documents.firstOrNull()
             document?.toObject(FirestoreSongDTO::class.java)?.toSong()
         } catch (e: Exception) {
-            Log.e("Firestore", "❌ Error fetching song by title: ${e.message}")
+            Log.e("Firestore", " Error fetching song by title: ${e.message}")
             null
         }
     }
@@ -199,9 +200,9 @@ class SongRepository(private val db: FirebaseFirestore) {
                 val currentCount = snapshot.getLong("viewsCount") ?: 0
                 transaction.update(songRef, "viewsCount", currentCount + 1)
             }.await()
-            Log.d("Firestore", "✅ View count incremented for $songId")
+            Log.d("Firestore", "View count incremented for $songId")
         } catch (e: Exception) {
-            Log.e("Firestore", "❌ Failed to increment view count: ${e.message}")
+            Log.e("Firestore", "Failed to increment view count: ${e.message}")
         }
     }
 
@@ -220,7 +221,7 @@ class SongRepository(private val db: FirebaseFirestore) {
                 callback(songList)
             }
             .addOnFailureListener { exception ->
-                Log.e("Firestore", "❌ Error fetching top songs: ${exception.message}")
+                Log.e("Firestore", "Error fetching top songs: ${exception.message}")
                 callback(emptyList())
             }
     }
@@ -238,7 +239,7 @@ class SongRepository(private val db: FirebaseFirestore) {
                 onResult(genres)
             }
             .addOnFailureListener { e ->
-                Log.e("Firestore", "❌ Failed to fetch genres: ${e.message}")
+                Log.e("Firestore", "Failed to fetch genres: ${e.message}")
                 onResult(emptyList())
             }
     }
@@ -254,56 +255,70 @@ class SongRepository(private val db: FirebaseFirestore) {
                     val id = doc.id
                     if (title != null) "$title - $artist" to id else null
                 }
-                Log.d("Firestore", "✅ Found ${songs.size} songs for genre: $genre")
+                Log.d("Firestore", "Found ${songs.size} songs for genre: $genre")
                 callback(songs)
             }
             .addOnFailureListener { e ->
-                Log.e("Firestore", "❌ Failed to fetch songs for genre $genre: ${e.message}")
+                Log.e("Firestore", "Failed to fetch songs for genre $genre: ${e.message}")
                 callback(emptyList())
             }
     }
 
     suspend fun addSampleSongs() {
-        val sampleSongs = listOf(
+        val lyrics = listOf(
+            "Every breath you take" to ("Every" to "G"),
+            "And every move you make" to ("make" to "Em"),
+            "Every bond you break" to ("break" to "C"),
+            "Every step you take" to ("take" to "D"),
+            "I'll be watching you" to ("watching" to "G"),
 
-            Song(
-                title = "Let Her Go",
-                artist = "Passenger",
-                key = "C",
-                bpm = 75,
-                genres = listOf("Folk", "Acoustic"),
-                createdAt = System.currentTimeMillis().toString(),
-                creatorId = "admin",
-                lyrics = listOf(
-                    SongLine(1, "Well you only need the light when it's burning low", listOf()),
-                    SongLine(2, "Only miss the sun when it starts to snow", listOf()),
-                    SongLine(3, "Only know you love her when you let her go", listOf())
-                )
-            )
-           ,
-            Song(
-                title = "Raging Fire",
-                artist = "Iron Claw",
-                key = "E",
-                bpm = 190,
-                genres = listOf("Thrash Metal", "Metal"),
-                createdAt = System.currentTimeMillis().toString(),
-                creatorId = "admin",
-                lyrics = listOf(
-                    SongLine(1, "Screaming thunder cracks the sky,", chords = listOf(ChordPosition("E5", 0))),
-                    SongLine(2, "Blazing steel, we ride or die,", chords = listOf(ChordPosition("C5", 1))),
-                    SongLine(3, "No remorse, no turning back,", chords = listOf(ChordPosition("D5", 2))),
-                    SongLine(4, "We attack, we attack!", chords = listOf(ChordPosition("E5", 3))),
-                    SongLine(5, "🔥 Raging fire inside our veins,", chords = emptyList()),
-                    SongLine(6, "Burning madness breaks the chains!", chords = emptyList())
-                )
-            )
+            "Every single day" to ("Every" to "G"),
+            "And every word you say" to ("say" to "Em"),
+            "Every game you play" to ("play" to "C"),
+            "Every night you stay" to ("stay" to "D"),
+            "I'll be watching you" to ("watching" to "G"),
+
+            "Oh can't you see" to ("see" to "C"),
+            "You belong to me" to ("me" to "D"),
+            "How my poor heart aches" to ("aches" to "Bm"),
+            "With every step you take" to ("take" to "Em"),
+
+            "Every move you make" to ("make" to "G"),
+            "And every vow you break" to ("break" to "Em"),
+            "Every smile you fake" to ("fake" to "C"),
+            "Every claim you stake" to ("stake" to "D"),
+            "I'll be watching you" to ("watching" to "G"),
+
+            "Since you've gone I've been lost without a trace" to ("trace" to "Em"),
+            "I dream at night, I can only see your face" to ("face" to "C"),
+            "I look around but it's you I can't replace" to ("replace" to "D"),
+            "I feel so cold and I long for your embrace" to ("embrace" to "Bm"),
+            "I keep crying baby, baby, please..." to ("please" to "Em")
         )
 
-        sampleSongs.forEachIndexed { index, song ->
-            val id = db.collection("songs").document().id
-            addSongData(id, song)
-        }
+        val song = Song(
+            title = "Every Breath You Take",
+            artist = "The Police",
+            key = "G",
+            bpm = 117,
+            genres = listOf("Rock", "Soft Rock", "Pop"),
+            createdAt = System.currentTimeMillis().toString(),
+            creatorId = "admin",
+            lyrics = lyrics.mapIndexed { index, (lineText, chordPair) ->
+                val (targetWord, chord) = chordPair
+                SongLine(
+                    lineNumber = index + 1,
+                    text = lineText,
+                    chordLine = generateChordLine(lineText, targetWord, chord)
+                )
+            }
+        )
+
+        val documentId = "Every_Breath_You_Take_Chords"
+        FirebaseFirestore.getInstance()
+            .collection("songs")
+            .document(documentId)
+            .set(song)  // overwrite το document
     }
 
 

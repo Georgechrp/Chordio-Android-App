@@ -33,7 +33,7 @@ data class FirestoreSongDTO(
 
                     SongLine(lineNumber, text, chords)
                 } catch (e: Exception) {
-                    println("❌ Error parsing line: $e")
+                    println("Error parsing line: $e")
                     null
                 }
             }

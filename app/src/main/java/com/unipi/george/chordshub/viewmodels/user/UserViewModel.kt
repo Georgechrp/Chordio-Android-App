@@ -43,7 +43,7 @@ class UserViewModel : ViewModel() {
                 _recentSongs.value = emptyList() // Κενή λίστα αν δεν υπάρχουν τραγούδια
             }
         }.addOnFailureListener { e ->
-            println("❌ Σφάλμα κατά την ανάκτηση των πρόσφατων τραγουδιών: ${e.message}")
+            println("Σφάλμα κατά την ανάκτηση των πρόσφατων τραγουδιών: ${e.message}")
         }
     }
 
@@ -64,23 +64,23 @@ class UserViewModel : ViewModel() {
 
                 userRef.update("recentSongs", updatedSongs)
                     .addOnSuccessListener {
-                        println("✅ Το τραγούδι '$songTitle' προστέθηκε στα πρόσφατα τραγούδια!")
+                        println(" Το τραγούδι '$songTitle' προστέθηκε στα πρόσφατα τραγούδια!")
                     }
                     .addOnFailureListener { e ->
-                        println("❌ Σφάλμα κατά την προσθήκη τραγουδιού: ${e.message}")
+                        println(" Σφάλμα κατά την προσθήκη τραγουδιού: ${e.message}")
                     }
             } else {
                 // Αν δεν υπάρχει το array, δημιουργείται νέο
                 userRef.set(mapOf("recentSongs" to listOf(songTitle)), SetOptions.merge())
                     .addOnSuccessListener {
-                        println("✅ Η λίστα recentSongs δημιουργήθηκε με επιτυχία!")
+                        println(" Η λίστα recentSongs δημιουργήθηκε με επιτυχία!")
                     }
                     .addOnFailureListener { e ->
-                        println("❌ Σφάλμα κατά τη δημιουργία recentSongs: ${e.message}")
+                        println(" Σφάλμα κατά τη δημιουργία recentSongs: ${e.message}")
                     }
             }
         }.addOnFailureListener { e ->
-            println("❌ Σφάλμα κατά την ανάκτηση δεδομένων χρήστη: ${e.message}")
+            println(" Σφάλμα κατά την ανάκτηση δεδομένων χρήστη: ${e.message}")
         }
     }
     private fun loadUserData() {

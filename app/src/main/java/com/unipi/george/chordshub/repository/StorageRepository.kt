@@ -17,7 +17,7 @@ class StorageRepository() {
 
             downloadUrl
         } catch (e: Exception)  {
-            Log.e("FirebaseStorage", "❌ Error uploading image", e)
+            Log.e("FirebaseStorage", "Error uploading image", e)
             null
         }
     }
@@ -28,7 +28,7 @@ class StorageRepository() {
             val fileRef = storageRef.child("profile_images/$userId")
             fileRef.downloadUrl.await().toString()
         } catch (e: Exception) {
-            Log.e("FirebaseStorage", "❌ Error fetching profile image", e)
+            Log.e("FirebaseStorage", "Error fetching profile image", e)
             null
         }
     }

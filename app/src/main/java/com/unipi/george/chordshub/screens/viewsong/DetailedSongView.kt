@@ -68,6 +68,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -175,6 +176,7 @@ fun DetailedSongView(
         Log.d("TransposeTest", "Saved transpose value: ${transposeValue.value} for songId: $songId")
 
     }
+
     LaunchedEffect(isFullScreenState) {
         homeViewModel.setFullScreen(isFullScreenState)
     }
@@ -520,10 +522,8 @@ fun SongLyricsView(
                         .fillMaxWidth()
                         .padding(8.dp)
                 ) {
-                    ChordText(
-                        songLine = line,
-                        onChordClick = { clickedChord -> snackbarHostState.value = "Επιλέξατε: $clickedChord"
-                    })
+                    RenderSongLine(songLine = line)
+
                 }
             }
         }
@@ -688,3 +688,23 @@ fun ChordText(
         }
     )
 }
+
+
+@Composable
+fun RenderSongLine(songLine: SongLine) {
+    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+        songLine.chordLine?.let {
+            Text(
+                text = it,
+                fontFamily = FontFamily.Monospace,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        Text(
+            text = songLine.text,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+

@@ -62,9 +62,9 @@ suspend fun updateUserProfileImage(userId: String, imageUrl: String) {
 
     userRef.update("profileImageUrl", imageUrl)
         .addOnSuccessListener {
-            Log.d("Firestore", "✅ Profile image updated successfully!")
+            Log.d("Firestore", " Profile image updated successfully!")
         }
         .addOnFailureListener {
-            Log.e("Firestore", "❌ Failed to update profile image: ${it.message}")
+            Log.e("Firestore", " Failed to update profile image: ${it.message}")
         }
 }
