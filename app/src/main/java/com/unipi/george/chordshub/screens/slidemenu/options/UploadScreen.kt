@@ -19,13 +19,13 @@ import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.models.song.ChordPosition
 import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.models.song.SongLine
-import com.unipi.george.chordshub.repository.AuthRepository
 import com.unipi.george.chordshub.repository.firestore.SongRepository
+import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UploadScreen(navController: NavController) {
+fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
     val songRepo = SongRepository(FirebaseFirestore.getInstance())
     val coroutineScope = rememberCoroutineScope()
 
@@ -111,7 +111,7 @@ fun UploadScreen(navController: NavController) {
             Button(
                 onClick = {
                     coroutineScope.launch {
-                        val currentUserId = AuthRepository.getUserId()
+                        val currentUserId = userViewModel.userId
                         val songId = title.replace(" ", "_").lowercase()
 
                         val songLines = lyrics.split("\n").mapIndexed { index, line ->

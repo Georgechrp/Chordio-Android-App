@@ -14,23 +14,17 @@ import kotlinx.coroutines.launch
 class UserViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
 
-
     private val _userState = mutableStateOf<User?>(null)
     val userState: State<User?> = _userState
-
-    private val _isLoading = mutableStateOf(false)
-    val isLoading: State<Boolean> = _isLoading
-
-    private val _error = mutableStateOf<String?>(null)
-    val error: State<String?> = _error
-
 
     val userId: String? get() = _userState.value?.uid
 
     private val _recentSongs = mutableStateOf<List<String>>(emptyList())
     val recentSongs: State<List<String>> = _recentSongs
 
-
+    fun setUser(user: User?) {
+        _userState.value = user
+    }
 
     fun fetchRecentSongs(userId: String) {
         val userRef = db.collection("users").document(userId)
@@ -47,9 +41,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    init {
-        loadUserData()
-    }
+
 
     fun addRecentSong(userId: String, songTitle: String) {
         val userRef = db.collection("users").document(userId)
@@ -83,34 +75,6 @@ class UserViewModel : ViewModel() {
             println(" Σφάλμα κατά την ανάκτηση δεδομένων χρήστη: ${e.message}")
         }
     }
-    private fun loadUserData() {
-        val uid = AuthRepository.getUserId()
-        if (uid != null) {
-            _isLoading.value = true
-            AuthRepository.getUserFromFirestore(uid) { user ->
-                _userState.value = user
-                _isLoading.value = false
-            }
-        } else {
-            _error.value = "User not logged in."
-        }
-    }
 
-    fun loginUser(email: String, password: String, onSuccess: () -> Unit) {
-        _isLoading.value = true
-        AuthRepository.signInUser(email, password) { success, errorMessage ->
-            if (success) {
-                loadUserData()  // Φόρτωση δεδομένων χρήστη μετά την επιτυχή σύνδεση
-                onSuccess()
-            } else {
-                _error.value = errorMessage ?: "Login failed."
-            }
-            _isLoading.value = false
-        }
-    }
 
-    fun logoutUser() {
-        AuthRepository.logoutUser()
-        _userState.value = null
-    }
 }

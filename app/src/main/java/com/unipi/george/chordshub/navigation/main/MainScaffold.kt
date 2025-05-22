@@ -84,7 +84,7 @@ fun MainScaffold(
                         .zIndex(1f) // same zIndex as TopBar
                 ) {
                     if (showBottomBar) {
-                        BottomNavBar(navController = navController, isFullScreen = isFullScreen)
+                        BottomNavBar(navController = navController, mainViewModel = mainViewModel)
                     }
                 }
             }

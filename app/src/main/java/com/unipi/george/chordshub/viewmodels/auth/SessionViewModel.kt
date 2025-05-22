@@ -1,4 +1,4 @@
-package com.unipi.george.chordshub.viewmodels.user
+package com.unipi.george.chordshub.viewmodels.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

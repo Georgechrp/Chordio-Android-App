@@ -13,32 +13,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.unipi.george.chordshub.R
-import com.unipi.george.chordshub.repository.AuthRepository
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 
 @Composable
 fun ProfileScreen(onLogout: () -> Unit) {
-    val fullName = AuthRepository.getFullName()
-    val email = AuthRepository.getUserEmail()
-    val uid = FirebaseAuth.getInstance().currentUser?.uid
-    val username = remember { mutableStateOf<String?>(null) }
-    val role = remember { mutableStateOf<String?>(null) }
-    val deleteMessage = remember { mutableStateOf<String?>(null) }
     val showDeleteDialog = remember { mutableStateOf(false) }
     val showLogoutDialog = remember { mutableStateOf(false) }
     val showEditUsernameDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val authViewModel: AuthViewModel = viewModel()
+    val fullName by authViewModel.fullName
+    val email by authViewModel.email
+    val username by authViewModel.username
+    val deleteMessage by authViewModel.deleteMessage
 
-    LaunchedEffect(uid) {
-        if (uid != null) {
-            AuthRepository.getUserRoleFromFirestore(uid) { userRole ->
-                role.value = userRole
-            }
-            AuthRepository.getUsernameFromFirestore(uid) { userUsername ->
-                username.value = userUsername
-            }
-        }
+    LaunchedEffect(Unit) {
+        authViewModel.loadProfileData()
     }
 
     Scaffold(
@@ -59,13 +51,13 @@ fun ProfileScreen(onLogout: () -> Unit) {
             title = stringResource(R.string.delete_acc_text),
             message = stringResource(R.string.Are_you_sure_you_want_to_delete_account),
             onConfirm = {
-                showDeleteDialog.value = false
-                AuthRepository.deleteUserAccount { success, message ->
+                authViewModel.deleteUserAccount { success ->
+                    showDeleteDialog.value = false
                     if (success) {
                         Toast.makeText(context, "Account Deleted", Toast.LENGTH_SHORT).show()
-                        AuthRepository.isUserLoggedInState.value = false
+                        onLogout()
                     } else {
-                        deleteMessage.value = message ?: "An unexpected error occurred."
+                        Toast.makeText(context, deleteMessage ?: "Unknown error", Toast.LENGTH_SHORT).show()
                     }
                 }
             },
@@ -78,9 +70,11 @@ fun ProfileScreen(onLogout: () -> Unit) {
             title = stringResource(R.string.logout_text),
             message = stringResource(R.string.Are_you_sure_you_want_to_logout),
             onConfirm = {
-                showLogoutDialog.value = false
-                AuthRepository.logoutUser()
-                onLogout()
+                authViewModel.logout {
+                    showLogoutDialog.value = false
+                    onLogout()
+
+                }
             },
             onDismiss = { showLogoutDialog.value = false }
         )
@@ -88,18 +82,17 @@ fun ProfileScreen(onLogout: () -> Unit) {
 
     if (showEditUsernameDialog.value) {
         EditUsernameDialog(
-            currentUsername = username.value,
+            currentUsername = username,
             onConfirm = { newUsername ->
-                if (uid != null) {
-                    AuthRepository.updateUsernameInFirestore(uid, newUsername) { success ->
-                        if (success) {
-                            username.value = newUsername
-                            Toast.makeText(context, "Username updated successfully", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, "Failed to update username", Toast.LENGTH_SHORT).show()
-                        }
+                authViewModel.updateUsername(newUsername) { success ->
+                    if (success) {
+                        Toast.makeText(context, "Username updated successfully", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Failed to update username", Toast.LENGTH_SHORT).show()
                     }
+                    showEditUsernameDialog.value = false
                 }
+
                 showEditUsernameDialog.value = false
             },
             onDismiss = { showEditUsernameDialog.value = false }
@@ -111,11 +104,11 @@ fun ProfileScreen(onLogout: () -> Unit) {
 fun ProfileCard(
     fullName: String?,
     email: String?,
-    username: MutableState<String?>,
+    username: String?,
     showLogoutDialog: MutableState<Boolean>,
     showDeleteDialog: MutableState<Boolean>,
     showEditUsernameDialog: MutableState<Boolean>,
-    deleteMessage: MutableState<String?>
+    deleteMessage: String?
 ) {
     Card(
         modifier = Modifier
@@ -133,7 +126,7 @@ fun ProfileCard(
         ) {
             InfoRow(label = stringResource(R.string.full_name_text), value = fullName)
             Divider(modifier = Modifier.padding(vertical = 4.dp))
-            EditableInfoRow(label = stringResource(R.string.username_text), value = username.value) {
+            EditableInfoRow(label = stringResource(R.string.username_text), value = username) {
                 showEditUsernameDialog.value = true
             }
             Divider(modifier = Modifier.padding(vertical = 4.dp))
@@ -169,7 +162,7 @@ fun ProfileCard(
                 Text(stringResource(R.string.delete_acc_text))
             }
 
-            deleteMessage.value?.let { message ->
+            deleteMessage?.let { message ->
                 Text(text = message, color = MaterialTheme.colorScheme.error)
             }
         }

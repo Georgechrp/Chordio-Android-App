@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.components.LoadingView
-import com.unipi.george.chordshub.repository.AuthRepository
 import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
 import com.unipi.george.chordshub.viewmodels.MainViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
@@ -30,7 +29,7 @@ fun RecentsScreen(
     homeViewModel: HomeViewModel
 ) {
     val recentSongs by userViewModel.recentSongs
-    val userId = AuthRepository.getUserId()
+    val userId = userViewModel.userId
     var isLoading by remember { mutableStateOf(true) }
     val selectedSongId by homeViewModel.selectedSongId.collectAsState()
     val mainViewModel = remember { MainViewModel() }
@@ -46,7 +45,6 @@ fun RecentsScreen(
     if (selectedSongId != null) {
         DetailedSongView(
             songId = selectedSongId!!,
-            isFullScreenState = false,
             onBack = {
                 homeViewModel.clearSelectedSong()
             },

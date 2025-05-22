@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class MainViewModel : ViewModel() {
@@ -29,5 +30,21 @@ class MainViewModel : ViewModel() {
     fun setMenuOpen(value: Boolean) {
         _isMenuOpen.value = value
     }
+
+    private val _bottomBarVisible = MutableStateFlow(true)
+    val bottomBarVisible: StateFlow<Boolean> = _bottomBarVisible
+
+    fun setBottomBarVisible(visible: Boolean) {
+        _bottomBarVisible.value = visible
+    }
+
+    private val _topBarVisible = MutableStateFlow(true)
+    val topBarVisible: StateFlow<Boolean> = _topBarVisible
+
+    fun setTopBarVisible(visible: Boolean) {
+        _topBarVisible.value = visible
+    }
+
+
 }
 

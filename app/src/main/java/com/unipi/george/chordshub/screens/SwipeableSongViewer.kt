@@ -30,7 +30,6 @@ fun SwipeableSongViewer(
     ) { page ->
         DetailedSongView(
             songId = songs[page],
-            isFullScreenState = false,
             onBack = onExit,
             navController = navController,
             mainViewModel = mainViewModel,

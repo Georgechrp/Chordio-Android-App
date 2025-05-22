@@ -16,7 +16,7 @@ import com.unipi.george.chordshub.ui.theme.ChordsHubTheme
 import com.unipi.george.chordshub.utils.ObserveUserSession
 import com.unipi.george.chordshub.viewmodels.SettingsViewModelFactory
 import com.unipi.george.chordshub.viewmodels.StorageViewModel
-import com.unipi.george.chordshub.viewmodels.user.SessionViewModel
+import com.unipi.george.chordshub.viewmodels.auth.SessionViewModel
 import com.unipi.george.chordshub.viewmodels.user.SettingsViewModel
 import kotlinx.coroutines.delay
 

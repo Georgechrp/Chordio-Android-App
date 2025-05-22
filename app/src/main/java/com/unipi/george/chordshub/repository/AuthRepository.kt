@@ -14,7 +14,7 @@ object AuthRepository {
     @SuppressLint("StaticFieldLeak")
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     val isUserLoggedInState = mutableStateOf(isUserLoggedIn())
-    val fullNameState = mutableStateOf(getFullName())
+    private val fullNameState = mutableStateOf(getFullName())
 
     fun signInUser(email: String, password: String, onResult: (Boolean, String?) -> Unit) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
@@ -183,7 +183,6 @@ object AuthRepository {
         return firebaseAuth.currentUser != null
     }
 
-
     fun getUserFromFirestore(uid: String, onResult: (User?) -> Unit) {
         firestore.collection("users").document(uid).get()
             .addOnSuccessListener { document ->
@@ -210,7 +209,5 @@ object AuthRepository {
                 }
             }
     }
-
-
 
 }

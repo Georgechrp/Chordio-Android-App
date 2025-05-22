@@ -11,7 +11,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import com.unipi.george.chordshub.navigation.main.RootAppEntry
 import com.unipi.george.chordshub.sharedpreferences.AppSettingsPreferences
-import com.unipi.george.chordshub.viewmodels.user.SessionViewModel
+import com.unipi.george.chordshub.viewmodels.auth.SessionViewModel
 import androidx.compose.ui.graphics.toArgb
 
 

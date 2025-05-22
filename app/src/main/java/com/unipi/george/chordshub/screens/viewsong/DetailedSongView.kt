@@ -1,5 +1,6 @@
 package com.unipi.george.chordshub.screens.viewsong
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -92,7 +93,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun DetailedSongView(
     songId: String,
-    isFullScreenState: Boolean,
     onBack: () -> Unit,
     repository: TempPlaylistRepository = TempPlaylistRepository(FirebaseFirestore.getInstance()),
     navController: NavController,
@@ -115,6 +115,7 @@ fun DetailedSongView(
     val songRepo = SongRepository(FirebaseFirestore.getInstance())
     val showAddToPlaylistDialog = remember { mutableStateOf(false) }
     val songViewModel = remember { SongViewModel(SongRepository(FirebaseFirestore.getInstance())) }
+    val isFullScreen = remember { mutableStateOf(false) }
 
     LaunchedEffect(isScrolling.value, scrollSpeed.floatValue) {
         while (isScrolling.value) {
@@ -177,30 +178,30 @@ fun DetailedSongView(
 
     }
 
-    LaunchedEffect(isFullScreenState) {
-        homeViewModel.setFullScreen(isFullScreenState)
+    LaunchedEffect(isFullScreen.value) {
+        mainViewModel.setBottomBarVisible(!isFullScreen.value)
+        mainViewModel.setTopBarVisible(!isFullScreen.value)
     }
-
-
     BackHandler {
-        if (isFullScreenState) {
-            homeViewModel.setFullScreen(false)
+        if (isFullScreen.value) {
+            isFullScreen.value = false
+            mainViewModel.setBottomBarVisible(true)
+            mainViewModel.setTopBarVisible(true)
         } else {
             onBack()
         }
     }
+
+
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background )
             .clickable {
-                if (isFullScreenState) {
-                    homeViewModel.setFullScreen(false)
-                } else {
-                    homeViewModel.setFullScreen(true)
-                }
+                isFullScreen.value = !isFullScreen.value
             }
+
     )
     {
         if (songState.value == null) {
@@ -211,10 +212,10 @@ fun DetailedSongView(
             val songData = songState.value!!
 
             Card(
-                modifier = if (isFullScreenState) Modifier.fillMaxSize() else Modifier.fillMaxWidth().padding(16.dp),
-                shape = RoundedCornerShape(if (isFullScreenState) 0.dp else 16.dp),
+                modifier = if (isFullScreen.value) Modifier.fillMaxSize() else Modifier.fillMaxWidth().padding(16.dp),
+                shape = RoundedCornerShape(if (isFullScreen.value) 0.dp else 16.dp),
                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = if (isFullScreenState) 0.dp else 8.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = if (isFullScreen.value) 0.dp else 8.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -231,7 +232,7 @@ fun DetailedSongView(
                         SongInfoPlace(
                             title = songData.title ?: "No Title",
                             artist = songData.artist ?: "Unknown Artist",
-                            isFullScreen = isFullScreenState,
+                            isFullScreen = isFullScreen.value,
                             navController ,
                             modifier = Modifier.weight(1f)
                         )
@@ -241,7 +242,6 @@ fun DetailedSongView(
                             showDialog = showDialog,
                             showQRCodeDialog = showQRCodeDialog,
                             tempPlaylistViewModel = tempPlaylistViewModel,
-                            navController = navController,
                             homeViewModel = homeViewModel
                         )
 
@@ -357,8 +357,6 @@ fun DetailedSongView(
         }
     }
 
-
-
 }
 
 
@@ -394,6 +392,7 @@ fun SongInfoPlace(
 }
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun OptionsPlace(
@@ -402,7 +401,6 @@ fun OptionsPlace(
     showDialog: MutableState<Boolean>,
     showQRCodeDialog: MutableState<Boolean>,
     tempPlaylistViewModel : TempPlaylistViewModel,
-    navController: NavController,
     homeViewModel: HomeViewModel
 ) {
     val userId = UserViewModel().userId

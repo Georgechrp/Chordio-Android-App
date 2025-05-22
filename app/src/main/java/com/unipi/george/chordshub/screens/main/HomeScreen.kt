@@ -51,6 +51,13 @@ fun HomeScreen(
     val isFullScreenState by homeViewModel.isFullScreen.collectAsState()
     var topBarOffset by rememberSaveable { mutableFloatStateOf(0f) }
     var showNoResults by remember { mutableStateOf(false) }
+    val isFullScreen = remember { mutableStateOf(false) }
+
+    LaunchedEffect(isFullScreen.value) {
+        mainViewModel.setTopBarVisible(!isFullScreen.value)
+        mainViewModel.setBottomBarVisible(!isFullScreen.value)
+    }
+
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -187,7 +194,6 @@ fun HomeScreen(
                     else -> {
                         DetailedSongView(
                             songId = selectedSongId!!,
-                            isFullScreenState = isFullScreenState,
                             onBack = {
                                 homeViewModel.clearSelectedSong()
                                 homeViewModel.setFullScreen(false)

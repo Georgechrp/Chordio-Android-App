@@ -34,11 +34,8 @@ fun SearchScreen(
     viewModel: SearchViewModel = viewModel(),
     mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
-    onMenuClick: () -> Unit,
     navController: NavController,
-    isFullScreen: Boolean,
     onFullScreenChange: (Boolean) -> Unit,
-    profileImageUrl: String?
 ) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     val searchResults by viewModel.searchResults.collectAsState()
@@ -46,6 +43,7 @@ fun SearchScreen(
     val randomSongs by viewModel.randomSongs.collectAsState()
     val isMenuOpen by mainViewModel.isMenuOpen
     val userViewModel: UserViewModel = viewModel()
+    val isFullScreen = remember { mutableStateOf(false) }
 
     LaunchedEffect(searchText.text) {
         if (searchText.text.isEmpty()) {
@@ -53,7 +51,7 @@ fun SearchScreen(
         }
     }
     LaunchedEffect(isFullScreen) {
-        if (!isFullScreen) {
+        if (!isFullScreen.value) {
             mainViewModel.setTopBarContent {
                 Row(
                     modifier = Modifier
@@ -77,6 +75,11 @@ fun SearchScreen(
             mainViewModel.setTopBarContent {}
         }
     }
+    LaunchedEffect(isFullScreen.value) {
+        mainViewModel.setTopBarVisible(!isFullScreen.value)
+        mainViewModel.setBottomBarVisible(!isFullScreen.value)
+    }
+
 
     BackHandler {
         if (isMenuOpen) {
@@ -93,7 +96,7 @@ fun SearchScreen(
     }
 
 
-    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background ).padding(top = if (isFullScreen) 0.dp else 56.dp)) {
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background ).padding(top = if (isFullScreen.value) 0.dp else 56.dp)) {
         if (selectedSongId == null) {
             SearchContent(
                 searchText = searchText,
@@ -103,14 +106,11 @@ fun SearchScreen(
                 },
                 searchResults = searchResults,
                 onSongSelect = { viewModel.selectSong(it) },
-                viewModel = viewModel,
-                isFullScreen = isFullScreen,
-                randomSongs = randomSongs
+                viewModel = viewModel
             )
         } else {
             DetailedSongView(
                 songId = selectedSongId!!,
-                isFullScreenState = isFullScreen,
                 onBack = {
                     onFullScreenChange(false)
                     viewModel.clearSelectedSong()
@@ -133,8 +133,6 @@ fun SearchContent(
     searchResults: List<Triple<String, String, String>>,
     onSongSelect: (String) -> Unit,
     viewModel: SearchViewModel,
-    isFullScreen: Boolean,
-    randomSongs: List<Pair<String, String>>
 ) {
     val topSongs by viewModel.topSongs.collectAsState()
     val genres by viewModel.genres.collectAsState()

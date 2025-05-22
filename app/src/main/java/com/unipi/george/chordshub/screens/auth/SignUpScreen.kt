@@ -25,12 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
 import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.navigation.AppScreens
-import com.unipi.george.chordshub.repository.AuthRepository
-import com.unipi.george.chordshub.repository.AuthRepository.saveUserToFirestore
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 
 @Composable
 fun SignUpScreen(navController: NavController) {
@@ -120,6 +119,7 @@ fun SignUpInputFields(
 
 @Composable
 fun SignUpActions(
+    authViewModel: AuthViewModel = viewModel(),
     fullName: MutableState<String>,
     email: MutableState<String>,
     password: MutableState<String>,
@@ -138,23 +138,19 @@ fun SignUpActions(
             return@Button
         }
 
-        AuthRepository.signUpUser(email.value, password.value, fullName.value) { success, errorMessage ->
+        authViewModel.signUpUser(
+            fullName.value,
+            email.value,
+            password.value
+        ) { success, error ->
             if (success) {
-                val uid = FirebaseAuth.getInstance().currentUser?.uid
-                if (uid != null) {
-                    saveUserToFirestore(uid, fullName.value, email.value, "user") { firestoreSuccess ->
-                        if (firestoreSuccess) {
-                            Toast.makeText(context, context.getString(R.string.account_created_successfully), Toast.LENGTH_SHORT).show()
-                            navController.navigate(AppScreens.Login.route)
-                        } else {
-                            Toast.makeText(context, context.getString(R.string.failed_to_save_user_role), Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
+                Toast.makeText(context, "Account created!", Toast.LENGTH_SHORT).show()
+                navController.navigate(AppScreens.Login.route)
             } else {
-                Toast.makeText(context, errorMessage ?: context.getString(R.string.sign_up_failed), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, error ?: "Sign up failed.", Toast.LENGTH_SHORT).show()
             }
         }
+
     }) {
         Text(stringResource(R.string.create_account))
     }

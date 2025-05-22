@@ -23,11 +23,13 @@ import com.unipi.george.chordshub.components.CardsView
 import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.repository.firestore.SongRepository
 import com.unipi.george.chordshub.utils.ArtistInfo
+import com.unipi.george.chordshub.viewmodels.MainViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArtistScreen(artistName: String, navController: NavController) {
+fun ArtistScreen(artistName: String, navController: NavController, mainViewModel: MainViewModel) {
+
     var showInfoSheet by remember { mutableStateOf(false) }
     var songs by remember { mutableStateOf<List<Song>>(emptyList()) }
     val homeViewModel: HomeViewModel = viewModel()
@@ -50,10 +52,9 @@ fun ArtistScreen(artistName: String, navController: NavController) {
 
         DetailedSongView(
             songId = selectedSongId.value!!,
-            isFullScreenState = false,
             onBack = { selectedSongId.value = null },
             navController = navController,
-            mainViewModel = viewModel(),
+            mainViewModel = mainViewModel,
             homeViewModel = homeViewModel,
             userViewModel = viewModel()
         )

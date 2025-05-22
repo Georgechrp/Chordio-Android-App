@@ -18,16 +18,17 @@ import android.net.Uri
 import androidx.compose.ui.res.stringResource
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun EditProfileScreen(navController: NavController, userId: String, onDismiss: () -> Unit) {
+fun EditProfileScreen(navController: NavController, userId: String, onDismiss: () -> Unit, authViewModel: AuthViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // ✅ Αποθηκεύουμε την αρχική κατάσταση
-    val initialUsername = remember { AuthRepository.fullNameState.value ?: "Unknown" }
+    // Αποθηκεύουμε την αρχική κατάσταση
+    val initialUsername = remember { authViewModel.username ?: "Unknown" }
     var newUsername by remember { mutableStateOf(initialUsername) }
 
     val initialImageUri = remember { mutableStateOf<Uri?>(null) }
@@ -44,10 +45,8 @@ fun EditProfileScreen(navController: NavController, userId: String, onDismiss: (
             contentAlignment = Alignment.Center
         ) {
             ProfileCard(
-                selectedImage = selectedImage,
-                newUsername = newUsername,
+                newUsername = newUsername.toString(),
                 onUsernameChange = { newUsername = it },
-                onImageSelected = { uri -> selectedImage = uri },
                 onSave = {
                     keyboardController?.hide()
 
@@ -56,7 +55,7 @@ fun EditProfileScreen(navController: NavController, userId: String, onDismiss: (
 
                     saveProfileChanges(
                         userId,
-                        newUsername,
+                        newUsername.toString(),
                         selectedImage,
                         snackbarHostState,
                         coroutineScope,
@@ -76,10 +75,8 @@ fun EditProfileScreen(navController: NavController, userId: String, onDismiss: (
 
 @Composable
 fun ProfileCard(
-    selectedImage: Uri?,
     newUsername: String,
     onUsernameChange: (String) -> Unit,
-    onImageSelected: (Uri?) -> Unit,
     onSave: () -> Unit,
     onCancel: () -> Unit
 ) {
