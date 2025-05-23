@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.unipi.george.chordshub.components.MyAppTopBar
 import com.unipi.george.chordshub.screens.slidemenu.ProfileMenu
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
+import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 
 /*
  * Here we have the Main UI
@@ -32,10 +34,12 @@ import com.unipi.george.chordshub.screens.slidemenu.ProfileMenu
 @Composable
 fun MainScaffold(
     navController: NavHostController,
+    authViewModel: AuthViewModel,
     profileImageUrl: String?
 ) {
     val mainViewModel: MainViewModel = viewModel()
     val homeViewModel: HomeViewModel = viewModel()
+    val userViewModel: UserViewModel = viewModel()
     val isMenuOpen by mainViewModel.isMenuOpen
     val isFullScreen by homeViewModel.isFullScreen.collectAsState()
     val bottomBarExcludedScreens = setOf("detailedSongView/{songTitle}")
@@ -92,6 +96,8 @@ fun MainScaffold(
             // ProfileMenu always on top
             ProfileMenu(
                 mainViewModel = mainViewModel,
+                userViewModel = userViewModel,
+                authViewModel = authViewModel,
                 navController = navController,
                 modifier = Modifier
                     .fillMaxSize()

@@ -18,10 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.unipi.george.chordshub.repository.AuthRepository
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 
 @Composable
-fun ForgotPasswordScreen(authRepository: AuthRepository, onBack: () -> Unit) {
+fun ForgotPasswordScreen(
+    authViewModel: AuthViewModel,
+    onBack: () -> Unit
+) {
     var email by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
 
@@ -38,7 +41,7 @@ fun ForgotPasswordScreen(authRepository: AuthRepository, onBack: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            authRepository.resetPassword(email) { success, errorMessage ->
+            authViewModel.resetPassword(email) { success, errorMessage ->
                 message = if (success) "Check your email for reset link" else errorMessage
             }
         }) {

@@ -1,12 +1,9 @@
-// package και imports δεν αλλάζουν
 package com.unipi.george.chordshub.screens.main
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,15 +16,14 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import com.google.firebase.firestore.FirebaseFirestore
 import com.unipi.george.chordshub.components.FilterRow
 import com.unipi.george.chordshub.components.CardsView
 import com.unipi.george.chordshub.components.LoadingView
-import com.unipi.george.chordshub.repository.firestore.SongRepository
 import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
-import com.unipi.george.chordshub.utils.ArtistImageOnly
 import com.unipi.george.chordshub.viewmodels.MainViewModel
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
+import com.unipi.george.chordshub.viewmodels.main.SearchViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
@@ -36,22 +32,23 @@ import kotlin.math.roundToInt
 fun HomeScreen(
     homeViewModel: HomeViewModel,
     mainViewModel: MainViewModel,
+    searchViewModel: SearchViewModel,
     userViewModel: UserViewModel,
-    navController: NavController,
-    onMenuClick: () -> Unit,
-    profileImageUrl: String?
+    authViewModel: AuthViewModel,
+    navController: NavController
 ) {
     val selectedSongId by homeViewModel.selectedSongId.collectAsState()
     val songList by homeViewModel.songList.collectAsState()
     var selectedFilter by remember { mutableStateOf("All") }
     val selectedTitle = remember { mutableStateOf<String?>(null) }
     var artistMode by remember { mutableStateOf(false) }
-    var artistList by remember { mutableStateOf<List<String>>(emptyList()) }
+    val artistList by searchViewModel.artistList.collectAsState()
     val isMenuOpen by mainViewModel.isMenuOpen
     val isFullScreenState by homeViewModel.isFullScreen.collectAsState()
     var topBarOffset by rememberSaveable { mutableFloatStateOf(0f) }
     var showNoResults by remember { mutableStateOf(false) }
     val isFullScreen = remember { mutableStateOf(false) }
+    val searchResults by searchViewModel.searchResults.collectAsState()
 
     LaunchedEffect(isFullScreen.value) {
         mainViewModel.setTopBarVisible(!isFullScreen.value)
@@ -79,7 +76,7 @@ fun HomeScreen(
         when (selectedFilter) {
             "Artists" -> homeViewModel.getAllArtists()
             else -> {
-                homeViewModel.fetchFilteredSongs(selectedFilter)
+                searchViewModel.searchByGenre(selectedFilter)
                 homeViewModel.getAllArtists()
             }
         }
@@ -110,18 +107,28 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(selectedFilter) {
+        artistMode = selectedFilter == "Artists"
 
-    val fetchArtists by homeViewModel.fetchArtists.collectAsState()
-    val songRepo = remember { SongRepository(FirebaseFirestore.getInstance()) }
-
-    LaunchedEffect(fetchArtists) {
-        if (fetchArtists != null) {
-            songRepo.getAllArtists { fetched ->
-                artistList = fetched
+        when (selectedFilter) {
+            "Artists" -> homeViewModel.getAllArtists()
+            "All" -> {
+                searchViewModel.clearSearchResults()
+                homeViewModel.fetchFilteredSongs("All")
             }
-            homeViewModel.resetFetchArtists()
+            else -> {
+                searchViewModel.searchByGenre(selectedFilter)
+            }
         }
     }
+
+
+    val fetchArtists by homeViewModel.fetchArtists.collectAsState()
+
+    LaunchedEffect(Unit) {
+        searchViewModel.fetchAllArtists()
+    }
+
 
     Box(
         modifier = Modifier
@@ -167,12 +174,16 @@ fun HomeScreen(
                                 }
                             )
                         } else {
-                            val combinedList = if (selectedFilter == "All")
-                                artistList.take(6).map { it to "artist:$it" } + songList
-                            else
-                                songList
 
-                        Box(modifier = Modifier.padding(bottom = 40.dp)) {
+                            val combinedList = when (selectedFilter) {
+                                "All" -> artistList.take(6).map { it to "artist:$it" } + songList
+                                else -> searchResults.map {
+                                    "${it.first} - ${it.second}" to it.second // ή .first αν το έχεις έτσι στον CardsView
+                                }
+                            }
+
+
+                            Box(modifier = Modifier.padding(bottom = 40.dp)) {
 
                             CardsView(
                                 songList = combinedList,
@@ -201,7 +212,8 @@ fun HomeScreen(
                             navController = navController,
                             mainViewModel = mainViewModel,
                             homeViewModel = homeViewModel,
-                            userViewModel = userViewModel
+                            userViewModel = userViewModel,
+                            authViewModel = authViewModel
                         )
                     }
                 }

@@ -23,14 +23,12 @@ import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.viewmodels.user.SettingsViewModel
 import com.unipi.george.chordshub.components.SettingsHeads
 import android.content.Context
-import android.content.res.Configuration
 import androidx.compose.ui.platform.LocalContext
 import java.util.Locale
 
 @Composable
 fun SettingsScreen(navController: NavController, settingsViewModel: SettingsViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = { SettingsTopBar(navController) },

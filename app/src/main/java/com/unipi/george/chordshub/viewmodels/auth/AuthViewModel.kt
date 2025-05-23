@@ -119,6 +119,17 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    fun getUserId(): String? {
+        return AuthRepository.getUserId()
+    }
+
+    fun resetPassword(email: String, onResult: (Boolean, String?) -> Unit) {
+        AuthRepository.resetPassword(email) { success, errorMessage ->
+            onResult(success, errorMessage)
+        }
+    }
+
+
     fun loadUserData(onUserLoaded: (User?) -> Unit) {
         val uid = AuthRepository.getUserId()
         if (uid != null) {

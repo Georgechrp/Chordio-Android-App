@@ -76,13 +76,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.components.CardsView
-import com.unipi.george.chordshub.repository.AuthRepository
 import com.unipi.george.chordshub.repository.firestore.SongRepository
 import com.unipi.george.chordshub.repository.firestore.TempPlaylistRepository
 import com.unipi.george.chordshub.sharedpreferences.TransposePreferences
 import com.unipi.george.chordshub.utils.QRCodeDialog
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.MainViewModel
+import com.unipi.george.chordshub.viewmodels.SongViewModelFactory
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.LibraryViewModel
 import com.unipi.george.chordshub.viewmodels.seconds.SongViewModel
 import com.unipi.george.chordshub.viewmodels.seconds.TempPlaylistViewModel
@@ -98,9 +99,10 @@ fun DetailedSongView(
     navController: NavController,
     mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    authViewModel: AuthViewModel
 ) {
-    val songState = remember { mutableStateOf<Song?>(null) }
+
     val transposeValue = remember { mutableStateOf(0) }
     val isScrolling = remember { mutableStateOf(false) }
     val scrollSpeed = remember { mutableFloatStateOf(30f) }
@@ -111,11 +113,29 @@ fun DetailedSongView(
     val context = LocalContext.current
     val transposePreferences = remember { TransposePreferences(context) }
     val tempPlaylistViewModel = remember { TempPlaylistViewModel(repository) }
-    val userId = AuthRepository.getUserId()
-    val songRepo = SongRepository(FirebaseFirestore.getInstance())
+    val userId = authViewModel.getUserId()
     val showAddToPlaylistDialog = remember { mutableStateOf(false) }
-    val songViewModel = remember { SongViewModel(SongRepository(FirebaseFirestore.getInstance())) }
     val isFullScreen = remember { mutableStateOf(false) }
+    val songViewModel: SongViewModel = viewModel(
+        factory = SongViewModelFactory(SongRepository(FirebaseFirestore.getInstance()))
+    )
+    val songState by songViewModel.songState.collectAsState()
+
+
+
+    LaunchedEffect(songId) {
+        val savedTranspose = transposePreferences.getTransposeValue(songId)
+        transposeValue.value = savedTranspose
+
+        songViewModel.loadSong(songId)
+
+        userId?.let { id ->
+            userViewModel.addRecentSong(id, songId)
+        }
+
+        songViewModel.registerSongView(songId)
+    }
+
 
     LaunchedEffect(isScrolling.value, scrollSpeed.floatValue) {
         while (isScrolling.value) {
@@ -129,52 +149,24 @@ fun DetailedSongView(
        // songRepo.addSampleSongs()
     }
 
-    LaunchedEffect(songId) {
-        val savedTranspose = transposePreferences.getTransposeValue(songId)
-        transposeValue.value = savedTranspose
-
-        Log.d("TransposeTest", "Loaded transpose value: $savedTranspose for songId: $songId")
-
-        var songData = songRepo.getSongDataAsync(songId)
-        if (songData == null) {
-            songData = songRepo.getSongByTitle(songId)
-        }
-
-        if (songData == null) {
-            Log.e("DetailedSongView", " Song not found. Triggering back.")
-            onBack()
-            return@LaunchedEffect
-        }
-
-        songState.value = songData
-
-        userId?.let { id ->
-            userViewModel.addRecentSong(id, songData.title ?: "Untitled")
-        }
-        // Καταγραφή view
-        songViewModel.registerSongView(songId)
-
-        // Προσθήκη στα πρόσφατα
-        userId?.let { id ->
-            userViewModel.addRecentSong(id, songData.title ?: "Untitled")
-        }
-    }
 
 
     fun applyTranspose() {
-        songState.value = songState.value?.lyrics?.map { line ->
+        val updated = songState?.lyrics?.map { line ->
             line.copy(
                 chords = line.chords.map { chord ->
                     chord.copy(chord = getNewKey(chord.chord, transposeValue.value))
                 }
             )
         }?.let {
-            songState.value?.copy(
-                lyrics = it
-            )
+            songState?.copy(lyrics = it)
+        }
+
+        updated?.let {
+            songViewModel.updateLocalSong(it)
         }
         transposePreferences.saveTransposeValue(songId, transposeValue.value)
-        Log.d("TransposeTest", "Saved transpose value: ${transposeValue.value} for songId: $songId")
+
 
     }
 
@@ -204,12 +196,12 @@ fun DetailedSongView(
 
     )
     {
-        if (songState.value == null) {
+        if (songState == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Loading...")
             }
         } else {
-            val songData = songState.value!!
+            val songData = songState!!
 
             Card(
                 modifier = if (isFullScreen.value) Modifier.fillMaxSize() else Modifier.fillMaxWidth().padding(16.dp),
@@ -262,8 +254,8 @@ fun DetailedSongView(
                             applyTranspose()
                         },
                         context = LocalContext.current,
-                        songTitle = songState.value?.title ?: "Untitled",
-                        songLyrics = songState.value?.lyrics ?: emptyList(),
+                        songTitle = songState?.title ?: "Untitled",
+                        songLyrics = songState?.lyrics ?: emptyList(),
                         showAddToPlaylistDialog = showAddToPlaylistDialog
 
                     )
@@ -329,7 +321,7 @@ fun DetailedSongView(
                                 TextButton(
                                     onClick = {
                                         selectedPlaylist.value?.let { playlist ->
-                                            songState.value?.title?.let { title ->
+                                            songState?.title?.let { title ->
                                                 libraryViewModel.addSongToPlaylist(playlist, title) {
                                                     showAddToPlaylistDialog.value = false
                                                 }

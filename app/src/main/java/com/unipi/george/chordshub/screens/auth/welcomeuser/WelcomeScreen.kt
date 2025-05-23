@@ -11,8 +11,8 @@ import com.unipi.george.chordshub.R
 import androidx.compose.animation.core.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import kotlinx.coroutines.delay
 
 /*
@@ -20,45 +20,65 @@ import kotlinx.coroutines.delay
 */
 
 @Composable
-fun WelcomeScreen() {
-    // Ελέγχει αν το animation πρέπει να ξεκινήσει (μεταβαίνει σε true με καθυστέρηση)
-    var visible by remember { mutableStateOf(false) }
+fun WelcomeScreen(onAnimationEnd: () -> Unit) {
+    var startAnimation by remember { mutableStateOf(false) }
+    var finished by remember { mutableStateOf(false) }
 
-    // Δημιουργεί animation για το μέγεθος (scale) του logo: από 40% σε 200% σε 3s
     val scale by animateFloatAsState(
-        targetValue = if (visible) 2.4f else 0.4f,
-        animationSpec = tween(durationMillis = 3000, easing = EaseOutCubic)
+        targetValue = if (startAnimation) 1.4f else 0.6f,
+        animationSpec = tween(1200, easing = EaseOutBack), label = ""
     )
 
-    // Δημιουργεί animation για τη διαφάνεια (alpha): από 0 (αόρατο) σε 2 (πλήρως ορατό + έξτρα φωτεινότητα)
-    val alpha by animateFloatAsState(
-        targetValue = if (visible) 2.4f else 0f,
-        animationSpec = tween(durationMillis = 3000)
+    val alphaIn by animateFloatAsState(
+        targetValue = if (startAnimation) 1f else 0f,
+        animationSpec = tween(1000), label = ""
     )
 
-    // Ξεκινάει το animation 400ms μετά την είσοδο του composable
+    val offsetY by animateFloatAsState(
+        targetValue = if (finished) -300f else 0f,
+        animationSpec = tween(800, easing = EaseInOutCubic), label = ""
+    )
+
+    val alphaOut by animateFloatAsState(
+        targetValue = if (finished) 0f else 1f,
+        animationSpec = tween(800), label = ""
+    )
+
+    val effectiveAlpha = alphaIn * alphaOut
+
     LaunchedEffect(Unit) {
-        delay(400)
-        visible = true
+        delay(300)
+        startAnimation = true
+        delay(1600)
+        finished = true
+        delay(900)
+        onAnimationEnd()
     }
 
-    // Κεντράρει το περιεχόμενο στην οθόνη με background από το theme
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.background
+                    )
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // Το λογότυπο με εφέ μεγέθυνσης και ξεθολώματος, βάση των scale & alpha
-            Image(
-                painter = painterResource(id = R.drawable.chordiologo1),
-                contentDescription = "App Logo",
-                modifier = Modifier
-                    .size(180.dp)
-                    .scale(scale)
-                    .alpha(alpha)
-            )
-        }
+        Image(
+            painter = painterResource(id = R.drawable.chordiologo1),
+            contentDescription = "App Logo",
+            modifier = Modifier
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    translationY = offsetY
+                    alpha = effectiveAlpha
+                }
+                .sizeIn(140.dp, 220.dp)
+        )
     }
 }

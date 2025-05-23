@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.navigation.AppScreens
-import com.unipi.george.chordshub.repository.AuthRepository
 import com.unipi.george.chordshub.viewmodels.MainViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
@@ -32,14 +31,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.zIndex
 import com.unipi.george.chordshub.components.BlurredBackground
 import com.unipi.george.chordshub.components.UserProfileImage
-import com.unipi.george.chordshub.repository.StorageRepository
 import com.unipi.george.chordshub.screens.slidemenu.viewprofile.getProfileImageUrl
-import com.unipi.george.chordshub.utils.updateUserProfileImage
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
+import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableInteractionSource")
 @Composable
-fun ProfileMenu(mainViewModel: MainViewModel, navController: NavController, modifier: Modifier = Modifier) {
+fun ProfileMenu(mainViewModel: MainViewModel, userViewModel: UserViewModel, authViewModel: AuthViewModel, navController: NavController, modifier: Modifier = Modifier) {
     val isMenuOpen by mainViewModel.isMenuOpen
 
     if (isMenuOpen) {
@@ -54,7 +53,7 @@ fun ProfileMenu(mainViewModel: MainViewModel, navController: NavController, modi
             .fillMaxSize()
             .zIndex(10f)
     ) {
-        ProfileMenuContent(mainViewModel, navController)
+        ProfileMenuContent(mainViewModel, userViewModel, authViewModel, navController)
     }
 
 }
@@ -62,26 +61,26 @@ fun ProfileMenu(mainViewModel: MainViewModel, navController: NavController, modi
 @Composable
 fun ProfileMenuContent(
     mainViewModel: MainViewModel,
+    userViewModel: UserViewModel,
+    authViewModel: AuthViewModel,
     navController: NavController
 ) {
-    val userId = AuthRepository.getUserId()
+    val userId = authViewModel.getUserId()
     val username = remember { mutableStateOf("Loading...") }
     var profileImageUrl by remember { mutableStateOf<String?>(null) }
     var selectedImage by rememberSaveable { mutableStateOf<Uri?>(null) }
     val coroutineScope = rememberCoroutineScope()
-    val storageRepositoryRepo = StorageRepository()
 
     LaunchedEffect(userId) {
         userId?.let {
-            AuthRepository.getUsernameFromFirestore(it) { fetchedUsername ->
-                username.value = fetchedUsername ?: "Unknown"
-            }
+            authViewModel.loadProfileData()
             getProfileImageUrl(it)?.let { url ->
                 profileImageUrl = url
                 mainViewModel.setProfileImageUrl(url)
             }
         }
     }
+
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -90,16 +89,15 @@ fun ProfileMenuContent(
             selectedImage = selectedUri
 
             coroutineScope.launch {
-                val imageUrl = userId?.let {
-                    storageRepositoryRepo.uploadImageToFirebaseStorage(selectedUri, it)
-                }
-                if (imageUrl != null) {
-                    if (userId != null) {
-                        updateUserProfileImage(userId, imageUrl)
+                if (userId != null) {
+                    userViewModel.updateProfileImage(userId, selectedUri) { success ->
+                        if (success) {
+                            val newUrl = userViewModel.profileImageUrl.value
+                            profileImageUrl = newUrl
+                            mainViewModel.setProfileImageUrl(newUrl ?: "")
+                            selectedImage = null
+                        }
                     }
-                    profileImageUrl = imageUrl
-                    mainViewModel.setProfileImageUrl(imageUrl)
-                    selectedImage = null
                 }
             }
         }

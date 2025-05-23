@@ -4,14 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.unipi.george.chordshub.navigation.AppScreens
 import com.unipi.george.chordshub.screens.auth.LoginScreen
 import com.unipi.george.chordshub.screens.auth.SignUpScreen
-import com.unipi.george.chordshub.repository.AuthRepository
 import com.unipi.george.chordshub.screens.auth.ForgotPasswordScreen
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 
@@ -22,12 +20,12 @@ import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 @Composable
 fun AuthNav(
     navController: NavHostController,
+    authViewModel: AuthViewModel,
     isUserLoggedInState: MutableState<Boolean>
 ) {
-    val authViewModel: AuthViewModel = viewModel()
 
     val isLoggedIn = remember {
-        mutableStateOf(AuthRepository.getUserId() != null)
+        mutableStateOf(authViewModel.getUserId() != null)
     }
 
     val startDestination = if (isLoggedIn.value) {
@@ -52,11 +50,7 @@ fun AuthNav(
             SignUpScreen(navController)
         }
         composable(AppScreens.ForgotPassword.route) {
-            ForgotPasswordScreen(authRepository = AuthRepository, onBack = { navController.popBackStack() })
-        }
-        // Αν έχεις Home εδώ:
-        composable(AppScreens.Home.route) {
-            // HomeScreen(...)
+            ForgotPasswordScreen(authViewModel = authViewModel, onBack = { navController.popBackStack() })
         }
     }
 }

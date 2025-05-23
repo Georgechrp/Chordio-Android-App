@@ -1,5 +1,7 @@
 package com.unipi.george.chordshub.viewmodels.user
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
@@ -7,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.unipi.george.chordshub.models.User
-import com.unipi.george.chordshub.repository.AuthRepository
+import com.unipi.george.chordshub.repository.StorageRepository
 import kotlinx.coroutines.launch
 
 
@@ -26,6 +28,33 @@ class UserViewModel : ViewModel() {
         _userState.value = user
     }
 
+    private val _profileImageUrl = mutableStateOf<String?>(null)
+    val profileImageUrl: State<String?> = _profileImageUrl
+
+    fun updateProfileImage(userId: String, imageUri: Uri, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val url = StorageRepository().uploadImageToFirebaseStorage(imageUri, userId)
+            if (url != null) {
+                updateUserProfileImageInFirestore(userId, url)
+                _profileImageUrl.value = url
+                onResult(true)
+            } else {
+                onResult(false)
+            }
+        }
+    }
+
+    private fun updateUserProfileImageInFirestore(userId: String, imageUrl: String) {
+        val userRef = FirebaseFirestore.getInstance().collection("users").document(userId)
+        userRef.update("profileImageUrl", imageUrl)
+            .addOnSuccessListener {
+                Log.d("Firestore", "Profile image updated successfully!")
+            }
+            .addOnFailureListener {
+                Log.e("Firestore", "Failed to update profile image: ${it.message}")
+            }
+    }
+
     fun fetchRecentSongs(userId: String) {
         val userRef = db.collection("users").document(userId)
 
@@ -40,8 +69,6 @@ class UserViewModel : ViewModel() {
             println("Σφάλμα κατά την ανάκτηση των πρόσφατων τραγουδιών: ${e.message}")
         }
     }
-
-
 
     fun addRecentSong(userId: String, songTitle: String) {
         val userRef = db.collection("users").document(userId)

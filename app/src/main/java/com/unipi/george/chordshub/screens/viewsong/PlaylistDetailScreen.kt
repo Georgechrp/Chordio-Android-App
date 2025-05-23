@@ -20,6 +20,7 @@ import androidx.navigation.NavHostController
 import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.screens.SwipeableSongViewer
 import com.unipi.george.chordshub.viewmodels.MainViewModel
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.main.LibraryViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
@@ -33,6 +34,7 @@ fun PlaylistDetailScreen(
     mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     userViewModel: UserViewModel,
+    authViewModel: AuthViewModel,
     navController: NavHostController
 )
 {
@@ -56,7 +58,8 @@ fun PlaylistDetailScreen(
             mainViewModel = mainViewModel,
             homeViewModel = homeViewModel,
             userViewModel = userViewModel,
-            onExit = { selectedSongId = null }
+            authViewModel = authViewModel,
+            onExit = { selectedSongId = null },
         )
     }
     else {

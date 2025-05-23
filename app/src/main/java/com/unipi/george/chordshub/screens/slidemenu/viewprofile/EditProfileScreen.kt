@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.R
-import com.unipi.george.chordshub.repository.AuthRepository
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import kotlinx.coroutines.CoroutineScope
@@ -45,6 +44,7 @@ fun EditProfileScreen(navController: NavController, userId: String, onDismiss: (
             contentAlignment = Alignment.Center
         ) {
             ProfileCard(
+                authViewModel = authViewModel,
                 newUsername = newUsername.toString(),
                 onUsernameChange = { newUsername = it },
                 onSave = {
@@ -75,12 +75,13 @@ fun EditProfileScreen(navController: NavController, userId: String, onDismiss: (
 
 @Composable
 fun ProfileCard(
+    authViewModel: AuthViewModel,
     newUsername: String,
     onUsernameChange: (String) -> Unit,
     onSave: () -> Unit,
     onCancel: () -> Unit
 ) {
-    val userId = AuthRepository.getUserId() ?: return
+    val userId = authViewModel.getUserId() ?: return
     Card(
         modifier = Modifier.width(320.dp).padding(24.dp),
         shape = RoundedCornerShape(8.dp),

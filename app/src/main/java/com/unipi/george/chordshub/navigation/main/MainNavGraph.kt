@@ -82,10 +82,10 @@ fun MainNavGraph(
             HomeScreen(
                 homeViewModel = homeViewModel,
                 mainViewModel = mainViewModel,
+                searchViewModel = searchViewModel,
                 userViewModel = userViewModel,
-                navController = navController,
-                onMenuClick = { mainViewModel.setMenuOpen(true) },
-                profileImageUrl = profileImageUrl
+                authViewModel = authViewModel,
+                navController = navController
             )
         }
 
@@ -93,6 +93,7 @@ fun MainNavGraph(
             SearchScreen(
                 viewModel = searchViewModel,
                 mainViewModel = mainViewModel,
+                authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
                 navController = navController,
                 onFullScreenChange = { homeViewModel.setFullScreen(it) }
@@ -109,9 +110,7 @@ fun MainNavGraph(
         composable(AppScreens.Library.route) {
             LibraryScreen(
                 navController = navController,
-                mainViewModel = mainViewModel,
-                onMenuClick = { mainViewModel.setMenuOpen(true) },
-                profileImageUrl = profileImageUrl
+                mainViewModel = mainViewModel
             )
         }
 
@@ -128,7 +127,7 @@ fun MainNavGraph(
 
         composable("artist/{artistName}") { backStackEntry ->
             val artistName = backStackEntry.arguments?.getString("artistName") ?: "Άγνωστος Καλλιτέχνης"
-            ArtistScreen(artistName = artistName, navController = navController, mainViewModel = mainViewModel)
+            ArtistScreen(artistName = artistName, navController = navController, mainViewModel = mainViewModel, authViewModel = authViewModel)
         }
 
         composable("edit_profile/{userId}") { backStackEntry ->
@@ -141,11 +140,11 @@ fun MainNavGraph(
         }
 
         composable(AppScreens.Recents.route) {
-            RecentsScreen(navController = navController, userViewModel = userViewModel, homeViewModel = homeViewModel)
+            RecentsScreen(navController = navController, userViewModel = userViewModel, authViewModel = authViewModel, homeViewModel = homeViewModel)
         }
 
         composable("recentsScreen") {
-            RecentsScreen(navController, userViewModel, homeViewModel)
+            RecentsScreen(navController, userViewModel, authViewModel, homeViewModel)
         }
 
         composable(
@@ -162,7 +161,8 @@ fun MainNavGraph(
                 navController = navController,
                 mainViewModel = mainViewModel,
                 homeViewModel = homeViewModel,
-                userViewModel = userViewModel
+                userViewModel = userViewModel,
+                authViewModel = authViewModel
             )
         }
 
@@ -175,6 +175,7 @@ fun MainNavGraph(
                 mainViewModel = mainViewModel,
                 homeViewModel = homeViewModel,
                 userViewModel = userViewModel,
+                authViewModel = authViewModel,
                 navController = navController
             )
         }

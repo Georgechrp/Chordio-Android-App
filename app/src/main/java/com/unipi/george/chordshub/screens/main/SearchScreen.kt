@@ -27,12 +27,14 @@ import com.unipi.george.chordshub.utils.QRCodeScannerButton
 import com.unipi.george.chordshub.viewmodels.main.SearchViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.MainViewModel
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = viewModel(),
     mainViewModel: MainViewModel,
+    authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     navController: NavController,
     onFullScreenChange: (Boolean) -> Unit,
@@ -118,7 +120,8 @@ fun SearchScreen(
                 navController = navController,
                 mainViewModel = mainViewModel,
                 homeViewModel = homeViewModel,
-                userViewModel = userViewModel
+                userViewModel = userViewModel,
+                authViewModel = authViewModel
             )
         }
     }

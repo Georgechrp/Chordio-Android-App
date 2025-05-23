@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.pager.*
 import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
 import com.unipi.george.chordshub.viewmodels.MainViewModel
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 
@@ -18,6 +19,7 @@ fun SwipeableSongViewer(
     mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     userViewModel: UserViewModel,
+    authViewModel: AuthViewModel,
     onExit: () -> Unit
 ) {
     val initialIndex = songs.indexOf(initialSongId).coerceAtLeast(0)
@@ -34,7 +36,8 @@ fun SwipeableSongViewer(
             navController = navController,
             mainViewModel = mainViewModel,
             homeViewModel = homeViewModel,
-            userViewModel = userViewModel
+            userViewModel = userViewModel,
+            authViewModel = authViewModel
         )
     }
 }

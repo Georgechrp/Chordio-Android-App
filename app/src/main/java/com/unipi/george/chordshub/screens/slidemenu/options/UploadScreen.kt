@@ -13,28 +13,45 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.google.firebase.firestore.FirebaseFirestore
 import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.models.song.ChordPosition
 import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.models.song.SongLine
-import com.unipi.george.chordshub.repository.firestore.SongRepository
+import com.unipi.george.chordshub.viewmodels.seconds.UploadViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
-    val songRepo = SongRepository(FirebaseFirestore.getInstance())
-    val coroutineScope = rememberCoroutineScope()
-
     var title by remember { mutableStateOf("") }
     var artist by remember { mutableStateOf("") }
     var key by remember { mutableStateOf("") }
     var bpm by remember { mutableStateOf("") }
     var lyrics by remember { mutableStateOf("") }
     var chords by remember { mutableStateOf("") }
+
+    val uploadViewModel: UploadViewModel = viewModel()
+    val uploadSuccess by uploadViewModel.uploadSuccess.collectAsState()
+
+    LaunchedEffect(uploadSuccess) {
+        if (uploadSuccess) {
+            uploadViewModel.resetStatus()
+            navController.popBackStack()
+        }
+    }
+
+    val errorMessage by uploadViewModel.errorMessage.collectAsState()
+    errorMessage?.let {
+        Text(
+            text = it,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+    }
+
 
     val scrollState = rememberScrollState()
 
@@ -110,40 +127,38 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
 
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        val currentUserId = userViewModel.userId
-                        val songId = title.replace(" ", "_").lowercase()
+                    val currentUserId = userViewModel.userId
+                    val songId = title.replace(" ", "_").lowercase()
 
-                        val songLines = lyrics.split("\n").mapIndexed { index, line ->
-                            SongLine(
-                                lineNumber = index + 1,
-                                text = line,
-                                chords = chords.split(",").mapNotNull { chordData ->
-                                    val parts = chordData.split("-")
-                                    if (parts.size == 2) {
-                                        val chord = parts[0]
-                                        val position = parts[1].toIntOrNull()
-                                        if (position != null) ChordPosition(chord, position) else null
-                                    } else null
-                                }
-                            )
-                        }
-
-                        val song = Song(
-                            title = title,
-                            artist = artist,
-                            key = key,
-                            bpm = bpm.toIntOrNull() ?: 0,
-                            genres = listOf("User Added"),
-                            createdAt = System.currentTimeMillis().toString(),
-                            creatorId = currentUserId,
-                            lyrics = songLines
+                    val songLines = lyrics.split("\n").mapIndexed { index, line ->
+                        SongLine(
+                            lineNumber = index + 1,
+                            text = line,
+                            chords = chords.split(",").mapNotNull { chordData ->
+                                val parts = chordData.split("-")
+                                if (parts.size == 2) {
+                                    val chord = parts[0]
+                                    val position = parts[1].toIntOrNull()
+                                    if (position != null) ChordPosition(chord, position) else null
+                                } else null
+                            }
                         )
-
-                        songRepo.addSongData(songId, song)
-                        navController.popBackStack()
                     }
-                },
+
+                    val song = Song(
+                        title = title,
+                        artist = artist,
+                        key = key,
+                        bpm = bpm.toIntOrNull() ?: 0,
+                        genres = listOf("User Added"),
+                        createdAt = System.currentTimeMillis().toString(),
+                        creatorId = currentUserId,
+                        lyrics = songLines
+                    )
+
+                    uploadViewModel.uploadSong(songId, song)
+                }
+                ,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(

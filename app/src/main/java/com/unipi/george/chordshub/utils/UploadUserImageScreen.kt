@@ -45,7 +45,7 @@ suspend fun uploadImageToCloudinary(imageUri: Uri, context: android.content.Cont
 
             if (response.isSuccessful && responseBody != null) {
                 val jsonObject = org.json.JSONObject(responseBody)
-                return@withContext jsonObject.getString("secure_url") // ✅ Επιστρέφουμε το URL της εικόνας
+                return@withContext jsonObject.getString("secure_url") // Επιστρέφουμε το URL της εικόνας
             } else {
                 Log.e("Cloudinary", "Upload failed: $responseBody")
             }

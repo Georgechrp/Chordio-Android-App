@@ -24,11 +24,12 @@ import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.repository.firestore.SongRepository
 import com.unipi.george.chordshub.utils.ArtistInfo
 import com.unipi.george.chordshub.viewmodels.MainViewModel
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArtistScreen(artistName: String, navController: NavController, mainViewModel: MainViewModel) {
+fun ArtistScreen(artistName: String, navController: NavController, mainViewModel: MainViewModel, authViewModel: AuthViewModel) {
 
     var showInfoSheet by remember { mutableStateOf(false) }
     var songs by remember { mutableStateOf<List<Song>>(emptyList()) }
@@ -56,7 +57,8 @@ fun ArtistScreen(artistName: String, navController: NavController, mainViewModel
             navController = navController,
             mainViewModel = mainViewModel,
             homeViewModel = homeViewModel,
-            userViewModel = viewModel()
+            userViewModel = viewModel(),
+            authViewModel = authViewModel
         )
         return
     }

@@ -28,6 +28,16 @@ class SearchViewModel : ViewModel() {
     private val _genres = MutableStateFlow<List<String>>(emptyList())
     val genres: StateFlow<List<String>> = _genres
 
+    private val _artistList = MutableStateFlow<List<String>>(emptyList())
+    val artistList: StateFlow<List<String>> = _artistList
+
+    fun fetchAllArtists() {
+        songRepo.getAllArtists { list ->
+            _artistList.value = list
+        }
+    }
+
+
     private fun fetchGenres() {
         songRepo.getGenres { genreList ->
             _genres.value = genreList

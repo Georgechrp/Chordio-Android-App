@@ -18,6 +18,7 @@ import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.components.LoadingView
 import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
 import com.unipi.george.chordshub.viewmodels.MainViewModel
+import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 
@@ -26,6 +27,7 @@ import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 fun RecentsScreen(
     navController: NavController,
     userViewModel: UserViewModel,
+    authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel
 ) {
     val recentSongs by userViewModel.recentSongs
@@ -51,7 +53,8 @@ fun RecentsScreen(
             navController = navController,
             mainViewModel = mainViewModel,
             homeViewModel = homeViewModel,
-            userViewModel = userViewModel
+            userViewModel = userViewModel,
+            authViewModel = authViewModel
         )
         return
     }

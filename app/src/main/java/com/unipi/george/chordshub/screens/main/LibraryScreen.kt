@@ -30,7 +30,10 @@ import com.unipi.george.chordshub.viewmodels.main.SearchViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun LibraryScreen(navController: NavController, mainViewModel: MainViewModel, onMenuClick: () -> Unit, profileImageUrl: String?) {
+fun LibraryScreen(
+    navController: NavController,
+    mainViewModel: MainViewModel,
+) {
     val viewModel: LibraryViewModel = viewModel()
     val playlists by viewModel.playlists.collectAsState()
 
