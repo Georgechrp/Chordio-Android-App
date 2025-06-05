@@ -26,10 +26,11 @@ class SongRepository(private val db: FirebaseFirestore) {
             val title = document.getString("title") ?: "Unknown Title"
             val artist = document.getString("artist") ?: "Unknown Artist"
             val key = document.getString("key") ?: "Unknown Key"
-            val bpm = document.getLong("bpm")?.toInt()
-            val genres = document.get("genres") as? List<String>
-            val createdAt = document.getString("createdAt")
-            val creatorId = document.getString("creatorId")
+            val bpm = document.getLong("bpm")?.toInt() ?: 0
+            val genres = document.get("genres") as? List<String> ?: emptyList()
+            val createdAt = document.getString("createdAt") ?: ""
+            val creatorId = document.getString("creatorId") ?: ""
+
 
             // 🔹 Μετατροπή lyrics σε List<SongLine>
             val lyricsList = document.get("lyrics") as? List<Map<String, Any>>
@@ -45,8 +46,9 @@ class SongRepository(private val db: FirebaseFirestore) {
                 )
             } ?: emptyList()
 
-            Log.d("Firestore", "✅ Song loaded successfully: $title")
+            Log.d("Firestore", "Song loaded successfully: $title")
             return Song(
+                id = document.id,
                 title = title,
                 artist = artist,
                 key = key,
@@ -144,15 +146,18 @@ class SongRepository(private val db: FirebaseFirestore) {
             .whereEqualTo("artist", artistName)
             .get()
             .addOnSuccessListener { result ->
-                println("✅ Fetched ${result.size()} documents for artist: $artistName")
-                val songs =  result.mapNotNull {
+                println(" Fetched ${result.size()} documents for artist: $artistName")
+                val songs = result.mapNotNull {
                     try {
-                        it.toObject(FirestoreSongDTO::class.java).toSong()
+                        val dto = it.toObject(FirestoreSongDTO::class.java)
+                        val viewsCount = it.getLong("viewsCount")?.toInt() ?: 0
+                        dto?.toSong()?.copy(viewsCount = viewsCount)
                     } catch (e: Exception) {
                         println("Error parsing song: ${e.localizedMessage}")
                         null
                     }
                 }
+
                 callback(songs)
             }
             .addOnFailureListener { e ->
@@ -264,62 +269,70 @@ class SongRepository(private val db: FirebaseFirestore) {
             }
     }
 
-    suspend fun addSampleSongs() {
-        val lyrics = listOf(
-            "Every breath you take" to ("Every" to "G"),
-            "And every move you make" to ("make" to "Em"),
-            "Every bond you break" to ("break" to "C"),
-            "Every step you take" to ("take" to "D"),
-            "I'll be watching you" to ("watching" to "G"),
+    suspend fun uploadSong(song: Song): Boolean {
+        return try {
+            val songMap = hashMapOf(
+                "title" to song.title,
+                "artist" to song.artist,
+                "key" to song.key,
+                "bpm" to song.bpm,
+                "genres" to song.genres,
+                "createdAt" to song.createdAt,
+                "creatorId" to song.creatorId,
+                "lyrics" to song.lyrics.map { line ->
+                    hashMapOf(
+                        "lineNumber" to line.lineNumber,
+                        "text" to line.text,
+                        "chords" to line.chords.map {
+                            hashMapOf(
+                                "chord" to it.chord,
+                                "position" to it.position
+                            )
+                        },
+                        // Αν δεν υπάρχει chordLine, το δημιουργούμε εδώ
+                        "chordLine" to (line.chordLine ?: generateChordLineFromPositions(line.text, line.chords))
+                    )
+                }
+            )
 
-            "Every single day" to ("Every" to "G"),
-            "And every word you say" to ("say" to "Em"),
-            "Every game you play" to ("play" to "C"),
-            "Every night you stay" to ("stay" to "D"),
-            "I'll be watching you" to ("watching" to "G"),
+            db.collection("songs")
+                .add(songMap)
+                .await()
 
-            "Oh can't you see" to ("see" to "C"),
-            "You belong to me" to ("me" to "D"),
-            "How my poor heart aches" to ("aches" to "Bm"),
-            "With every step you take" to ("take" to "Em"),
-
-            "Every move you make" to ("make" to "G"),
-            "And every vow you break" to ("break" to "Em"),
-            "Every smile you fake" to ("fake" to "C"),
-            "Every claim you stake" to ("stake" to "D"),
-            "I'll be watching you" to ("watching" to "G"),
-
-            "Since you've gone I've been lost without a trace" to ("trace" to "Em"),
-            "I dream at night, I can only see your face" to ("face" to "C"),
-            "I look around but it's you I can't replace" to ("replace" to "D"),
-            "I feel so cold and I long for your embrace" to ("embrace" to "Bm"),
-            "I keep crying baby, baby, please..." to ("please" to "Em")
-        )
-
-        val song = Song(
-            title = "Every Breath You Take",
-            artist = "The Police",
-            key = "G",
-            bpm = 117,
-            genres = listOf("Rock", "Soft Rock", "Pop"),
-            createdAt = System.currentTimeMillis().toString(),
-            creatorId = "admin",
-            lyrics = lyrics.mapIndexed { index, (lineText, chordPair) ->
-                val (targetWord, chord) = chordPair
-                SongLine(
-                    lineNumber = index + 1,
-                    text = lineText,
-                    chordLine = generateChordLine(lineText, targetWord, chord)
-                )
-            }
-        )
-
-        val documentId = "Every_Breath_You_Take_Chords"
-        FirebaseFirestore.getInstance()
-            .collection("songs")
-            .document(documentId)
-            .set(song)  // overwrite το document
+            true
+        } catch (e: Exception) {
+            Log.e("Firestore", "❌ Error uploading song: ${e.message}")
+            false
+        }
     }
+
+
+    private fun generateChordLineFromPositions(text: String, chords: List<ChordPosition>): String {
+        val result = CharArray(text.length.coerceAtLeast(1)) { ' ' }
+
+        for (chord in chords.sortedBy { it.position }) {
+            val pos = chord.position.coerceIn(0, result.lastIndex)
+            val chordText = chord.chord
+            for (i in chordText.indices) {
+                if (pos + i < result.size) {
+                    result[pos + i] = chordText[i]
+                }
+            }
+        }
+
+        return String(result)
+    }
+
+    suspend fun getSongViewsCount(songId: String): Int? {
+        return try {
+            val doc = db.collection("songs").document(songId).get().await()
+            doc.getLong("viewsCount")?.toInt()
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error fetching views count: ${e.message}")
+            null
+        }
+    }
+
 
 
 }

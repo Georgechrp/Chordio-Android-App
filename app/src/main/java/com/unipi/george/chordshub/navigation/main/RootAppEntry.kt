@@ -1,6 +1,5 @@
 package com.unipi.george.chordshub.navigation.main
 
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -63,9 +62,11 @@ fun RootAppEntry(sessionViewModel: SessionViewModel) {
         ObserveUserSession(sessionViewModel)
 
 
+
+
         when {
             !splashDone.value -> WelcomeScreen { splashDone.value = true }
-            isUserLoggedInState.value -> MainScaffold(navController, authViewModel, imageUrl)
+            isUserLoggedInState.value -> MainScaffold(navController, authViewModel, sessionViewModel, imageUrl)
             else -> AuthNav(navController, authViewModel, isUserLoggedInState)
         }
 

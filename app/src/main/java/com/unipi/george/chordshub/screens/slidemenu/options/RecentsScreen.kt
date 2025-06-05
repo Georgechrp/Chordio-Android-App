@@ -1,5 +1,6 @@
 package com.unipi.george.chordshub.screens.slidemenu.options
 
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,11 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.R
+import com.unipi.george.chordshub.components.CardsView
 import com.unipi.george.chordshub.components.LoadingView
 import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
 import com.unipi.george.chordshub.viewmodels.MainViewModel
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
+import com.unipi.george.chordshub.viewmodels.main.SearchViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,22 +31,29 @@ fun RecentsScreen(
     navController: NavController,
     userViewModel: UserViewModel,
     authViewModel: AuthViewModel,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    searchViewModel: SearchViewModel
 ) {
     val recentSongs by userViewModel.recentSongs
-    val userId = userViewModel.userId
+    val artistList by searchViewModel.artistList.collectAsState()
+    val userId = authViewModel.getUserId()
     var isLoading by remember { mutableStateOf(true) }
     val selectedSongId by homeViewModel.selectedSongId.collectAsState()
     val mainViewModel = remember { MainViewModel() }
-    // Fetch recent songs κατά την είσοδο στην οθόνη
+
+    // Fetch songs and artists
     LaunchedEffect(userId) {
         if (userId != null) {
             userViewModel.fetchRecentSongs(userId)
         }
+        homeViewModel.getAllArtists()
         isLoading = false
     }
+    LaunchedEffect(Unit) {
+        searchViewModel.fetchAllArtists()
+    }
 
-    // Αν έχει επιλεγεί τραγούδι, δείχνουμε την λεπτομέρεια του
+
     if (selectedSongId != null) {
         DetailedSongView(
             songId = selectedSongId!!,
@@ -68,7 +78,6 @@ fun RecentsScreen(
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Πίσω")
                     }
                 }
-
             )
         }
     ) { paddingValues ->
@@ -83,53 +92,57 @@ fun RecentsScreen(
                     LoadingView()
                 }
 
-                recentSongs.isEmpty() -> {
+                recentSongs.isEmpty() && artistList.isEmpty() -> {
                     Text(
-                        "Δεν υπάρχουν πρόσφατα τραγούδια.",
+                        "Δεν υπάρχουν πρόσφατα ακόμη.",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onBackground
                     )
-
                 }
 
                 else -> {
-                    Text(
-                        text = "Τα τελευταία τραγούδια που είδες",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-
-
-                    LazyColumn(
-                        contentPadding = PaddingValues(bottom = 80.dp)
-                    )  {
-                        items(recentSongs) { song ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
-                                    .clickable {
-                                        homeViewModel.selectSong(song)
-                                    },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-
-                            ) {
-                                Text(
-                                    text = song,
-                                    modifier = Modifier.padding(16.dp),
-                                    fontSize = 18.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                    if (recentSongs.isNotEmpty()) {
+                        Text(
+                            text = "Τα τελευταία τραγούδια που είδες",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        val recentSongPairs = remember(recentSongs) {
+                            recentSongs.mapNotNull { song ->
+                                val title = song.title?.trim()
+                                val artist = song.artist?.trim()
+                                val songId = song.id
+                                if (title != null && songId != null) {
+                                    val combinedTitle = if (!artist.isNullOrEmpty()) "$title - $artist" else title
+                                    combinedTitle to songId
+                                } else null
                             }
                         }
+
+                        CardsView(
+                            songList = recentSongPairs,
+                            homeViewModel = homeViewModel,
+                            selectedTitle = remember { mutableStateOf(null) },
+                            columns = 1,
+                            cardHeight = 80.dp,
+                            cardPadding = 12.dp,
+                            fontSize = 16.sp,
+                            onSongClick = { songId ->
+                                homeViewModel.selectSong(songId)
+                            }
+                        )
+
                     }
+
+
                 }
+
             }
+
         }
+
     }
+
 }
+

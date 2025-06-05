@@ -41,9 +41,6 @@ fun AuthNav(
         composable(AppScreens.Login.route) {
             LoginScreen(authViewModel = authViewModel, navController) {
                 isUserLoggedInState.value = true
-                navController.navigate(AppScreens.Home.route) {
-                    popUpTo(0) { inclusive = true }
-                }
             }
         }
         composable(AppScreens.SignUp.route) {

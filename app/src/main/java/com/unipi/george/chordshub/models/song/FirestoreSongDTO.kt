@@ -12,6 +12,7 @@ data class FirestoreSongDTO(
 ) {
     fun toSong(): Song {
         return Song(
+            id = "",
             title = title,
             artist = artist,
             bpm = bpm,

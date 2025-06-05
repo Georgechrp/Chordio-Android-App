@@ -114,7 +114,7 @@ fun LibraryScreen(
                                 }
                             ),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
+                            containerColor = MaterialTheme.colorScheme.secondary,
                             contentColor = MaterialTheme.colorScheme.onSurface
                         )
 
@@ -125,7 +125,7 @@ fun LibraryScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(playlist, style = MaterialTheme.typography.bodyLarge)
+                                Text(playlist, style = MaterialTheme.typography.bodyMedium)
 
                                 IconButton(onClick = {
                                     selectedPlaylist = playlist
@@ -143,8 +143,9 @@ fun LibraryScreen(
 
                 }
             }
-
+            Spacer(modifier = Modifier.height(104.dp))
         }
+
 
         // FloatingActionButton
         FloatingActionButton(onClick = {

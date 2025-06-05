@@ -28,7 +28,9 @@ import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.MainViewModel
 import com.unipi.george.chordshub.viewmodels.TempPlaylistViewModelFactory
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
+import com.unipi.george.chordshub.viewmodels.auth.SessionViewModel
 import com.unipi.george.chordshub.viewmodels.main.SearchViewModel
+import com.unipi.george.chordshub.viewmodels.seconds.SongViewModel
 import com.unipi.george.chordshub.viewmodels.seconds.TempPlaylistViewModel
 import com.unipi.george.chordshub.viewmodels.user.SettingsViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
@@ -54,11 +56,13 @@ import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 fun MainNavGraph(
     navController: NavHostController,
     mainViewModel: MainViewModel,
-    profileImageUrl: String?
+    sessionViewModel: SessionViewModel
 ) {
     val homeViewModel: HomeViewModel = viewModel()
     val searchViewModel: SearchViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
+
+
     val appSettingsPreferences = AppSettingsPreferences(navController.context)
     val settingsViewModel = SettingsViewModel(appSettingsPreferences)
     val isMenuOpen by mainViewModel.isMenuOpen
@@ -74,10 +78,12 @@ fun MainNavGraph(
             mainViewModel.setMenuOpen(false)
         }
     }
+
     NavHost(
         navController = navController,
         startDestination = AppScreens.Home.route
     ) {
+
         composable(AppScreens.Home.route) {
             HomeScreen(
                 homeViewModel = homeViewModel,
@@ -115,19 +121,13 @@ fun MainNavGraph(
         }
 
         composable(AppScreens.Profile.route) {
-            ProfileScreen(
-                onLogout = {
-                    navController.navigate(AppScreens.Login.route) {
-                        popUpTo(AppScreens.Home.route) { inclusive = true }
-                    }
-                }
-            )
+            ProfileScreen(navController, sessionViewModel )
         }
 
 
         composable("artist/{artistName}") { backStackEntry ->
             val artistName = backStackEntry.arguments?.getString("artistName") ?: "Άγνωστος Καλλιτέχνης"
-            ArtistScreen(artistName = artistName, navController = navController, mainViewModel = mainViewModel, authViewModel = authViewModel)
+            ArtistScreen(artistName = artistName, navController = navController, mainViewModel = mainViewModel, homeViewModel = homeViewModel, authViewModel = authViewModel)
         }
 
         composable("edit_profile/{userId}") { backStackEntry ->
@@ -140,11 +140,11 @@ fun MainNavGraph(
         }
 
         composable(AppScreens.Recents.route) {
-            RecentsScreen(navController = navController, userViewModel = userViewModel, authViewModel = authViewModel, homeViewModel = homeViewModel)
+            RecentsScreen(navController = navController, userViewModel = userViewModel, authViewModel = authViewModel, homeViewModel = homeViewModel, searchViewModel = searchViewModel)
         }
 
         composable("recentsScreen") {
-            RecentsScreen(navController, userViewModel, authViewModel, homeViewModel)
+            RecentsScreen(navController, userViewModel, authViewModel, homeViewModel, searchViewModel)
         }
 
         composable(
@@ -189,7 +189,7 @@ fun MainNavGraph(
 
         composable(AppScreens.Stats.route) {
             WeeklyStatsScreen(
-                userId = userViewModel.userId ?: return@composable,
+                userId = authViewModel.getUserId() ?: return@composable,
                 navController = navController
             )
         }

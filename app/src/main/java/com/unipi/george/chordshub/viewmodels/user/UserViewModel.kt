@@ -6,9 +6,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.unipi.george.chordshub.models.User
+import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.repository.StorageRepository
 import kotlinx.coroutines.launch
 
@@ -21,8 +23,9 @@ class UserViewModel : ViewModel() {
 
     val userId: String? get() = _userState.value?.uid
 
-    private val _recentSongs = mutableStateOf<List<String>>(emptyList())
-    val recentSongs: State<List<String>> = _recentSongs
+    private val _recentSongs = mutableStateOf<List<Song>>(emptyList())
+    val recentSongs: State<List<Song>> = _recentSongs
+
 
     fun setUser(user: User?) {
         _userState.value = user
@@ -60,48 +63,51 @@ class UserViewModel : ViewModel() {
 
         userRef.get().addOnSuccessListener { document ->
             if (document.exists()) {
-                val recentSongs = document.get("recentSongs") as? List<String> ?: emptyList()
-                _recentSongs.value = recentSongs
+                val recentIds = document.get("recentSongs") as? List<String> ?: emptyList()
+                val validIds = recentIds.filter { it.isNotBlank() }.take(10)
+
+                if (validIds.isEmpty()) {
+                    _recentSongs.value = emptyList()
+                    return@addOnSuccessListener
+                }
+
+                db.collection("songs")
+                    .whereIn(FieldPath.documentId(), validIds)
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        val songList = snapshot.documents.mapNotNull { it.toObject(Song::class.java)?.apply { id = it.id } }
+                        val orderedList = validIds.mapNotNull { id -> songList.find { it.id == id } }
+                        _recentSongs.value = orderedList
+                    }
+                    .addOnFailureListener {
+                        Log.e("Firestore", "Error fetching songs: ${it.message}")
+                    }
+
             } else {
-                _recentSongs.value = emptyList() // Κενή λίστα αν δεν υπάρχουν τραγούδια
+                _recentSongs.value = emptyList()
             }
         }.addOnFailureListener { e ->
-            println("Σφάλμα κατά την ανάκτηση των πρόσφατων τραγουδιών: ${e.message}")
+            Log.e("Firestore", "⚠Failed to fetch user data: ${e.message}")
         }
     }
 
-    fun addRecentSong(userId: String, songTitle: String) {
+
+
+    fun addRecentSong(userId: String, songId: String) {
+        if (songId.isBlank()) return  // Προστασία από άκυρο ID
+
         val userRef = db.collection("users").document(userId)
 
         userRef.get().addOnSuccessListener { document ->
-            if (document.exists()) {
-                val recentSongs = document.get("recentSongs") as? List<String> ?: emptyList()
+            val recentSongs = document.get("recentSongs") as? List<String> ?: emptyList()
+            val updatedSongs = (listOf(songId) + recentSongs.filter { it != songId }).take(10)
 
-                // Αν το τραγούδι υπάρχει ήδη, το αφαιρούμε πριν το προσθέσουμε ξανά (ώστε να πάει στην αρχή)
-                val updatedSongs = (listOf(songTitle) + recentSongs.filter { it != songTitle })
-                    .take(10) // Διατηρούμε μόνο τις τελευταίες 8 καταχωρήσεις
-
-                userRef.update("recentSongs", updatedSongs)
-                    .addOnSuccessListener {
-                        println(" Το τραγούδι '$songTitle' προστέθηκε στα πρόσφατα τραγούδια!")
-                    }
-                    .addOnFailureListener { e ->
-                        println(" Σφάλμα κατά την προσθήκη τραγουδιού: ${e.message}")
-                    }
-            } else {
-                // Αν δεν υπάρχει το array, δημιουργείται νέο
-                userRef.set(mapOf("recentSongs" to listOf(songTitle)), SetOptions.merge())
-                    .addOnSuccessListener {
-                        println(" Η λίστα recentSongs δημιουργήθηκε με επιτυχία!")
-                    }
-                    .addOnFailureListener { e ->
-                        println(" Σφάλμα κατά τη δημιουργία recentSongs: ${e.message}")
-                    }
-            }
-        }.addOnFailureListener { e ->
-            println(" Σφάλμα κατά την ανάκτηση δεδομένων χρήστη: ${e.message}")
+            userRef.update("recentSongs", updatedSongs)
+        }.addOnFailureListener {
+            userRef.set(mapOf("recentSongs" to listOf(songId)), SetOptions.merge())
         }
     }
+
 
 
 }

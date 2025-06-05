@@ -21,6 +21,7 @@ import androidx.compose.ui.zIndex
 import com.unipi.george.chordshub.components.MyAppTopBar
 import com.unipi.george.chordshub.screens.slidemenu.ProfileMenu
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
+import com.unipi.george.chordshub.viewmodels.auth.SessionViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 
 /*
@@ -35,6 +36,7 @@ import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 fun MainScaffold(
     navController: NavHostController,
     authViewModel: AuthViewModel,
+    sessionViewModel: SessionViewModel,
     profileImageUrl: String?
 ) {
     val mainViewModel: MainViewModel = viewModel()
@@ -64,7 +66,7 @@ fun MainScaffold(
             MainNavGraph(
                 navController = navController,
                 mainViewModel = mainViewModel,
-                profileImageUrl = profileImageUrl
+                sessionViewModel = sessionViewModel
             )
 
             if (currentRoute in topBarScreens && !isFullScreen) {

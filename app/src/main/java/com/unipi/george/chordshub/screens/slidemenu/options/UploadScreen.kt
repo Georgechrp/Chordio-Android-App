@@ -127,7 +127,8 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
 
             Button(
                 onClick = {
-                    val currentUserId = userViewModel.userId
+                    val currentUserId = userViewModel.userId ?: return@Button
+
                     val songId = title.replace(" ", "_").lowercase()
 
                     val songLines = lyrics.split("\n").mapIndexed { index, line ->
@@ -146,6 +147,7 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
                     }
 
                     val song = Song(
+                        id = songId,
                         title = title,
                         artist = artist,
                         key = key,

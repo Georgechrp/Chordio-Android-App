@@ -4,16 +4,18 @@ import androidx.annotation.Keep
 
 @Keep
 data class SongLine(
-    val lineNumber: Int,
-    val text: String,
-    val chords: List<ChordPosition> = emptyList(),
-    val chordLine: String? = null
+    var lineNumber: Int = 0,
+    var text: String = "",
+    var chords: List<ChordPosition> = emptyList(),
+    var chordLine: String? = null
 )
 
+
 data class ChordPosition(
-    val chord: String,
-    val position: Int
+    var chord: String = "",
+    var position: Int = 0
 )
+
 
 fun generateChordLine(text: String, word: String, chord: String): String? {
     val index = text.indexOf(word)

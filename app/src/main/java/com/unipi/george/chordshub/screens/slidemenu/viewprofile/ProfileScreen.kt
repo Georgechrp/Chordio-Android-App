@@ -14,11 +14,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.unipi.george.chordshub.R
+import com.unipi.george.chordshub.navigation.AppScreens
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
+import com.unipi.george.chordshub.viewmodels.auth.SessionViewModel
 
 @Composable
-fun ProfileScreen(onLogout: () -> Unit) {
+fun ProfileScreen(navController: NavController, sessionViewModel : SessionViewModel) {
     val showDeleteDialog = remember { mutableStateOf(false) }
     val showLogoutDialog = remember { mutableStateOf(false) }
     val showEditUsernameDialog = remember { mutableStateOf(false) }
@@ -54,12 +57,17 @@ fun ProfileScreen(onLogout: () -> Unit) {
                 authViewModel.deleteUserAccount { success ->
                     showDeleteDialog.value = false
                     if (success) {
-                        Toast.makeText(context, "Account Deleted", Toast.LENGTH_SHORT).show()
-                        onLogout()
+                        authViewModel.logout {
+                            Toast.makeText(context, "Account Deleted", Toast.LENGTH_SHORT).show()
+                            navController.navigate("login") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
                     } else {
                         Toast.makeText(context, deleteMessage ?: "Unknown error", Toast.LENGTH_SHORT).show()
                     }
                 }
+
             },
             onDismiss = { showDeleteDialog.value = false }
         )
@@ -71,10 +79,11 @@ fun ProfileScreen(onLogout: () -> Unit) {
             message = stringResource(R.string.Are_you_sure_you_want_to_logout),
             onConfirm = {
                 authViewModel.logout {
+                    sessionViewModel.endSession(false) // ή sessionViewModel.handleUserSession(null)
                     showLogoutDialog.value = false
-                    onLogout()
-
                 }
+
+
             },
             onDismiss = { showLogoutDialog.value = false }
         )
@@ -132,7 +141,7 @@ fun ProfileCard(
             Divider(modifier = Modifier.padding(vertical = 4.dp))
             InfoRow(label = stringResource(R.string.email), value = email)
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(440.dp))
 
             OutlinedButton(
                 onClick = { showLogoutDialog.value = true },

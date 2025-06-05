@@ -1,7 +1,6 @@
 package com.unipi.george.chordshub.screens.viewsong
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -50,6 +49,7 @@ import com.unipi.george.chordshub.models.song.SongLine
 import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.utils.saveCardContentAsPdf
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.ClickableText
@@ -76,6 +76,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.R
 import com.unipi.george.chordshub.components.CardsView
+import com.unipi.george.chordshub.models.song.ChordPosition
 import com.unipi.george.chordshub.repository.firestore.SongRepository
 import com.unipi.george.chordshub.repository.firestore.TempPlaylistRepository
 import com.unipi.george.chordshub.sharedpreferences.TransposePreferences
@@ -145,9 +146,57 @@ fun DetailedSongView(
         }
     }
 
-    LaunchedEffect(songId) {
-       // songRepo.addSampleSongs()
-    }
+
+    /*LaunchedEffect(Unit) {
+        val testSong = Song(
+            title = "Wonderwall",
+            artist = "Oasis",
+            key = "F#",
+            bpm = 84,
+            genres = listOf("Britpop", "Acoustic"),
+            createdAt = System.currentTimeMillis().toString(),
+            creatorId = userId,
+            lyrics = listOf(
+                SongLine(
+                    lineNumber = 0,
+                    text = "Today is gonna be the day",
+                    chords = listOf(
+                        ChordPosition("Em7", 0),
+                        ChordPosition("G", 14)
+                    ),
+                    chordLine = null
+                ),
+                SongLine(
+                    lineNumber = 1,
+                    text = "That they're gonna throw it back to you",
+                    chords = listOf(
+                        ChordPosition("Dsus4", 0),
+                        ChordPosition("A7sus4", 28)
+                    ),
+                    chordLine = null
+                ),
+                SongLine(
+                    lineNumber = 2,
+                    text = "By now you should've somehow",
+                    chords = listOf(
+                        ChordPosition("Cadd9", 0),
+                        ChordPosition("Em7", 17)
+                    ),
+                    chordLine = null
+                )
+            )
+        )
+
+        val success = songViewModel.uploadSong(testSong)
+        if (success) {
+            Log.d("Upload", "✅ Uploaded test song!")
+        } else {
+            Log.e("Upload", "❌ Failed to upload test song!")
+        }
+    }*/
+
+
+
 
 
 
@@ -512,10 +561,10 @@ fun SongLyricsView(
                         .fillMaxWidth()
                         .padding(8.dp)
                 ) {
-                    RenderSongLine(songLine = line)
-
+                    ChordText(songLine = line, onChordClick = { /* Handle if needed */ })
                 }
             }
+
         }
 
         snackbarHostState.value?.let { message ->

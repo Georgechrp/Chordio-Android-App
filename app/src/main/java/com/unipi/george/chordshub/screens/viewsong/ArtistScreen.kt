@@ -24,29 +24,43 @@ import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.repository.firestore.SongRepository
 import com.unipi.george.chordshub.utils.ArtistInfo
 import com.unipi.george.chordshub.viewmodels.MainViewModel
+import com.unipi.george.chordshub.viewmodels.SongViewModelFactory
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
+import com.unipi.george.chordshub.viewmodels.seconds.SongViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArtistScreen(artistName: String, navController: NavController, mainViewModel: MainViewModel, authViewModel: AuthViewModel) {
+fun ArtistScreen(
+    artistName: String,
+    navController: NavController,
+    mainViewModel: MainViewModel,
+    homeViewModel: HomeViewModel,
+    authViewModel: AuthViewModel
+) {
 
     var showInfoSheet by remember { mutableStateOf(false) }
     var songs by remember { mutableStateOf<List<Song>>(emptyList()) }
-    val homeViewModel: HomeViewModel = viewModel()
 
     val selectedTitle = remember { mutableStateOf<String?>(null) }
     val selectedSongId = remember { mutableStateOf<String?>(null) }
 
-    val songRepository = remember { SongRepository(FirebaseFirestore.getInstance()) }
+    val songViewModel: SongViewModel = viewModel(
+        factory = SongViewModelFactory(SongRepository(FirebaseFirestore.getInstance()))
+    )
+
 
 
     LaunchedEffect(artistName) {
         homeViewModel.clearSelectedSong()
-        songRepository.getSongsByArtistName(artistName) { fetchedSongs ->
-            songs = fetchedSongs
+        songViewModel.getSongsByArtistName(artistName) { fetchedSongs ->
+            val sortedByPopularity = fetchedSongs.sortedByDescending { it.viewsCount ?: 0 }
+            val top5 = sortedByPopularity.take(5)
+            val remaining = sortedByPopularity.drop(5).sortedBy { it.title }
+            songs = top5 + remaining
         }
     }
+
 
     // Show DetailedSongView if a song is selected
     if (selectedSongId.value != null) {
@@ -91,7 +105,8 @@ fun ArtistScreen(artistName: String, navController: NavController, mainViewModel
             CardsView(
                 songList = songs.mapNotNull { song ->
                     val title = song.title
-                    if (title != null) title to title else null
+                    val id = song.id
+                    if (title != null && id != null) title to id else null
                 },
                 homeViewModel = homeViewModel,
                 selectedTitle = selectedTitle,
@@ -101,10 +116,8 @@ fun ArtistScreen(artistName: String, navController: NavController, mainViewModel
                 cardPadding = 12.dp,
                 gridPadding = 16.dp,
                 fontSize = 16.sp,
-                onSongClick = { clickedTitle ->
-                    homeViewModel.clearSelectedSong()
-                    homeViewModel.setFullScreen(true)
-                    selectedSongId.value = clickedTitle
+                onSongClick = { clickedId ->
+                    selectedSongId.value = clickedId
                 }
 
             )

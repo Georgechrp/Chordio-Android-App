@@ -3,29 +3,37 @@ package com.unipi.george.chordshub.screens.auth.welcomeuser
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.unipi.george.chordshub.R
-import androidx.compose.animation.core.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
 import kotlinx.coroutines.delay
-
-/*
-*   Just a Welcome Screen with fade up 3 seconds from 40% --> 200%
-*/
+import androidx.compose.animation.core.*
+import android.media.MediaPlayer
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.isSystemInDarkTheme
 
 @Composable
 fun WelcomeScreen(onAnimationEnd: () -> Unit) {
     var startAnimation by remember { mutableStateOf(false) }
     var finished by remember { mutableStateOf(false) }
-
+    val isDarkTheme = isSystemInDarkTheme()
+    val logoPainter = painterResource(
+        id = if (isDarkTheme) R.drawable.blacklogotransparent else R.drawable.chordiowhitetransparent
+    )
+    PlaySplashSound()
+    // Logo animations
     val scale by animateFloatAsState(
-        targetValue = if (startAnimation) 1.4f else 0.6f,
+        targetValue = if (startAnimation) 1.3f else 0.6f,
         animationSpec = tween(1200, easing = EaseOutBack), label = ""
     )
 
@@ -35,7 +43,7 @@ fun WelcomeScreen(onAnimationEnd: () -> Unit) {
     )
 
     val offsetY by animateFloatAsState(
-        targetValue = if (finished) -300f else 0f,
+        targetValue = if (finished) -250f else 0f,
         animationSpec = tween(800, easing = EaseInOutCubic), label = ""
     )
 
@@ -44,14 +52,25 @@ fun WelcomeScreen(onAnimationEnd: () -> Unit) {
         animationSpec = tween(800), label = ""
     )
 
-    val effectiveAlpha = alphaIn * alphaOut
+    val effectiveAlpha = (alphaIn * alphaOut).coerceIn(0f, 1f)
+
+    // Glow animation
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    val glowAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.2f,
+        targetValue = 0.6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1400, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
 
     LaunchedEffect(Unit) {
         delay(300)
         startAnimation = true
-        delay(1600)
+        delay(1800)
         finished = true
-        delay(900)
+        delay(800)
         onAnimationEnd()
     }
 
@@ -68,8 +87,22 @@ fun WelcomeScreen(onAnimationEnd: () -> Unit) {
             ),
         contentAlignment = Alignment.Center
     ) {
+        // Glowing background behind the logo
+        Box(
+            modifier = Modifier
+                .size(240.dp)
+                .graphicsLayer {
+                    alpha = glowAlpha
+                    scaleX = 1.2f
+                    scaleY = 1.2f
+                }
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.6f))
+        )
+
+        // Logo
         Image(
-            painter = painterResource(id = R.drawable.chordiologo1),
+            painter = logoPainter,
             contentDescription = "App Logo",
             modifier = Modifier
                 .graphicsLayer {
@@ -78,7 +111,22 @@ fun WelcomeScreen(onAnimationEnd: () -> Unit) {
                     translationY = offsetY
                     alpha = effectiveAlpha
                 }
-                .sizeIn(140.dp, 220.dp)
+                .size(200.dp)
         )
+    }
+}
+
+
+@Composable
+fun PlaySplashSound() {
+    val context = LocalContext.current
+
+    DisposableEffect(Unit) {
+        val mediaPlayer = MediaPlayer.create(context, R.raw.splash_sound2)
+        mediaPlayer.start()
+
+        onDispose {
+            mediaPlayer.release()
+        }
     }
 }

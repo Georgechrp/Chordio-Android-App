@@ -16,14 +16,21 @@ class WeeklyStatsViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
 
     fun fetchWeeklyStats(userId: String) {
+        println("📥 Fetching stats for userId = $userId")
+
         db.collection("users").document(userId).get()
             .addOnSuccessListener { document ->
-                if (!document.exists()) return@addOnSuccessListener
+                println("Document data: ${document.data}")
+                if (!document.exists()) {
+                    println("❌ Document does not exist")
+                    return@addOnSuccessListener
+                }
 
                 val days = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
                 val stats = mutableListOf<DayStat>()
 
                 val nestedMap = document.get("totalTimeSpent") as? Map<*, *>
+                println("🗺 totalTimeSpent map: $nestedMap")
 
                 for (day in days) {
                     val value = when {
@@ -35,7 +42,12 @@ class WeeklyStatsViewModel : ViewModel() {
                     stats.add(DayStat(day, text))
                 }
 
+                println("Weekly Stats Parsed: $stats")
                 _weeklyStats.value = stats
             }
+            .addOnFailureListener { e ->
+                println(" Error fetching stats: ${e.message}")
+            }
     }
+
 }

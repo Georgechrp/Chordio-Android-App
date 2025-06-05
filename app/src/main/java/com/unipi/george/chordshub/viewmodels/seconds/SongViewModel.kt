@@ -13,6 +13,23 @@ class SongViewModel(private val songRepo: SongRepository) : ViewModel() {
     private val _songState = MutableStateFlow<Song?>(null)
     val songState: StateFlow<Song?> = _songState
 
+    private val _viewsCount = MutableStateFlow<Int?>(null)
+    val viewsCount: StateFlow<Int?> = _viewsCount
+
+    fun fetchViewsCount(songId: String) {
+        viewModelScope.launch {
+            val count = songRepo.getSongViewsCount(songId)
+            _viewsCount.value = count
+        }
+    }
+
+    fun getSongsByArtistName(artistName: String, callback: (List<Song>) -> Unit) {
+        viewModelScope.launch {
+            songRepo.getSongsByArtistName(artistName, callback)
+        }
+    }
+
+
     fun loadSong(songId: String, fallbackToTitle: Boolean = true) {
         viewModelScope.launch {
             var song = songRepo.getSongDataAsync(songId)
@@ -25,6 +42,16 @@ class SongViewModel(private val songRepo: SongRepository) : ViewModel() {
     }
     fun updateLocalSong(updated: Song) {
         _songState.value = updated
+    }
+
+
+    suspend fun uploadSong(song: Song): Boolean {
+        return songRepo.uploadSong(song)
+    }
+
+
+    suspend fun getViewsCount(songId: String): Int? {
+        return songRepo.getSongViewsCount(songId)
     }
 
 

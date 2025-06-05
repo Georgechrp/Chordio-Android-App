@@ -47,6 +47,7 @@ fun CardsView(
             .fillMaxSize()
             .heightIn(min = 100.dp, max = 600.dp)
             .padding(gridPadding),
+        contentPadding = PaddingValues(bottom = 80.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {

@@ -15,6 +15,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.components.FilterRow
 import com.unipi.george.chordshub.components.CardsView
@@ -24,6 +25,7 @@ import com.unipi.george.chordshub.viewmodels.MainViewModel
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.main.SearchViewModel
+import com.unipi.george.chordshub.viewmodels.seconds.SongViewModel2
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
@@ -69,12 +71,22 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         selectedFilter = "All"
     }
+    val viewModel: SongViewModel2 = viewModel()
+    val songId = remember { mutableStateOf<String?>(null) }
+
+    // ανέβασε τραγούδι και κράτα το id
+    LaunchedEffect(Unit) {
+       // val uploadedId = viewModel.uploadTestSong()
+        //songId.value = uploadedId
+
+    }
 
     LaunchedEffect(selectedFilter) {
         artistMode = selectedFilter == "Artists"
 
         when (selectedFilter) {
             "Artists" -> homeViewModel.getAllArtists()
+
             else -> {
                 searchViewModel.searchByGenre(selectedFilter)
                 homeViewModel.getAllArtists()
@@ -128,6 +140,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         searchViewModel.fetchAllArtists()
     }
+
 
 
     Box(

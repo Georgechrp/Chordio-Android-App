@@ -66,7 +66,7 @@ fun ProfileMenuContent(
     navController: NavController
 ) {
     val userId = authViewModel.getUserId()
-    val username = remember { mutableStateOf("Loading...") }
+    val username = authViewModel.username.value ?: "Loading..."
     var profileImageUrl by remember { mutableStateOf<String?>(null) }
     var selectedImage by rememberSaveable { mutableStateOf<Uri?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -139,7 +139,11 @@ fun ProfileMenuContent(
                     onClick = { launcher.launch("image/*") }
                 )
 
-                UserProfileSection(username, mainViewModel, navController)
+                UserProfileSection(
+                    username = username,
+                    mainViewModel = mainViewModel,
+                    navController = navController
+                )
             }
             Divider(
                 modifier = Modifier.padding(vertical = 8.dp),
@@ -182,7 +186,7 @@ fun ProfileMenuContent(
 //Head for Slide menu
 @Composable
 fun UserProfileSection(
-    username: MutableState<String>,
+    username: String,
     mainViewModel: MainViewModel,
     navController: NavController
 ) {
@@ -191,7 +195,7 @@ fun UserProfileSection(
         modifier = Modifier.padding(start = 8.dp)
     ) {
         Text(
-            text = username.value,
+            text = username,
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
