@@ -20,13 +20,15 @@ import androidx.compose.animation.core.*
 import android.media.MediaPlayer
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.foundation.isSystemInDarkTheme
-
+import com.unipi.george.chordshub.sharedpreferences.AppSettingsPreferences
 @Composable
 fun WelcomeScreen(onAnimationEnd: () -> Unit) {
     var startAnimation by remember { mutableStateOf(false) }
     var finished by remember { mutableStateOf(false) }
-    val isDarkTheme = isSystemInDarkTheme()
+    val context = LocalContext.current
+    val preferences = remember { AppSettingsPreferences(context) }
+    val isDarkTheme = remember { preferences.isDarkMode() }
+
     val logoPainter = painterResource(
         id = if (isDarkTheme) R.drawable.blacklogotransparent else R.drawable.chordiowhitetransparent
     )

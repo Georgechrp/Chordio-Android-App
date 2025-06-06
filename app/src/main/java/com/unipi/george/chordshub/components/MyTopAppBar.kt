@@ -10,10 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.unipi.george.chordshub.R
 
 /*
 *   My custom Top Bar used by 3 main screens(Home, Search, Library)
@@ -88,16 +89,21 @@ fun FilterButton(
 fun FilterRow(
     selectedFilter: String,
     onFilterChange: (String) -> Unit,
-    filters: List<String> = listOf("All", "Artists", "Downloads")
+    filters: List<Int> = listOf(
+        R.string.all_filter,
+        R.string.artists_filter,
+        R.string.downloads_filter
+    )
 ) {
     val scrollState = rememberScrollState()
 
     Row(modifier = Modifier.horizontalScroll(scrollState)) {
         filters.forEach { filter ->
+            val filterText = stringResource(id = filter)
             FilterButton(
-                text = filter,
-                isSelected = filter == selectedFilter,
-                onClick = { onFilterChange(filter) }
+                text = filterText,
+                isSelected = filterText == selectedFilter,
+                onClick = { onFilterChange(filterText) }
             )
         }
     }

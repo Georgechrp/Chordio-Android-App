@@ -89,14 +89,13 @@
     <string name="Library_text">Your Library</string>
     <string name="Create_a_playlist_text">Create a playlist</string>
     <string name="name_of_playlist_text">Name of playlist</string>
-
-
+    <string name="not_playlists_yet">Not Playlists yet</string>
 
     <!--   Search Screen    -->
     <string name="search_text">Search</string>"
     <string name="top_song">Top Songs</string>
     <string name="Are_u_looking_for_something_text">Are u looking for something?</string>
-
+    <string name="Discover_something_new_text">Discover something new 🎧</string>
 
     <!--  More     -->
     <string name="X_Text">❌</string>
@@ -105,7 +104,31 @@
 
     <!--   HomeScreen    -->
     <string name="unfortunately_text">Unfortunately, there are no results for this filter at the moment.</string>
+    <string name="all_filter">All</string>
+    <string name="artists_filter">Artists</string>
+    <string name="downloads_filter">Downloads</string>
+
+
+
+    <!--  settings screen  -->
+    <string name="dark_mode_text">Dark Mode</string>
+    <string name="language_text">Language</string>
+    <string name="font_size_text">Font Size</string>
+    <string name="dialog_title_theme_change">Theme Change</string>
+    <string name="dialog_text_restart_required">An app restart is required to apply the change.</string>
+    <string name="font_size_dynamic">Font Size: %1$dsp</string>
+    <string name="font_sample_text">Font Sample</string>
+
+
+    <string name="song_title">Title</string>
+    <string name="song_artist">Artist</string>
+    <string name="song_key">Key (Tonality)</string>
+    <string name="song_lyrics">Lyrics (lines separated by enter)</string>
+    <string name="song_chords">Chords (format: Bb-0, Gm-5)</string>
+    <string name="submit_song">Submit Song</string>
 
 
     <string name="create_text">Create</string>
+    <string name="weekly_statistics">📊 Weekly Statistics</string>
+
 </resources>

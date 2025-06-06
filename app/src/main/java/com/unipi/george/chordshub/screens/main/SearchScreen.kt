@@ -174,7 +174,7 @@ fun SearchContent(
             if (genres.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Discover something new 🎧",
+                        text = stringResource(R.string.Discover_something_new_text) ,
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSecondary,
                         modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)

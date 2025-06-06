@@ -43,7 +43,7 @@ fun SettingsScreen(navController: NavController, settingsViewModel: SettingsView
             horizontalAlignment = Alignment.Start
         ) {
             DarkModeToggle(settingsViewModel)
-            LanguageSelection(settingsViewModel)
+           // LanguageSelection(settingsViewModel)
             FontSizeSelection(settingsViewModel)
         }
     }
@@ -74,7 +74,10 @@ fun DarkModeToggle(settingsViewModel: SettingsViewModel) {
     var showDialog by remember { mutableStateOf(false) }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        SettingsHeads("Dark Mode", settingsViewModel)
+        SettingsHeads(
+            text = stringResource(R.string.dark_mode_text),
+            settingsViewModel = settingsViewModel
+        )
         Spacer(modifier = Modifier.weight(1f))
         Switch(
             checked = settingsViewModel.darkMode.value,
@@ -94,8 +97,9 @@ fun DarkModeToggle(settingsViewModel: SettingsViewModel) {
                     Text("ΟΚ")
                 }
             },
-            title = { Text("Αλλαγή Θέματος") },
-            text = { Text("Απαιτείται επανεκκίνηση της εφαρμογής για να εφαρμοστεί η αλλαγή.") }
+            title = { Text(stringResource(id = R.string.dialog_title_theme_change)) },
+            text = { Text(stringResource(id = R.string.dialog_text_restart_required)) }
+
         )
     }
 }
@@ -167,9 +171,12 @@ fun LanguageSelection(settingsViewModel: SettingsViewModel) {
 @Composable
 fun FontSizeSelection(settingsViewModel: SettingsViewModel) {
     var tempFontSize by remember { mutableStateOf(settingsViewModel.fontSize.value) }
-    var sampleText by remember { mutableStateOf("Δοκιμή Γραμματοσειράς") }
+    val sampleText = stringResource(R.string.font_sample_text)
 
-    SettingsHeads("Μέγεθος Γραμματοσειράς: ${tempFontSize.toInt()}sp", settingsViewModel)
+    SettingsHeads(
+        text = stringResource(R.string.font_size_dynamic, tempFontSize.toInt()),
+        settingsViewModel = settingsViewModel
+    )
     Row(verticalAlignment = Alignment.CenterVertically) {
         Slider(
             value = tempFontSize,

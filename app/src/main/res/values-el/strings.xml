@@ -71,7 +71,7 @@
     <string name="Library_text">Η Βιβλιοθήκη σου</string>
     <string name="Create_a_playlist_text">Δημιουργία λίστας</string>
     <string name="name_of_playlist_text">Όνομα playlist</string>
-
+    <string name="not_playlists_yet">Δεν υπάρχουν playlists ακόμα</string>
 
     <!-- More -->
     <string name="X_Text">❌</string>
@@ -79,11 +79,39 @@
 
     <!-- HomeScreene -->
     <string name="unfortunately_text">Δυστυχώς, δεν υπάρχουν αποτελέσματα για αυτο το φίλτρο αυτη την στιγμή</string>
+    <string name="all_filter">Όλα</string>
+    <string name="artists_filter">Καλλιτέχνες</string>
+    <string name="downloads_filter">Λήψεις</string>
+
+
 
     <!--   Search Screen    -->
     <string name="search_text">Αναζήτηση</string>"
     <string name="top_song">Δημοφιλέστερα τραγούδια</string>
     <string name="Are_u_looking_for_something_text">Ψάχνεις κάτι;</string>
-
+    <string name="Discover_something_new_text">Ανακάλυψε 🎧</string>
     <string name="create_text">Δημιουργία</string>
+
+    <!--  settings screen  -->
+    <string name="dark_mode_text">Σκοτεινή λειτουργία</string>
+    <string name="language_text">Επιλογή Γλώσσας</string>
+    <string name="font_size_text">Μέγεθος Γραμματοσειράς</string>
+    <string name="dialog_title_theme_change">Αλλαγή Θέματος</string>
+    <string name="dialog_text_restart_required">Απαιτείται επανεκκίνηση της εφαρμογής για να εφαρμοστεί η αλλαγή.</string>
+    <string name="font_size_dynamic">Μέγεθος Γραμματοσειράς: %1$dsp</string>
+    <string name="font_sample_text">Δοκιμή Γραμματοσειράς</string>
+
+
+    <string name="weekly_statistics">📊 Εβδομαδιαία Στατιστικά</string>
+
+
+
+    <!-- Upload -->
+    <string name="song_title">Τίτλος</string>
+    <string name="song_artist">Καλλιτέχνης</string>
+    <string name="song_key">Τονικό Ύψος (Key)</string>
+    <string name="song_lyrics">Στίχοι (γραμμές χωρισμένες με enter)</string>
+    <string name="song_chords">Συγχορδίες (μορφή: Bb-0, Gm-5)</string>
+    <string name="submit_song">Στείλε το τραγούδι</string>
+
 </resources>

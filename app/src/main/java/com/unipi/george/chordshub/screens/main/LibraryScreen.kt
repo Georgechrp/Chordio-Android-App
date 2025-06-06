@@ -91,13 +91,17 @@ fun LibraryScreen(
             FilterRow(
                 selectedFilter = selectedFilter,
                 onFilterChange = { viewModel.fetchFilteredPlaylists(it) },
-                filters = listOf("All", "Downloaded")
+                filters = listOf(
+                    R.string.all_filter,
+                    R.string.downloads_filter
+                )
             )
+
             Spacer(modifier = Modifier.height(8.dp))
 
 
             if (playlists.isEmpty()) {
-                Text("Δεν υπάρχουν playlists ακόμα.")
+                Text(R.string.not_playlists_yet.toString())
             } else {
                 playlists.forEach { (playlist, songs) ->
                     Card(

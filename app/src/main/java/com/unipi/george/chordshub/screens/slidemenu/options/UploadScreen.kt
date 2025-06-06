@@ -85,28 +85,28 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Τίτλος", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                label = { Text(stringResource(R.string.song_title), color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = artist,
                 onValueChange = { artist = it },
-                label = { Text("Καλλιτέχνης") },
+                label = { Text(stringResource(R.string.song_artist)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = key,
                 onValueChange = { key = it },
-                label = { Text("Τονικό Ύψος (Key)") },
+                label = { Text(stringResource(R.string.song_key)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = bpm,
                 onValueChange = { bpm = it },
-                label = { Text("BPM") },
+                label =  { Text("BPM") },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -114,16 +114,17 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
             OutlinedTextField(
                 value = lyrics,
                 onValueChange = { lyrics = it },
-                label = { Text("Στίχοι (γραμμές χωρισμένες με enter)") },
+                label = { Text(stringResource(R.string.song_lyrics)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = chords,
                 onValueChange = { chords = it },
-                label = { Text("Συγχορδίες (μορφή: Bb-0, Gm-5)") },
+                label = { Text(stringResource(R.string.song_chords)) },
                 modifier = Modifier.fillMaxWidth()
             )
+
 
             Button(
                 onClick = {
@@ -164,7 +165,7 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    "Στείλε το τραγούδι",
+                    text = stringResource(R.string.submit_song),
                     color = MaterialTheme.colorScheme.onPrimary
                 )
 
