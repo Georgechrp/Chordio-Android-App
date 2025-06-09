@@ -28,17 +28,19 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.R
+import com.unipi.george.chordshub.components.LoadingView
 import com.unipi.george.chordshub.navigation.AppScreens
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 
 @Composable
-fun SignUpScreen(navController: NavController) {
+fun SignUpScreen(navController: NavController, onLoginSuccess: () -> Unit) {
     // Αρχικοποίηση των states
     val fullName = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val confirmPassword = remember { mutableStateOf("") }
     val context = LocalContext.current
+
 
     Column(
         modifier = Modifier
@@ -61,7 +63,8 @@ fun SignUpScreen(navController: NavController) {
             password = password,
             confirmPassword = confirmPassword,
             navController = navController,
-            context = context
+            context = context,
+            onLoginSuccess = onLoginSuccess
         )
     }
 }
@@ -74,10 +77,11 @@ fun SignUpInputFields(
     confirmPassword: MutableState<String>
 ) {
     Text(
-        text = "Welcome",
+        text = stringResource(R.string.sign_in_to),
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold
     )
+    Spacer(modifier = Modifier.height(50.dp))
     TextField(
         value = fullName.value,
         onValueChange = { fullName.value = it },
@@ -125,8 +129,12 @@ fun SignUpActions(
     password: MutableState<String>,
     confirmPassword: MutableState<String>,
     navController: NavController,
-    context: Context
+    context: Context,
+    onLoginSuccess: () -> Unit
 ) {
+    val isLoading = remember { mutableStateOf(false) }
+
+
     Button(onClick = {
         if (fullName.value.isBlank() || email.value.isBlank() || password.value.isBlank() || confirmPassword.value.isBlank()) {
             Toast.makeText(context, context.getString(R.string.please_fill_fields), Toast.LENGTH_SHORT).show()
@@ -137,15 +145,16 @@ fun SignUpActions(
             Toast.makeText(context, context.getString(R.string.passwords_do_not_match), Toast.LENGTH_SHORT).show()
             return@Button
         }
-
+        isLoading.value = true
         authViewModel.signUpUser(
             fullName.value,
             email.value,
             password.value
         ) { success, error ->
+            isLoading.value = false
             if (success) {
                 Toast.makeText(context, "Account created!", Toast.LENGTH_SHORT).show()
-                navController.navigate(AppScreens.Login.route)
+                onLoginSuccess()
             } else {
                 Toast.makeText(context, error ?: "Sign up failed.", Toast.LENGTH_SHORT).show()
             }
@@ -153,6 +162,10 @@ fun SignUpActions(
 
     }) {
         Text(stringResource(R.string.create_account))
+    }
+    if (isLoading.value) {
+        LoadingView()
+        return
     }
     Spacer(modifier = Modifier.height(8.dp))
 

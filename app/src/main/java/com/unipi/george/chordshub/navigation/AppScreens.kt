@@ -1,4 +1,5 @@
 package com.unipi.george.chordshub.navigation
+import android.net.Uri
 
 sealed class AppScreens(val route: String) {
 
@@ -12,7 +13,12 @@ sealed class AppScreens(val route: String) {
     // ---------- Auth ----------
     data object Login : AppScreens("Login")
     data object SignUp : AppScreens("SignUp")
-    data object ForgotPassword : AppScreens("ForgotPassword")
+    data object ForgotPassword : AppScreens("forgot_password?email={email}") {
+        fun createRoute(email: String): String =
+            "forgot_password?email=${Uri.encode(email)}"
+    }
+
+
 
     // ---------- Extras ----------
     data object Settings : AppScreens("Settings")

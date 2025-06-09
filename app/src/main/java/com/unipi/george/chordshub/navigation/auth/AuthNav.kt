@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.unipi.george.chordshub.navigation.AppScreens
 import com.unipi.george.chordshub.screens.auth.LoginScreen
 import com.unipi.george.chordshub.screens.auth.SignUpScreen
@@ -44,10 +45,25 @@ fun AuthNav(
             }
         }
         composable(AppScreens.SignUp.route) {
-            SignUpScreen(navController)
+            SignUpScreen(
+                navController = navController,
+                onLoginSuccess = { isUserLoggedInState.value = true }
+            )
         }
-        composable(AppScreens.ForgotPassword.route) {
-            ForgotPasswordScreen(authViewModel = authViewModel, onBack = { navController.popBackStack() })
+        composable(
+            route = "forgot_password?email={email}",
+            arguments = listOf(navArgument("email") {
+                defaultValue = ""
+                nullable = true
+            })
+        ) { backStackEntry ->
+            val emailArg = backStackEntry.arguments?.getString("email") ?: ""
+            ForgotPasswordScreen(
+                authViewModel = authViewModel,
+                prefilledEmail = emailArg,
+                onBack = { navController.popBackStack() }
+            )
         }
+
     }
 }

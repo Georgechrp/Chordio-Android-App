@@ -42,34 +42,48 @@ fun RootAppEntry(sessionViewModel: SessionViewModel) {
     val storageViewModel = remember { StorageViewModel() }
     val imageUrl by storageViewModel.profileImageUrl
 
-    val isLoading = remember { mutableStateOf(true) }
-
+    val isCheckingSession = remember { mutableStateOf(true) }
     val splashDone = remember { mutableStateOf(false) }
 
 
     LaunchedEffect(Unit) {
-        delay(2000) // 3000
+        authViewModel.validateSession { isValid ->
+            isUserLoggedInState.value = isValid
+            isCheckingSession.value = false
+        }
+    }
+
+
+    LaunchedEffect(Unit) {
+        delay(2000)
         authViewModel.getUserId()?.let {
             storageViewModel.loadProfileImage(it)
         }
-        isLoading.value = false
+        splashDone.value = true
     }
-
 
     ChordsHubTheme(darkTheme = darkMode) {
         val navController = rememberNavController()
-
         ObserveUserSession(sessionViewModel)
 
-
-
-
         when {
-            !splashDone.value -> WelcomeScreen { splashDone.value = true }
-            isUserLoggedInState.value -> MainScaffold(navController, authViewModel, sessionViewModel, imageUrl)
-            else -> AuthNav(navController, authViewModel, isUserLoggedInState)
-        }
+            isCheckingSession.value -> {
+                com.unipi.george.chordshub.components.LoadingView()
+            }
 
+            !splashDone.value -> {
+                WelcomeScreen { splashDone.value = true }
+            }
+
+            isUserLoggedInState.value -> {
+                MainScaffold(navController, authViewModel, sessionViewModel, imageUrl)
+            }
+
+            else -> {
+                AuthNav(navController, authViewModel, isUserLoggedInState)
+            }
+        }
     }
 }
+
 

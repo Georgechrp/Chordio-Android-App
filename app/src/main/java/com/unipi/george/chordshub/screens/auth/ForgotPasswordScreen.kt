@@ -23,11 +23,11 @@ import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 @Composable
 fun ForgotPasswordScreen(
     authViewModel: AuthViewModel,
+    prefilledEmail: String,
     onBack: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
-
+    val email = remember { mutableStateOf(prefilledEmail) }
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -35,13 +35,13 @@ fun ForgotPasswordScreen(
     ) {
         Text("Enter your email to reset password")
         TextField(
-            value = email,
-            onValueChange = { email = it },
+            value = email.value,
+            onValueChange = { email.value = it },
             label = { Text("Email") }
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            authViewModel.resetPassword(email) { success, errorMessage ->
+            authViewModel.resetPassword(email.value) { success, errorMessage ->
                 message = if (success) "Check your email for reset link" else errorMessage
             }
         }) {

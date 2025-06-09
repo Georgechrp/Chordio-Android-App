@@ -11,6 +11,8 @@
     <string name="please_fill_fields">Συμπλήρωσε όλα τα πεδία</string>
     <string name="login_failed">Η σύνδεση απέτυχε</string>
     <string name="resetPassword_text">Ξέχασες τον κωδικό;</string>
+    <string name="welcome_text">Καλωσόρισες στο Chordio</string>
+    <string name="sign_in_to">Δημιούργησε τον λογαριασμό σου στο Chordio</string>
 
     <!-- SignUpScreen -->
     <string name="full_name">Ονοματεπώνυμο</string>

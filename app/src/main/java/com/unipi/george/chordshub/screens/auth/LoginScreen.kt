@@ -45,9 +45,7 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(), navController: NavCo
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (isLoading) {
-            CircularProgressIndicator()
-        }
+
 
         error?.let {
             Spacer(modifier = Modifier.height(8.dp))
@@ -55,10 +53,12 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(), navController: NavCo
         }
 
         Text(
-            text = "Welcome",
+            text = stringResource(R.string.welcome_text),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
+        Spacer(modifier = Modifier.height(50.dp))
+
         TextField(
             value = email.value,
             onValueChange = { email.value = it },
@@ -76,7 +76,7 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(), navController: NavCo
             maxLines = 1
         )
         TextButton(onClick = {
-            navController.navigate(AppScreens.ForgotPassword.route)
+            navController.navigate(AppScreens.ForgotPassword.createRoute(email.value))
         }) {
             Text(stringResource(R.string.resetPassword_text))
         }
@@ -93,6 +93,9 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(), navController: NavCo
 
         }) {
             Text(stringResource(R.string.sign_in))
+        }
+        if (isLoading) {
+            CircularProgressIndicator()
         }
         Spacer(modifier = Modifier.height(8.dp))
         TextButton(onClick = {

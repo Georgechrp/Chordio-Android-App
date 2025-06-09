@@ -2,14 +2,13 @@
     <string name="app_name">Chordio</string>
 
     <!--                   LoginScreen                    -->
-    <!-- Labels for input fields -->
     <string name="email">Email</string>
     <string name="password">Password</string>
-
-    <!-- Buttons -->
+    <string name="welcome_text">Welcome to Chordio</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="dont_have_account">Don\'t have an account? Sign Up</string>
+    <string name="sign_in_to">Create your Chordio account</string>
 
     <!-- Toast messages -->
     <string name="please_fill_fields">Please fill in all fields</string>

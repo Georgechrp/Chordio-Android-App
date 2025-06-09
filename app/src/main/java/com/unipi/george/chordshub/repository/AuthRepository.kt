@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.runtime.mutableStateOf
+import com.google.firebase.auth.FirebaseUser
 import com.unipi.george.chordshub.models.User
 
 object AuthRepository {
@@ -171,6 +172,10 @@ object AuthRepository {
         firebaseAuth.signOut()
         isUserLoggedInState.value = false
         fullNameState.value = null
+    }
+
+    fun getCurrentUser(): FirebaseUser? {
+        return firebaseAuth.currentUser
     }
 
     fun getUserId(): String? {

@@ -118,10 +118,28 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+    fun validateSession(onResult: (Boolean) -> Unit) {
+        val user = AuthRepository.getCurrentUser()
+        if (user == null) {
+            _isUserLoggedIn.value = false
+            onResult(false)
+            return
+        }
+
+        user.reload().addOnCompleteListener { task ->
+            val isValid = task.isSuccessful && AuthRepository.getCurrentUser() != null
+            if (!isValid) {
+                logout {}
+            }
+            _isUserLoggedIn.value = isValid
+            onResult(isValid)
+        }
+    }
 
     fun getUserId(): String? {
         return AuthRepository.getUserId()
     }
+
 
     fun resetPassword(email: String, onResult: (Boolean, String?) -> Unit) {
         AuthRepository.resetPassword(email) { success, errorMessage ->
