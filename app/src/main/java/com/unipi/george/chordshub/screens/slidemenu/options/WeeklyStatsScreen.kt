@@ -12,11 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.unipi.george.chordshub.viewmodels.user.WeeklyStatsViewModel
-
+import com.unipi.george.chordshub.R
 @Composable
 fun WeeklyStatsScreen(
     userId: String,
@@ -50,7 +51,7 @@ fun WeeklyStatsScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            "📊 Weekly Statistics",
+            text = stringResource(R.string.weekly_statistics),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground
         )

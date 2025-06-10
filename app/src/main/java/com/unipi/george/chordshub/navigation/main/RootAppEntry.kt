@@ -67,12 +67,11 @@ fun RootAppEntry(sessionViewModel: SessionViewModel) {
         ObserveUserSession(sessionViewModel)
 
         when {
-            isCheckingSession.value -> {
-                com.unipi.george.chordshub.components.LoadingView()
-            }
-
             !splashDone.value -> {
                 WelcomeScreen { splashDone.value = true }
+            }
+            isCheckingSession.value -> {
+                com.unipi.george.chordshub.components.LoadingView()
             }
 
             isUserLoggedInState.value -> {

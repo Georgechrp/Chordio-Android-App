@@ -28,6 +28,7 @@ import com.unipi.george.chordshub.viewmodels.SongViewModelFactory
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.seconds.SongViewModel
+import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +37,8 @@ fun ArtistScreen(
     navController: NavController,
     mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    userViewModel: UserViewModel
 ) {
 
     var showInfoSheet by remember { mutableStateOf(false) }
@@ -48,6 +50,11 @@ fun ArtistScreen(
     val songViewModel: SongViewModel = viewModel(
         factory = SongViewModelFactory(SongRepository(FirebaseFirestore.getInstance()))
     )
+    LaunchedEffect(selectedSongId.value) {
+        selectedSongId.value?.let { id ->
+            songViewModel.loadSong(id)
+        }
+    }
 
 
 
@@ -71,7 +78,7 @@ fun ArtistScreen(
             navController = navController,
             mainViewModel = mainViewModel,
             homeViewModel = homeViewModel,
-            userViewModel = viewModel(),
+            userViewModel = userViewModel,
             authViewModel = authViewModel
         )
         return

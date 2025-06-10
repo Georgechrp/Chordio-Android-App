@@ -1,11 +1,7 @@
 package com.unipi.george.chordshub.screens.slidemenu.options
 
-import android.net.Uri
-import androidx.compose.foundation.clickable
+
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -40,7 +36,6 @@ fun RecentsScreen(
     var isLoading by remember { mutableStateOf(true) }
     val selectedSongId by homeViewModel.selectedSongId.collectAsState()
     val mainViewModel = remember { MainViewModel() }
-
     // Fetch songs and artists
     LaunchedEffect(userId) {
         if (userId != null) {

@@ -28,6 +28,7 @@ import com.unipi.george.chordshub.viewmodels.main.SearchViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.MainViewModel
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
+import com.unipi.george.chordshub.viewmodels.seconds.SongViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 
 @Composable
@@ -42,11 +43,9 @@ fun SearchScreen(
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     val searchResults by viewModel.searchResults.collectAsState()
     val selectedSongId by viewModel.selectedSongId.collectAsState()
-    val randomSongs by viewModel.randomSongs.collectAsState()
     val isMenuOpen by mainViewModel.isMenuOpen
     val userViewModel: UserViewModel = viewModel()
     val isFullScreen = remember { mutableStateOf(false) }
-
     LaunchedEffect(searchText.text) {
         if (searchText.text.isEmpty()) {
             viewModel.clearSearchResults()

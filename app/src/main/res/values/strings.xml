@@ -1,68 +1,55 @@
 <resources>
     <string name="app_name">Chordio</string>
 
+
     <!--                   LoginScreen                    -->
+    <string name="welcome_text">Welcome to Chordio</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="welcome_text">Welcome to Chordio</string>
+    <string name="resetPassword_text">Forgot the Password?</string>
     <string name="sign_in">Sign In</string>
-    <string name="sign_up">Sign Up</string>
     <string name="dont_have_account">Don\'t have an account? Sign Up</string>
-    <string name="sign_in_to">Create your Chordio account</string>
-
-    <!-- Toast messages -->
     <string name="please_fill_fields">Please fill in all fields</string>
     <string name="login_failed">Login failed</string>
-    <string name="resetPassword_text">Forgot the Password?</string>
+
 
 
     <!--                  SignUpScreen                   -->
-    <!-- Labels for input fields -->
+    <string name="sign_in_to">Create your Chordio account</string>
     <string name="full_name">Full Name</string>
     <string name="confirm_password">Confirm Password</string>
-
-    <!-- Buttons -->
     <string name="create_account">Create Account</string>
     <string name="already_have_account">Already have an account? Sign In</string>
-
-    <!-- Toast messages -->
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="account_created_successfully">Account created successfully!</string>
     <string name="failed_to_save_user_role">Failed to save user role</string>
     <string name="sign_up_failed">Sign-up failed</string>
 
     <!--                 MainActivity                  -->
-    <!-- TopBar -->
-    <string name="hello_user">Hello, %1$s</string>
-    <string name="default_user">User</string>
-
-    <!-- Circular Image View -->
     <string name="circular_image_description">Circular Image</string>
 
-    <!-- Profile Menu -->
+    <!--                Profile Menu                    -->
     <string name="view_profile_text">View profile</string>
     <string name="add_song_text">Add a Song</string>
     <string name="recent_text">Recents</string>
     <string name="settings_text">Settings</string>
 
 
-    <!--   DetailedSongView       -->
+    <!--               DetailedSongView             -->
     <string name="Transpose_by_text">Transpose by</string>
     <string name="Options_header">Options</string>
     <string name="Save_as_pdf_text">Save as a PDF</string>
     <string name="scroll_speed_text">Scroll speed</string>
 
-    <!--   QRUtils.kt       -->
+    <!--               QRUtils.kt                   -->
     <string name="generate_qr_code_text">Share with QR Code</string>
     <string name="scan_qr_code_text">Scan a QR</string>
 
-
-    <!--   Edit_Profile_Screen    -->
+    <!--           Edit_Profile_Screen              -->
     <string name="username_text">Username</string>
-
     <string name="save_changes_text">Save Changes</string>
 
-    <!-- Profile Screen -->
+    <!--           Profile Screen                -->
     <string name="edit_username_text">Edit Username</string>
     <string name="cancel_button_text">Cancel</string>
     <string name="save_button_text">Save</string>
@@ -72,14 +59,13 @@
     <string name="logout_text">Log out</string>
     <string name="Are_you_sure_you_want_to_logout">Are you sure you want to logout?</string>
     <string name="Are_you_sure_you_want_to_delete_account">Are you sure you want to delete your account? This action cannot be undone.</string>
-    <string name="full_name_text">Full Name</string>
 
 
-    <!-- PlaylistDetailScreen -->
+    <!--            PlaylistDetailScreen               -->
     <string name="no_songs_here">There is no songs here.</string>
 
 
-    <!-- Library Screen -->
+    <!--                  Library Screen                -->
     <string name="rename_playlist_text">✏️Rename Playlist</string>
     <string name="add_song_text2">➕Add Song</string>
     <string name="delete_playlist_text">🗑️Delete Playlist</string>"
@@ -90,26 +76,20 @@
     <string name="name_of_playlist_text">Name of playlist</string>
     <string name="not_playlists_yet">Not Playlists yet</string>
 
-    <!--   Search Screen    -->
-    <string name="search_text">Search</string>"
-    <string name="top_song">Top Songs</string>
-    <string name="Are_u_looking_for_something_text">Are u looking for something?</string>
-    <string name="Discover_something_new_text">Discover something new 🎧</string>
-
-    <!--  More     -->
-    <string name="X_Text">❌</string>
-    <string name="already_exists_the_name_of_playlist">⛔Already exists this name</string>
-
-
-    <!--   HomeScreen    -->
+    <!--                   HomeScreen                       -->
     <string name="unfortunately_text">Unfortunately, there are no results for this filter at the moment.</string>
     <string name="all_filter">All</string>
     <string name="artists_filter">Artists</string>
     <string name="downloads_filter">Downloads</string>
 
+    <!--                 Search Screen                    -->
+    <string name="search_text">Search</string>"
+    <string name="top_song">Top Songs</string>
+    <string name="Are_u_looking_for_something_text">Are u looking for something?</string>
+    <string name="Discover_something_new_text">Discover something new 🎧</string>
+    <string name="create_text">Create</string>
 
-
-    <!--  settings screen  -->
+    <!--               settings screen            -->
     <string name="dark_mode_text">Dark Mode</string>
     <string name="language_text">Language</string>
     <string name="font_size_text">Font Size</string>
@@ -118,7 +98,7 @@
     <string name="font_size_dynamic">Font Size: %1$dsp</string>
     <string name="font_sample_text">Font Sample</string>
 
-
+    <!--               Upload screen            -->
     <string name="song_title">Title</string>
     <string name="song_artist">Artist</string>
     <string name="song_key">Key (Tonality)</string>
@@ -126,8 +106,9 @@
     <string name="song_chords">Chords (format: Bb-0, Gm-5)</string>
     <string name="submit_song">Submit Song</string>
 
-
-    <string name="create_text">Create</string>
+    <!--             More               -->
+    <string name="X_Text">❌</string>
+    <string name="already_exists_the_name_of_playlist">⛔Already exists this name</string>
     <string name="weekly_statistics">📊 Weekly Statistics</string>
-
+    <string name="add_to_playlist">➕ Add to Playlist</string>
 </resources>

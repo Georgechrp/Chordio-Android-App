@@ -21,7 +21,6 @@ import com.unipi.george.chordshub.models.song.Song
 import com.unipi.george.chordshub.models.song.SongLine
 import com.unipi.george.chordshub.viewmodels.seconds.UploadViewModel
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

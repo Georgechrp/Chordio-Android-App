@@ -117,6 +117,7 @@ fun DetailedSongView(
     val userId = authViewModel.getUserId()
     val showAddToPlaylistDialog = remember { mutableStateOf(false) }
     val isFullScreen = remember { mutableStateOf(false) }
+
     val songViewModel: SongViewModel = viewModel(
         factory = SongViewModelFactory(SongRepository(FirebaseFirestore.getInstance()))
     )
@@ -639,7 +640,7 @@ fun OptionsDialog(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Button(
+                    /*Button(
                         onClick = {
                             saveCardContentAsPdf(context, songTitle, songLyrics)
                             showDialog.value = false
@@ -647,7 +648,7 @@ fun OptionsDialog(
                         modifier = Modifier.padding(top = 8.dp)
                     ) {
                         Text(stringResource(R.string.Save_as_pdf_text))
-                    }
+                    }*/
                     Button(
                         onClick = {
                             showAddToPlaylistDialog.value = true
@@ -655,7 +656,7 @@ fun OptionsDialog(
                         },
                         modifier = Modifier.padding(top = 8.dp)
                     ) {
-                        Text("Add to Playlist")
+                        Text(stringResource(R.string.add_to_playlist))
                     }
 
                 }
@@ -728,22 +729,4 @@ fun ChordText(
     )
 }
 
-
-@Composable
-fun RenderSongLine(songLine: SongLine) {
-    Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        songLine.chordLine?.let {
-            Text(
-                text = it,
-                fontFamily = FontFamily.Monospace,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-        Text(
-            text = songLine.text,
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
 

@@ -21,6 +21,7 @@ import android.media.MediaPlayer
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import com.unipi.george.chordshub.sharedpreferences.AppSettingsPreferences
+
 @Composable
 fun WelcomeScreen(onAnimationEnd: () -> Unit) {
     var startAnimation by remember { mutableStateOf(false) }
@@ -56,7 +57,6 @@ fun WelcomeScreen(onAnimationEnd: () -> Unit) {
 
     val effectiveAlpha = (alphaIn * alphaOut).coerceIn(0f, 1f)
 
-    // Glow animation
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val glowAlpha by infiniteTransition.animateFloat(
         initialValue = 0.2f,
@@ -89,7 +89,6 @@ fun WelcomeScreen(onAnimationEnd: () -> Unit) {
             ),
         contentAlignment = Alignment.Center
     ) {
-        // Glowing background behind the logo
         Box(
             modifier = Modifier
                 .size(240.dp)

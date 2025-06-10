@@ -2,19 +2,20 @@
 <resources>
     <string name="app_name">Chordio</string>
 
-    <!-- LoginScreen -->
+    <!--        LoginScreen         -->
+    <string name="welcome_text">Καλωσόρισες στο Chordio</string>
     <string name="email">Email</string>
     <string name="password">Κωδικός</string>
+    <string name="resetPassword_text">Ξέχασες τον κωδικό;</string>
     <string name="sign_in">Σύνδεση</string>
-    <string name="sign_up">Εγγραφή</string>
     <string name="dont_have_account">Δεν έχεις λογαριασμό; Εγγράψου</string>
     <string name="please_fill_fields">Συμπλήρωσε όλα τα πεδία</string>
     <string name="login_failed">Η σύνδεση απέτυχε</string>
-    <string name="resetPassword_text">Ξέχασες τον κωδικό;</string>
-    <string name="welcome_text">Καλωσόρισες στο Chordio</string>
-    <string name="sign_in_to">Δημιούργησε τον λογαριασμό σου στο Chordio</string>
 
-    <!-- SignUpScreen -->
+
+
+    <!--        SignUpScreen        -->
+    <string name="sign_in_to">Δημιούργησε τον λογαριασμό σου στο Chordio</string>
     <string name="full_name">Ονοματεπώνυμο</string>
     <string name="confirm_password">Επιβεβαίωση Κωδικού</string>
     <string name="create_account">Δημιουργία Λογαριασμού</string>
@@ -24,32 +25,30 @@
     <string name="failed_to_save_user_role">Απέτυχε η αποθήκευση ρόλου</string>
     <string name="sign_up_failed">Απέτυχε η εγγραφή</string>
 
-    <!-- MainActivity -->
-    <string name="hello_user">Γεια σου, %1$s</string>
-    <string name="default_user">Χρήστης</string>
+    <!--        MainActivity         -->
     <string name="circular_image_description">Κυκλική Εικόνα</string>
 
-    <!-- Profile Menu -->
+    <!--         Profile Menu       -->
     <string name="view_profile_text">Προφίλ</string>
     <string name="add_song_text">Προσθήκη Τραγουδιού</string>
     <string name="recent_text">Πρόσφατα</string>
     <string name="settings_text">Ρυθμίσεις</string>
 
-    <!-- DetailedSongView -->
+    <!--        DetailedSongView        -->
     <string name="Transpose_by_text">Μετατόπιση κατά</string>
     <string name="Options_header">Επιλογές</string>
     <string name="Save_as_pdf_text">Αποθήκευση ως PDF</string>
     <string name="scroll_speed_text">Ταχύτητα Κύλισης</string>
 
-    <!-- QRUtils.kt -->
+    <!--         QRUtils.kt         -->
     <string name="generate_qr_code_text">Κοινοποίηση με QR</string>
     <string name="scan_qr_code_text">Σάρωση QR</string>
 
-    <!-- Edit_Profile_Screen -->
+    <!--        Edit_Profile_Screen         -->
     <string name="username_text">Όνομα Χρήστη</string>
     <string name="save_changes_text">Αποθήκευση Αλλαγών</string>
 
-    <!-- Profile Screen -->
+    <!--        Profile Screen      -->
     <string name="edit_username_text">Επεξεργασία Ονόματος</string>
     <string name="cancel_button_text">Άκυρο</string>
     <string name="save_button_text">Αποθήκευση</string>
@@ -59,12 +58,11 @@
     <string name="logout_text">Αποσύνδεση</string>
     <string name="Are_you_sure_you_want_to_logout">Θέλεις σίγουρα να αποσυνδεθείς;</string>
     <string name="Are_you_sure_you_want_to_delete_account">Θέλεις σίγουρα να διαγράψεις τον λογαριασμό σου; Αυτή η ενέργεια δεν αναιρείται.</string>
-    <string name="full_name_text">Ονοματεπώνυμο</string>
 
-    <!-- PlaylistDetailScreen -->
+    <!--        PlaylistDetailScreen        -->
     <string name="no_songs_here">Δεν υπάρχουν τραγούδια εδώ.</string>
 
-    <!-- Library Screen -->
+    <!--        Library Screen       -->
     <string name="rename_playlist_text">✏️ Μετονομασία Playlist</string>
     <string name="add_song_text2">➕ Προσθήκη Τραγουδιού</string>
     <string name="delete_playlist_text">🗑️ Διαγραφή Playlist</string>
@@ -75,17 +73,11 @@
     <string name="name_of_playlist_text">Όνομα playlist</string>
     <string name="not_playlists_yet">Δεν υπάρχουν playlists ακόμα</string>
 
-    <!-- More -->
-    <string name="X_Text">❌</string>
-    <string name="already_exists_the_name_of_playlist">⛔ Υπάρχει ήδη λίστα με αυτό το όνομα</string>
-
     <!-- HomeScreene -->
     <string name="unfortunately_text">Δυστυχώς, δεν υπάρχουν αποτελέσματα για αυτο το φίλτρο αυτη την στιγμή</string>
     <string name="all_filter">Όλα</string>
     <string name="artists_filter">Καλλιτέχνες</string>
     <string name="downloads_filter">Λήψεις</string>
-
-
 
     <!--   Search Screen    -->
     <string name="search_text">Αναζήτηση</string>"
@@ -103,12 +95,7 @@
     <string name="font_size_dynamic">Μέγεθος Γραμματοσειράς: %1$dsp</string>
     <string name="font_sample_text">Δοκιμή Γραμματοσειράς</string>
 
-
-    <string name="weekly_statistics">📊 Εβδομαδιαία Στατιστικά</string>
-
-
-
-    <!-- Upload -->
+    <!--               Upload screen            -->
     <string name="song_title">Τίτλος</string>
     <string name="song_artist">Καλλιτέχνης</string>
     <string name="song_key">Τονικό Ύψος (Key)</string>
@@ -116,4 +103,10 @@
     <string name="song_chords">Συγχορδίες (μορφή: Bb-0, Gm-5)</string>
     <string name="submit_song">Στείλε το τραγούδι</string>
 
+
+    <!-- More -->
+    <string name="X_Text">❌</string>
+    <string name="already_exists_the_name_of_playlist">⛔ Υπάρχει ήδη λίστα με αυτό το όνομα</string>
+    <string name="weekly_statistics">📊 Εβδομαδιαία Στατιστικά</string>
+    <string name="add_to_playlist">➕ Προσθήκη σε λίστα</string>
 </resources>

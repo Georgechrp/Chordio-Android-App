@@ -15,7 +15,6 @@ import com.unipi.george.chordshub.repository.firestore.TempPlaylistRepository
 import com.unipi.george.chordshub.screens.TempPlaylistManagerScreen
 import com.unipi.george.chordshub.screens.main.*
 import com.unipi.george.chordshub.screens.viewsong.ArtistScreen
-import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
 import com.unipi.george.chordshub.screens.slidemenu.viewprofile.EditProfileScreen
 import com.unipi.george.chordshub.screens.viewsong.PlaylistDetailScreen
 import com.unipi.george.chordshub.screens.slidemenu.viewprofile.ProfileScreen
@@ -23,6 +22,7 @@ import com.unipi.george.chordshub.screens.slidemenu.options.RecentsScreen
 import com.unipi.george.chordshub.screens.slidemenu.options.SettingsScreen
 import com.unipi.george.chordshub.screens.slidemenu.options.UploadScreen
 import com.unipi.george.chordshub.screens.slidemenu.options.WeeklyStatsScreen
+import com.unipi.george.chordshub.screens.viewsong.DetailedSongView
 import com.unipi.george.chordshub.sharedpreferences.AppSettingsPreferences
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.MainViewModel
@@ -127,7 +127,7 @@ fun MainNavGraph(
 
         composable("artist/{artistName}") { backStackEntry ->
             val artistName = backStackEntry.arguments?.getString("artistName") ?: "Άγνωστος Καλλιτέχνης"
-            ArtistScreen(artistName = artistName, navController = navController, mainViewModel = mainViewModel, homeViewModel = homeViewModel, authViewModel = authViewModel)
+            ArtistScreen(artistName = artistName, navController = navController, mainViewModel = mainViewModel, homeViewModel = homeViewModel, authViewModel = authViewModel, userViewModel = userViewModel)
         }
 
         composable("edit_profile/{userId}") { backStackEntry ->

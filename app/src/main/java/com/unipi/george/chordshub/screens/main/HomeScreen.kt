@@ -25,6 +25,7 @@ import com.unipi.george.chordshub.viewmodels.MainViewModel
 import com.unipi.george.chordshub.viewmodels.auth.AuthViewModel
 import com.unipi.george.chordshub.viewmodels.main.HomeViewModel
 import com.unipi.george.chordshub.viewmodels.main.SearchViewModel
+import com.unipi.george.chordshub.viewmodels.seconds.SongViewModel
 import com.unipi.george.chordshub.viewmodels.seconds.SongViewModel2
 import com.unipi.george.chordshub.viewmodels.user.UserViewModel
 import kotlinx.coroutines.delay
@@ -51,7 +52,6 @@ fun HomeScreen(
     var showNoResults by remember { mutableStateOf(false) }
     val isFullScreen = remember { mutableStateOf(false) }
     val searchResults by searchViewModel.searchResults.collectAsState()
-
     LaunchedEffect(isFullScreen.value) {
         mainViewModel.setTopBarVisible(!isFullScreen.value)
         mainViewModel.setBottomBarVisible(!isFullScreen.value)

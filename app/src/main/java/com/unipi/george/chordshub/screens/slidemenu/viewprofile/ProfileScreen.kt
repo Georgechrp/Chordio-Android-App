@@ -133,7 +133,7 @@ fun ProfileCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            InfoRow(label = stringResource(R.string.full_name_text), value = fullName)
+            InfoRow(label = stringResource(R.string.full_name), value = fullName)
             Divider(modifier = Modifier.padding(vertical = 4.dp))
             EditableInfoRow(label = stringResource(R.string.username_text), value = username) {
                 showEditUsernameDialog.value = true

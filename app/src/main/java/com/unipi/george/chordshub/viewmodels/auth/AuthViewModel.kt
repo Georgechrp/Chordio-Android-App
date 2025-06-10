@@ -118,6 +118,7 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+
     fun validateSession(onResult: (Boolean) -> Unit) {
         val user = AuthRepository.getCurrentUser()
         if (user == null) {
@@ -140,13 +141,11 @@ class AuthViewModel : ViewModel() {
         return AuthRepository.getUserId()
     }
 
-
     fun resetPassword(email: String, onResult: (Boolean, String?) -> Unit) {
         AuthRepository.resetPassword(email) { success, errorMessage ->
             onResult(success, errorMessage)
         }
     }
-
 
     fun loadUserData(onUserLoaded: (User?) -> Unit) {
         val uid = AuthRepository.getUserId()
