@@ -103,6 +103,9 @@
     <string name="song_chords">Συγχορδίες (μορφή: Bb-0, Gm-5)</string>
     <string name="submit_song">Στείλε το τραγούδι</string>
 
+    <!--           Recents Screen                -->
+    <string name="no_recents">Δεν υπάρχουν πρόσφατα ακόμη</string>
+    <string name="last_songs_u_see">Πρόσφατα</string>
 
     <!-- More -->
     <string name="X_Text">❌</string>

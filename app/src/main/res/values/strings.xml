@@ -106,6 +106,11 @@
     <string name="song_chords">Chords (format: Bb-0, Gm-5)</string>
     <string name="submit_song">Submit Song</string>
 
+
+    <!--           Recents Screen                -->
+    <string name="no_recents">Not yet</string>
+    <string name="last_songs_u_see">The last songs you visit</string>
+
     <!--             More               -->
     <string name="X_Text">❌</string>
     <string name="already_exists_the_name_of_playlist">⛔Already exists this name</string>

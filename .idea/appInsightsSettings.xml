@@ -8,7 +8,7 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.unipi.george.chordshub" />
+                  <option name="appId" value="com.chordio" />
                   <option name="mobileSdkAppId" value="1:522030542122:android:0d3ca7941f3e537375c253" />
                   <option name="projectId" value="chordstabs-11b50" />
                   <option name="projectNumber" value="522030542122" />

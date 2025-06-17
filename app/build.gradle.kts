@@ -1,5 +1,3 @@
-
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,12 +6,12 @@ plugins {
 }
 
 android {
-    namespace = "com.unipi.george.chordshub"
+    namespace = "com.chordio"
     compileSdk = 35
 
     defaultConfig {
 
-        applicationId = "com.unipi.george.chordshub"
+        applicationId = "com.chordio"
         minSdk = 31
         targetSdk = 35
         versionCode = 1
