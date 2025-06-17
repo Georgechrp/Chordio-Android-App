@@ -137,10 +137,11 @@ fun RecentScreen(
                             recentSongs.groupBy { song ->
                                 val ts = songTimestampMap[song.id] ?: 0L
                                 Instant.ofEpochMilli(ts)
-                                    .atZone(ZoneId.systemDefault())
+                                    .atZone(ZoneId.of("Europe/Athens"))
                                     .toLocalDate()
                             }.toSortedMap(reverseOrder())
                         }
+
 
 
 

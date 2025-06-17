@@ -39,20 +39,11 @@ fun ArtistScreen(
 
     var showInfoSheet by remember { mutableStateOf(false) }
     var songs by remember { mutableStateOf<List<Song>>(emptyList()) }
-
     val selectedTitle = remember { mutableStateOf<String?>(null) }
     val selectedSongId = remember { mutableStateOf<String?>(null) }
-
     val songViewModel: SongViewModel = viewModel(
         factory = SongViewModelFactory(SongRepository(FirebaseFirestore.getInstance()))
     )
-    LaunchedEffect(selectedSongId.value) {
-        selectedSongId.value?.let { id ->
-            songViewModel.loadSong(id)
-        }
-    }
-
-
 
     LaunchedEffect(artistName) {
         homeViewModel.clearSelectedSong()
@@ -64,10 +55,23 @@ fun ArtistScreen(
         }
     }
 
+    val songState by songViewModel.songState.collectAsState()
+    val selectedSong = songs.find { it.id == selectedSongId.value }
 
-    // Show DetailedSongView if a song is selected
+    LaunchedEffect(selectedSong) {
+        if (selectedSong != null) {
+            songViewModel.updateLocalSong(selectedSong)
+        }
+    }
+
+    if (selectedSongId.value != null && songState == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Loading...")
+        }
+        return
+    }
+
     if (selectedSongId.value != null) {
-
         DetailedSongView(
             songId = selectedSongId.value!!,
             onBack = { selectedSongId.value = null },
@@ -79,6 +83,7 @@ fun ArtistScreen(
         )
         return
     }
+
 
     // Scaffold with CardsView
     Scaffold(

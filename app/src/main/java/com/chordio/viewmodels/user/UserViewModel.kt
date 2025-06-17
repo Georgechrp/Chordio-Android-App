@@ -80,22 +80,34 @@ class UserViewModel : ViewModel() {
                 return@addOnSuccessListener
             }
 
-            db.collection("songs")
-                .whereIn(FieldPath.documentId(), ids)
-                .get()
-                .addOnSuccessListener { snapshot ->
-                    val songs = snapshot.documents.mapNotNull {
-                        it.toObject(Song::class.java)?.apply { id = it.id }
+            // Σπάμε σε chunks των 10
+            val chunks = ids.chunked(10)
+            val allSongs = mutableListOf<Song>()
+
+            var loadedCount = 0
+            for (chunk in chunks) {
+                db.collection("songs")
+                    .whereIn(FieldPath.documentId(), chunk)
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        val songs = snapshot.documents.mapNotNull {
+                            it.toObject(Song::class.java)?.apply { id = it.id }
+                        }
+                        allSongs.addAll(songs)
+                        loadedCount++
+
+                        if (loadedCount == chunks.size) {
+                            val orderedSongs = recentEntries.mapNotNull { entry ->
+                                allSongs.find { it.id == entry.songId }?.let { it to entry.timestamp }
+                            }
+
+                            _recentSongs.value = orderedSongs.map { it.first }
+                            recentSongMap = orderedSongs.associate { it.first.id to it.second }
+
+                            Log.d("Firestore", "🎵 Loaded ${orderedSongs.size} recent songs")
+                        }
                     }
-
-                    val orderedSongs = recentEntries.mapNotNull { entry ->
-                        songs.find { it.id == entry.songId }?.let { it to entry.timestamp }
-                    }
-
-                    _recentSongs.value = orderedSongs.map { it.first }
-                    recentSongMap = orderedSongs.associate { it.first.id to it.second }
-
-                }
+            }
         }
     }
 
@@ -132,7 +144,7 @@ class UserViewModel : ViewModel() {
     fun addRecentSongWithDate(userId: String, songId: String, daysAgo: Long) {
         val userRef = db.collection("users").document(userId)
 
-        val timestamp = System.currentTimeMillis() - daysAgo * 24 * 60 * 60 * 1000  
+        val timestamp = System.currentTimeMillis() - daysAgo * 24 * 60 * 60 * 1000
 
         userRef.get().addOnSuccessListener { document ->
             val recentData = document.get("recentSongs") as? List<Map<String, Any>> ?: emptyList()

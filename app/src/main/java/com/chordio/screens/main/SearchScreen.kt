@@ -146,8 +146,12 @@ fun SearchContent(
     ) {
         // SearchBar
         item {
-            SearchBar(searchText, onSearchTextChange, viewModel)
+            Column {
+                Spacer(modifier = Modifier.height(8.dp))
+                SearchBar(searchText, onSearchTextChange, viewModel)
+            }
         }
+
 
         // Only show TopSongs & Genres when no search query
         if (searchText.text.isEmpty()) {

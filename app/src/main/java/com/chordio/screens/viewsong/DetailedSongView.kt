@@ -124,14 +124,15 @@ fun DetailedSongView(
         val savedTranspose = transposePreferences.getTransposeValue(songId)
         transposeValue.value = savedTranspose
 
-        songViewModel.loadSong(songId)
-
-        userId?.let { id ->
-            userViewModel.addRecentSong(id, songId)
+        if (songViewModel.songState.value?.id != songId) {
+            songViewModel.loadSong(songId)
         }
 
+        userId?.let { id -> userViewModel.addRecentSong(id, songId) }
         songViewModel.registerSongView(songId)
     }
+
+
 
 
     LaunchedEffect(isScrolling.value, scrollSpeed.floatValue) {
