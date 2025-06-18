@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.chordio.models.song.SongLine
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.ClickableText
@@ -72,6 +73,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.chordio.R
 import com.chordio.components.CardsView
+import com.chordio.models.song.ChordPosition
+import com.chordio.models.song.Song
 import com.chordio.repository.firestore.SongRepository
 import com.chordio.repository.firestore.TempPlaylistRepository
 import com.chordio.sharedpreferences.TransposePreferences
@@ -143,52 +146,80 @@ fun DetailedSongView(
         }
     }
 
-
-    /*LaunchedEffect(Unit) {
-        val testSong = Song(
-            title = "Wonderwall",
-            artist = "Oasis",
-            key = "F#",
-            bpm = 84,
-            genres = listOf("Britpop", "Acoustic"),
-            createdAt = System.currentTimeMillis().toString(),
-            creatorId = userId,
-            lyrics = listOf(
-                SongLine(
-                    lineNumber = 0,
-                    text = "Today is gonna be the day",
-                    chords = listOf(
-                        ChordPosition("Em7", 0),
-                        ChordPosition("G", 14)
+   /* LaunchedEffect(Unit) {
+        val testSong = userId?.let {
+            Song(
+                title = "Μια συνουσία μυστική",
+                artist = "Πυξ Λαξ",
+                key = "Am",
+                bpm = 88,
+                genres = listOf("Greek", "Rock", "Alternative"),
+                createdAt = System.currentTimeMillis().toString(),
+                creatorId = it,
+                lyrics = listOf(
+                    SongLine(
+                        lineNumber = 0,
+                        text = "Άγνωστοι φόβοι στο μυαλό σου πολεμούν",
+                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 11), ChordPosition("F", 16), ChordPosition("G", 18), ChordPosition("Am", 20), ChordPosition("G", 29), ChordPosition("F", 41), ChordPosition("G", 43)),
+                        chordLine = null
                     ),
-                    chordLine = null
-                ),
-                SongLine(
-                    lineNumber = 1,
-                    text = "That they're gonna throw it back to you",
-                    chords = listOf(
-                        ChordPosition("Dsus4", 0),
-                        ChordPosition("A7sus4", 28)
+                    SongLine(
+                        lineNumber = 1,
+                        text = "με τις σκιές που θολά σε καλύπτουν κάθε βράδυ",
+                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 10), ChordPosition("F", 20), ChordPosition("G", 30), ChordPosition("Am", 42), ChordPosition("G", 45), ChordPosition("F", 49), ChordPosition("G", 51)),
+                        chordLine = null
                     ),
-                    chordLine = null
-                ),
-                SongLine(
-                    lineNumber = 2,
-                    text = "By now you should've somehow",
-                    chords = listOf(
-                        ChordPosition("Cadd9", 0),
-                        ChordPosition("Em7", 17)
+                    SongLine(
+                        lineNumber = 2,
+                        text = "Ανυποψίαστοι περαστικοί γελούν μαζί σου",
+                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 11), ChordPosition("F", 25), ChordPosition("G", 27), ChordPosition("Am", 39), ChordPosition("G", 41), ChordPosition("F", 45), ChordPosition("G", 47)),
+                        chordLine = null
                     ),
-                    chordLine = null
+                    SongLine(
+                        lineNumber = 3,
+                        text = "μα τους ανέχεσαι παθητικά με τη σιωπή σου",
+                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 10), ChordPosition("F", 26), ChordPosition("G", 28), ChordPosition("Am", 43), ChordPosition("G", 45), ChordPosition("F", 49), ChordPosition("G", 51)),
+                        chordLine = null
+                    ),
+                    SongLine(
+                        lineNumber = 4,
+                        text = "Μια συνουσία μυστική μια συνουσία μυστική της διαφθοράς",
+                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 17), ChordPosition("F", 30), ChordPosition("G", 32), ChordPosition("Am", 35), ChordPosition("G", 51), ChordPosition("F", 55), ChordPosition("G", 60)),
+                        chordLine = null
+                    ),
+                    SongLine(
+                        lineNumber = 5,
+                        text = "χώροι στενοί μες στη μιζέρια δε νιώθεις τίποτα",
+                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 24), ChordPosition("F", 37), ChordPosition("G", 44), ChordPosition("Am", 54), ChordPosition("G", 58), ChordPosition("F", 62), ChordPosition("G", 64)),
+                        chordLine = null
+                    ),
+                    SongLine(
+                        lineNumber = 6,
+                        text = "Πετάς τα ρούχα σου ψηλά γυμνός μες τη χαρά σου",
+                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 23), ChordPosition("F", 35), ChordPosition("G", 38), ChordPosition("Am", 42), ChordPosition("G", 54), ChordPosition("F", 57), ChordPosition("G", 60)),
+                        chordLine = null
+                    ),
+                    SongLine(
+                        lineNumber = 7,
+                        text = "κρατάς τη λύπη σου μακριά δε νιώθεις τίποτα",
+                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 20), ChordPosition("F", 34), ChordPosition("G", 38), ChordPosition("Am", 49), ChordPosition("G", 53), ChordPosition("F", 56), ChordPosition("G", 58)),
+                        chordLine = null
+                    )
                 )
             )
-        )
+        }
 
-        val success = songViewModel.uploadSong(testSong)
-        if (success) {
-            Log.d("Upload", "✅ Uploaded test song!")
-        } else {
-            Log.e("Upload", "❌ Failed to upload test song!")
+        testSong?.let { song ->
+            val firestore = FirebaseFirestore.getInstance()
+            val docId = "pyx_lax_den_niotheis_tipota"
+
+            firestore.collection("songs").document(docId).set(song)
+                .addOnSuccessListener {
+                    Log.d("Upload", "✅ Uploaded 'Δεν Νιώθεις Τίποτα' with ID: $docId")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Upload", "❌ Failed to upload 'Δεν Νιώθεις Τίποτα': $e")
+                }
         }
     }*/
 

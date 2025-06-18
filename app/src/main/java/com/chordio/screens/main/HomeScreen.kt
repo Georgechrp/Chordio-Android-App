@@ -173,7 +173,7 @@ fun HomeScreen(
                     selectedSongId == null -> {
                         if (artistMode) {
                             val artistCards = artistList
-                                .take(6) // μόνο 6 αν θες
+                                //.take(7) // μόνο 6 αν θες
                                 .map { it to "artist:$it" }
 
                             CardsView(
