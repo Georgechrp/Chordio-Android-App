@@ -121,6 +121,11 @@ fun DetailedSongView(
     )
     val songState by songViewModel.songState.collectAsState()
 
+    LaunchedEffect(songState) {
+        if (userId != null && songState != null) {
+            songViewModel.onSongOpened(userId, songState!!)
+        }
+    }
 
 
     LaunchedEffect(songId) {
@@ -215,7 +220,7 @@ fun DetailedSongView(
 
             firestore.collection("songs").document(docId).set(song)
                 .addOnSuccessListener {
-                    Log.d("Upload", "✅ Uploaded 'Δεν Νιώθεις Τίποτα' with ID: $docId")
+                    Log.d("Upload", " Uploaded 'Δεν Νιώθεις Τίποτα' with ID: $docId")
                 }
                 .addOnFailureListener { e ->
                     Log.e("Upload", "❌ Failed to upload 'Δεν Νιώθεις Τίποτα': $e")

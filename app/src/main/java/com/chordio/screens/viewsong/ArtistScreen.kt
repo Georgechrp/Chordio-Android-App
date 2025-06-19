@@ -47,13 +47,26 @@ fun ArtistScreen(
 
     LaunchedEffect(artistName) {
         homeViewModel.clearSelectedSong()
-        songViewModel.getSongsByArtistName(artistName) { fetchedSongs ->
-            val sortedByPopularity = fetchedSongs.sortedByDescending { it.viewsCount ?: 0 }
-            val top5 = sortedByPopularity.take(5)
-            val remaining = sortedByPopularity.drop(5).sortedBy { it.title }
-            songs = top5 + remaining
+
+        if (artistName == "Αγαπημένα Τραγούδια") {
+            val userId = authViewModel.getUserId()
+            if (userId != null) {
+                userViewModel.fetchTopGenres(userId) { topGenres ->
+                    songViewModel.getSongsByGenres(topGenres) { fetchedSongs ->
+                        songs = fetchedSongs.sortedByDescending { it.viewsCount ?: 0 }
+                    }
+                }
+            }
+        } else {
+            songViewModel.getSongsByArtistName(artistName) { fetchedSongs ->
+                val sortedByPopularity = fetchedSongs.sortedByDescending { it.viewsCount ?: 0 }
+                val top5 = sortedByPopularity.take(5)
+                val remaining = sortedByPopularity.drop(5).sortedBy { it.title }
+                songs = top5 + remaining
+            }
         }
     }
+
 
     val songState by songViewModel.songState.collectAsState()
     val selectedSong = songs.find { it.id == selectedSongId.value }
@@ -96,9 +109,12 @@ fun ArtistScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { showInfoSheet = true }) {
-                        Icon(Icons.Default.Info, contentDescription = "Info")
+                    if (artistName != "Αγαπημένα Τραγούδια") {
+                        IconButton(onClick = { showInfoSheet = true }) {
+                            Icon(Icons.Default.Info, contentDescription = "Info")
+                        }
                     }
+
                 }
             )
         }

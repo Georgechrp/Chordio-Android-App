@@ -164,7 +164,7 @@ class UserViewModel : ViewModel() {
 
             userRef.update("recentSongs", toStore)
                 .addOnSuccessListener {
-                    Log.d("Firestore", "✅ Προστέθηκε τραγούδι με custom ημερομηνία")
+                    Log.d("Firestore", " Προστέθηκε τραγούδι με custom ημερομηνία")
                 }
                 .addOnFailureListener {
                     userRef.set(mapOf("recentSongs" to toStore), SetOptions.merge())
@@ -172,6 +172,17 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    fun fetchTopGenres(userId: String, callback: (List<String>) -> Unit) {
+        val userRef = FirebaseFirestore.getInstance().collection("users").document(userId)
+        userRef.get().addOnSuccessListener { doc ->
+            val prefs = doc.get("userPreferences.genreClicks") as? Map<String, Long>
+            val topGenres = prefs?.entries
+                ?.sortedByDescending { it.value }
+                ?.take(3)  // top 3 genres
+                ?.map { it.key } ?: emptyList()
+            callback(topGenres)
+        }
+    }
 
 
 }

@@ -85,7 +85,7 @@ class SongRepository(private val db: FirebaseFirestore) {
 
         try {
             db.collection("songs").document(songId).set(songMap).await()
-            Log.d("Firestore", "✅ Song added successfully: $songId")
+            Log.d("Firestore", " Song added successfully: $songId")
         } catch (e: Exception) {
             Log.e("Firestore", " Error adding song", e)
         }
@@ -239,7 +239,7 @@ class SongRepository(private val db: FirebaseFirestore) {
                     .flatten()
                     .toSet()
                     .toList()
-                Log.d("Firestore", "✅ Genres fetched: $genres")
+                Log.d("Firestore", " Genres fetched: $genres")
                 onResult(genres)
             }
             .addOnFailureListener { e ->
@@ -332,6 +332,18 @@ class SongRepository(private val db: FirebaseFirestore) {
         }
     }
 
+    suspend fun getSongsByGenres(genres: List<String>): List<Song> {
+        val firestore = FirebaseFirestore.getInstance()
+        val songsCollection = firestore.collection("songs")
+        val results = mutableListOf<Song>()
+
+        for (genre in genres) {
+            val snapshot = songsCollection.whereArrayContains("genres", genre).get().await()
+            results.addAll(snapshot.documents.mapNotNull { it.toObject(Song::class.java)?.copy(id = it.id) })
+        }
+
+        return results.distinctBy { it.id }  // remove duplicates
+    }
 
 
 }

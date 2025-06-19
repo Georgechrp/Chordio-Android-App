@@ -1,6 +1,7 @@
 package com.chordio.screens.main
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -54,6 +55,19 @@ fun HomeScreen(
     LaunchedEffect(isFullScreen.value) {
         mainViewModel.setTopBarVisible(!isFullScreen.value)
         mainViewModel.setBottomBarVisible(!isFullScreen.value)
+    }
+
+    val favoriteGenres = remember { mutableStateListOf<String>() }
+
+    LaunchedEffect(Unit) {
+        val userId = authViewModel.getUserId()
+        if (userId != null) {
+            userViewModel.fetchTopGenres(userId) { genres ->
+                favoriteGenres.clear()
+                favoriteGenres.addAll(genres)
+                Log.d("UI", "Loaded favorite genres: $genres")
+            }
+        }
     }
 
 
@@ -197,7 +211,21 @@ fun HomeScreen(
 
                             Box(modifier = Modifier.padding(bottom = 40.dp)) {
 
-                            CardsView(
+                                if (!artistMode && favoriteGenres.isNotEmpty()) {
+                                    CardsView(
+                                        songList = listOf("Αγαπημένα Τραγούδια" to "artist:Αγαπημένα Τραγούδια"),
+                                        homeViewModel = homeViewModel,
+                                        selectedTitle = selectedTitle,
+                                        onSongClick = { tag ->
+                                            val artist = tag.removePrefix("artist:")
+                                            navController.navigate("artist/${Uri.encode(artist)}")
+                                        }
+                                    )
+
+                                }
+
+
+                                CardsView(
                                 songList = combinedList,
                                 homeViewModel = homeViewModel,
                                 selectedTitle = selectedTitle,

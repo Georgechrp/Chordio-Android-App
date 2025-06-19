@@ -46,7 +46,7 @@ fun saveCardContentAsPdf(context: Context, title: String, lyrics: List<SongLine>
         val outputStream: OutputStream?
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // ✅ Για Android 10+ χρησιμοποιούμε MediaStore
+            //  Για Android 10+ χρησιμοποιούμε MediaStore
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
                 put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")

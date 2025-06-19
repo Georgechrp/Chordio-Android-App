@@ -121,8 +121,8 @@ suspend fun uploadImageToFirebase(imageUri: Uri, userId: String): String {
     val imageRef = storageRef.child("profile_pictures/$userId.jpg")
 
     return try {
-        imageRef.putFile(imageUri).await() // ✅ Ανεβάζουμε την εικόνα
-        imageRef.downloadUrl.await().toString() // ✅ Παίρνουμε το URL και το επιστρέφουμε
+        imageRef.putFile(imageUri).await() //  Ανεβάζουμε την εικόνα
+        imageRef.downloadUrl.await().toString() //  Παίρνουμε το URL και το επιστρέφουμε
     } catch (e: Exception) {
         throw Exception("Failed to upload image: ${e.message}")
     }
@@ -141,12 +141,12 @@ fun saveProfileChanges(
         try {
             var imageUrl: String? = null
 
-            // ✅ Αν υπάρχει νέα εικόνα, την ανεβάζουμε στο Firebase Storage
+            // Αν υπάρχει νέα εικόνα, την ανεβάζουμε στο Firebase Storage
             if (imageChanged && newImage != null) {
                 imageUrl = uploadImageToFirebase(newImage, userId)
             }
 
-            // ✅ Ενημέρωση Firestore με το νέο username και το image URL
+            //  Ενημέρωση Firestore με το νέο username και το image URL
             val userRef = FirebaseFirestore.getInstance().collection("users").document(userId)
 
             val updates = mutableMapOf<String, Any>()
@@ -157,7 +157,7 @@ fun saveProfileChanges(
                 userRef.update(updates).await()
             }
 
-            // ✅ Εμφάνιση μηνύματος επιτυχίας
+            //  Εμφάνιση μηνύματος επιτυχίας
             val message = when {
                 usernameChanged && imageChanged -> "Username and profile picture updated!"
                 usernameChanged -> "Username updated successfully!"

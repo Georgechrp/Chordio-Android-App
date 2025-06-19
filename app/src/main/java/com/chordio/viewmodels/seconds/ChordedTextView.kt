@@ -46,7 +46,7 @@ class SongViewModel2 : ViewModel() {
         db.collection("songs").document(songId).get()
             .addOnSuccessListener { doc ->
                 doc?.toObject(Song::class.java)?.let {
-                    Log.d("Firestore", "✅ Song fetched: ${it.title}")
+                    Log.d("Firestore", " Song fetched: ${it.title}")
                     song = it
                 }
             }
@@ -155,7 +155,7 @@ fun SongCard2(songId: String, viewModel: SongViewModel2 = viewModel()) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight() // ✅ ή βάλε fixed height αν χρειάζεται
+                    .fillMaxHeight() // ή βάλε fixed height αν χρειάζεται
                     .padding(16.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {

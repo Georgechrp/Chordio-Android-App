@@ -19,7 +19,7 @@ class UserStatsRepository(private val db: FirebaseFirestore) {
             val currentValue = snapshot.getLong(field) ?: 0
             transaction.update(userRef, field, currentValue + 1)
         }.addOnSuccessListener {
-            Log.d("Firestore", "✅ $field updated successfully for user $userId")
+            Log.d("Firestore", " $field updated successfully for user $userId")
         }.addOnFailureListener { e ->
             Log.e("Firestore", "Error updating $field", e)
         }
@@ -45,7 +45,7 @@ class UserStatsRepository(private val db: FirebaseFirestore) {
         usersCollection.document(userId)
             .update("lastLogin", System.currentTimeMillis().toString())
             .addOnSuccessListener {
-                Log.d("Firestore", "✅ Last login updated for user $userId")
+                Log.d("Firestore", "Last login updated for user $userId")
             }
             .addOnFailureListener { e ->
                 Log.e("Firestore", "Error updating last login", e)
@@ -62,7 +62,7 @@ class UserStatsRepository(private val db: FirebaseFirestore) {
             val currentValue = snapshot.getLong("totalTimeSpent") ?: 0
             transaction.update(userRef, "totalTimeSpent", currentValue + minutes)
         }.addOnSuccessListener {
-            Log.d("Firestore", "✅ Total time spent updated successfully for user $userId")
+            Log.d("Firestore", "Total time spent updated successfully for user $userId")
         }.addOnFailureListener { e ->
             Log.e("Firestore", "Error updating total time spent", e)
         }
@@ -75,9 +75,9 @@ class UserStatsRepository(private val db: FirebaseFirestore) {
         userRef.get()
             .addOnSuccessListener { document ->
                 if (document.exists() && !document.contains("totalTimeSpent")) {
-                    userRef.update("totalTimeSpent", 0L) // ✅ Προσθήκη μόνο αν λείπει
+                    userRef.update("totalTimeSpent", 0L) // Προσθήκη μόνο αν λείπει
                         .addOnSuccessListener {
-                            Log.d("Firestore", "✅ Added totalTimeSpent = 0 for user $userId")
+                            Log.d("Firestore", " Added totalTimeSpent = 0 for user $userId")
                         }
                         .addOnFailureListener { e ->
                             Log.e("Firestore", " Error adding totalTimeSpent", e)
@@ -148,4 +148,40 @@ class UserStatsRepository(private val db: FirebaseFirestore) {
             println(" Σφάλμα κατά την ενημέρωση: ${e.message}")
         }
     }
+
+
+    fun incrementGenreAndArtistClick(userId: String, genre: String?, artist: String?) {
+        val userRef = usersCollection.document(userId)
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(userRef)
+
+            // Ανάκτηση υφιστάμενων clicks
+            val prefs = snapshot.get("userPreferences") as? Map<*, *> ?: emptyMap<String, Any>()
+
+            val genreClicks = (prefs["genreClicks"] as? Map<String, Long>)?.toMutableMap() ?: mutableMapOf()
+            val artistClicks = (prefs["artistClicks"] as? Map<String, Long>)?.toMutableMap() ?: mutableMapOf()
+
+            // Ενημέρωση counters
+            if (!genre.isNullOrBlank()) {
+                genreClicks[genre] = (genreClicks[genre] ?: 0) + 1
+            }
+
+            if (!artist.isNullOrBlank()) {
+                artistClicks[artist] = (artistClicks[artist] ?: 0) + 1
+            }
+
+            val updatedPrefs = mapOf(
+                "userPreferences.genreClicks" to genreClicks,
+                "userPreferences.artistClicks" to artistClicks
+            )
+
+            transaction.update(userRef, updatedPrefs)
+        }.addOnSuccessListener {
+            Log.d("Firestore", "User preferences updated for $userId")
+        }.addOnFailureListener { e ->
+            Log.e("Firestore", "Failed to update user preferences", e)
+        }
+    }
+
 }
