@@ -5,5 +5,5 @@ Chordio is an Android application developed as part of my undergraduate thesis a
 ## 🌐 Thesis Website
 
 You can explore the **official website of the thesis** here:  
-👉 [https://georgioschristopoulos.info/assets/mythesis/index.html](https://georgioschristopoulos.info/assets/mythesis/index.html)
+👉 [here](https://georgioschristopoulos.info/assets/mythesis/index.html)
 
