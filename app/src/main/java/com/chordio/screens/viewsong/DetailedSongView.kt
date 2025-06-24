@@ -730,18 +730,30 @@ fun OptionsDialog(
     }
 }
 
-fun getNewKey(originalKey: String, transpose: Int): String {
-    val sharpNotes = listOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+fun getNewKey(originalChord: String, transpose: Int): String {
+    // Πλήρης λίστα ημιτονίων (με διέσεις και υφέσεις)
+    val semitoneMap = listOf(
+        "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
+    )
+    val flatToSharp = mapOf("Db" to "C#", "Eb" to "D#", "Gb" to "F#", "Ab" to "G#", "Bb" to "A#")
 
-    // Βρίσκουμε το index της συγχορδίας
-    val currentIndex = sharpNotes.indexOf(originalKey)
-    if (currentIndex == -1) return originalKey
+    // Regex για να διαχωρίσουμε root note + remainder
+    val match = Regex("^([A-Ga-g][b#]?)(.*)").find(originalChord) ?: return originalChord
+    var (root, suffix) = match.destructured
+    root = root.replaceFirstChar { it.uppercaseChar() } // normalize e.g. "a" → "A"
 
-    // Υπολογισμός νέου index με circular logic
-    val newIndex = (currentIndex + transpose + 12) % 12
+    // Αν είναι ύφεση, μετατρέπουμε σε δίεση
+    if (root in flatToSharp) root = flatToSharp[root]!!
 
-    return sharpNotes[newIndex]
+    val index = semitoneMap.indexOf(root)
+    if (index == -1) return originalChord
+
+    val newIndex = (index + transpose + 12) % 12
+    val newRoot = semitoneMap[newIndex]
+
+    return newRoot + suffix
 }
+
 
 
 @Composable
