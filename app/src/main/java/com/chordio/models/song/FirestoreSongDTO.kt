@@ -8,7 +8,8 @@ data class FirestoreSongDTO(
     val creatorId: String = "",
     val genres: List<String> = emptyList(),
     val key: String = "",
-    val lyrics: List<Map<String, Any>> = emptyList()
+    val lyrics: List<Map<String, Any>> = emptyList(),
+    val viewsCount: Long? = null
 ) {
     fun toSong(): Song {
         return Song(

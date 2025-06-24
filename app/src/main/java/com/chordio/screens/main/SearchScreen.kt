@@ -28,6 +28,7 @@ import com.chordio.viewmodels.main.SearchViewModel
 import com.chordio.viewmodels.main.HomeViewModel
 import com.chordio.viewmodels.MainViewModel
 import com.chordio.viewmodels.auth.AuthViewModel
+import com.chordio.viewmodels.seconds.SongViewModel
 import com.chordio.viewmodels.user.UserViewModel
 
 @Composable
@@ -38,6 +39,7 @@ fun SearchScreen(
     homeViewModel: HomeViewModel,
     navController: NavController,
     onFullScreenChange: (Boolean) -> Unit,
+    songViewModel: SongViewModel
 ) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     val searchResults by viewModel.searchResults.collectAsState()
@@ -110,6 +112,8 @@ fun SearchScreen(
             )
         } else {
             DetailedSongView(
+                songViewModel = songViewModel,
+
                 songId = selectedSongId!!,
                 onBack = {
                     onFullScreenChange(false)

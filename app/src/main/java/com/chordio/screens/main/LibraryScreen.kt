@@ -103,7 +103,7 @@ fun LibraryScreen(
             if (playlists.isEmpty()) {
                 Text(R.string.not_playlists_yet.toString())
             } else {
-                playlists.forEach { (playlist, songs) ->
+                playlists.forEach { (playlist, id) ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -111,7 +111,8 @@ fun LibraryScreen(
                             .combinedClickable(
                                 onClick = {
                                     navController.navigate("playlist_detail/${Uri.encode(playlist)}")
-                                },
+                                }
+                                ,
                                 onLongClick = {
                                     selectedPlaylist = playlist
                                     showBottomSheet.value = true

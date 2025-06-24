@@ -22,6 +22,7 @@ import com.chordio.components.MyAppTopBar
 import com.chordio.screens.slidemenu.ProfileMenu
 import com.chordio.viewmodels.auth.AuthViewModel
 import com.chordio.viewmodels.auth.SessionViewModel
+import com.chordio.viewmodels.seconds.SongViewModel
 import com.chordio.viewmodels.user.UserViewModel
 
 /*
@@ -37,7 +38,8 @@ fun MainScaffold(
     navController: NavHostController,
     authViewModel: AuthViewModel,
     sessionViewModel: SessionViewModel,
-    profileImageUrl: String?
+    profileImageUrl: String?,
+    songViewModel: SongViewModel
 ) {
     val mainViewModel: MainViewModel = viewModel()
     val homeViewModel: HomeViewModel = viewModel()
@@ -66,7 +68,8 @@ fun MainScaffold(
             MainNavGraph(
                 navController = navController,
                 mainViewModel = mainViewModel,
-                sessionViewModel = sessionViewModel
+                sessionViewModel = sessionViewModel,
+                songViewModel = songViewModel
             )
 
             if (currentRoute in topBarScreens && !isFullScreen) {

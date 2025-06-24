@@ -3,7 +3,6 @@ package com.chordio.screens.viewsong
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -45,6 +44,15 @@ fun ArtistScreen(
         factory = SongViewModelFactory(SongRepository(FirebaseFirestore.getInstance()))
     )
 
+
+    LaunchedEffect(selectedSongId.value) {
+        selectedSongId.value?.let { songId ->
+            songViewModel.loadSong(songId, fallbackToTitle = true)
+        }
+    }
+
+
+
     LaunchedEffect(artistName) {
         homeViewModel.clearSelectedSong()
 
@@ -68,31 +76,23 @@ fun ArtistScreen(
     }
 
 
-    val songState by songViewModel.songState.collectAsState()
-    val selectedSong = songs.find { it.id == selectedSongId.value }
 
-    LaunchedEffect(selectedSong) {
-        if (selectedSong != null) {
-            songViewModel.updateLocalSong(selectedSong)
-        }
-    }
 
-    if (selectedSongId.value != null && songState == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Loading...")
-        }
-        return
-    }
 
     if (selectedSongId.value != null) {
         DetailedSongView(
+            songViewModel = songViewModel,
             songId = selectedSongId.value!!,
-            onBack = { selectedSongId.value = null },
+            onBack = {
+                songViewModel.clearSongState()
+                selectedSongId.value = null
+            },
             navController = navController,
             mainViewModel = mainViewModel,
             homeViewModel = homeViewModel,
             userViewModel = userViewModel,
             authViewModel = authViewModel
+
         )
         return
     }
@@ -127,10 +127,11 @@ fun ArtistScreen(
             contentAlignment = Alignment.TopCenter
         ) {
             CardsView(
-                songList = songs.mapNotNull { song ->
+                songs.mapNotNull { song ->
+                    println("🎧 DEBUG: ${song.title} => '${song.id}'")
                     val title = song.title
                     val id = song.id
-                    if (title != null && id != null) title to id else null
+                    if (title.isNotBlank() && id.isNotBlank()) title to id else null
                 },
                 homeViewModel = homeViewModel,
                 selectedTitle = selectedTitle,
@@ -141,6 +142,7 @@ fun ArtistScreen(
                 gridPadding = 16.dp,
                 fontSize = 16.sp,
                 onSongClick = { clickedId ->
+                    songViewModel.clearSongState()
                     selectedSongId.value = clickedId
                 }
 

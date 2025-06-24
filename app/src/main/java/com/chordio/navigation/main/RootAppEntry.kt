@@ -10,14 +10,18 @@ import androidx.navigation.compose.rememberNavController
 import com.chordio.AppContainer
 import com.chordio.components.LoadingView
 import com.chordio.navigation.auth.AuthNav
+import com.chordio.repository.firestore.SongRepository
 import com.chordio.screens.auth.welcomeuser.WelcomeScreen
 import com.chordio.ui.theme.ChordsHubTheme
 import com.chordio.utils.ObserveUserSession
 import com.chordio.viewmodels.SettingsViewModelFactory
+import com.chordio.viewmodels.SongViewModelFactory
 import com.chordio.viewmodels.StorageViewModel
 import com.chordio.viewmodels.auth.AuthViewModel
 import com.chordio.viewmodels.auth.SessionViewModel
+import com.chordio.viewmodels.seconds.SongViewModel
 import com.chordio.viewmodels.user.SettingsViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 
 /*
@@ -45,6 +49,10 @@ fun RootAppEntry(sessionViewModel: SessionViewModel) {
 
     val isCheckingSession = remember { mutableStateOf(true) }
     val splashDone = remember { mutableStateOf(false) }
+
+    val songViewModel: SongViewModel = viewModel(
+        factory = SongViewModelFactory(SongRepository(FirebaseFirestore.getInstance()))
+    )
 
 
     LaunchedEffect(Unit) {
@@ -76,7 +84,7 @@ fun RootAppEntry(sessionViewModel: SessionViewModel) {
             }
 
             isUserLoggedInState.value -> {
-                MainScaffold(navController, authViewModel, sessionViewModel, imageUrl)
+                MainScaffold(navController, authViewModel, sessionViewModel, imageUrl, songViewModel)
             }
 
             else -> {

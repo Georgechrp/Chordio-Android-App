@@ -22,7 +22,7 @@ fun SwipeableSongViewer(
     authViewModel: AuthViewModel,
     onExit: () -> Unit
 ) {
-    val initialIndex = songs.indexOf(initialSongId).coerceAtLeast(0)
+  /*  val initialIndex = songs.indexOf(initialSongId).coerceAtLeast(0)
     val pagerState = rememberPagerState(initialPage = initialIndex)
     HorizontalPager(
         count = songs.size,
@@ -30,6 +30,7 @@ fun SwipeableSongViewer(
         modifier = Modifier.fillMaxSize()
     ) { page ->
         DetailedSongView(
+
             songId = songs[page],
             onBack = onExit,
             navController = navController,
@@ -38,5 +39,5 @@ fun SwipeableSongViewer(
             userViewModel = userViewModel,
             authViewModel = authViewModel
         )
-    }
+    }*/
 }

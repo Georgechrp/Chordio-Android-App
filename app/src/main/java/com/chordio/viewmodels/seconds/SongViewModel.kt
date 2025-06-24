@@ -17,6 +17,9 @@ class SongViewModel(private val songRepo: SongRepository, private val userStatsR
     private val _viewsCount = MutableStateFlow<Int?>(null)
     val viewsCount: StateFlow<Int?> = _viewsCount
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     fun fetchViewsCount(songId: String) {
         viewModelScope.launch {
             val count = songRepo.getSongViewsCount(songId)
@@ -30,17 +33,28 @@ class SongViewModel(private val songRepo: SongRepository, private val userStatsR
         }
     }
 
+    // SongViewModel.kt
+    suspend fun getSongById(songId: String): Song? {
+        return songRepo.getSongDataAsync(songId)
+    }
+
+
 
     fun loadSong(songId: String, fallbackToTitle: Boolean = true) {
         viewModelScope.launch {
+            _isLoading.value = true
+            _songState.value = null  // clear previous to avoid flicker
+
             var song = songRepo.getSongDataAsync(songId)
             if (song == null && fallbackToTitle) {
                 song = songRepo.getSongByTitle(songId)
             }
 
             _songState.value = song
+            _isLoading.value = false
         }
     }
+
     fun updateLocalSong(updated: Song) {
         _songState.value = updated
     }
@@ -48,7 +62,9 @@ class SongViewModel(private val songRepo: SongRepository, private val userStatsR
         userStatsRepository.incrementTotalSongsViewed(userId)
         userStatsRepository.incrementGenreAndArtistClick(userId, song.genres.toString(), song.artist)
     }
-
+    fun clearSongState() {
+        _songState.value = null
+    }
 
     suspend fun uploadSong(song: Song): Boolean {
         return songRepo.uploadSong(song)

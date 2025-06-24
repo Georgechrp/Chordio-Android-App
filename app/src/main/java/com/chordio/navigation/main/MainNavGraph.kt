@@ -32,6 +32,7 @@ import com.chordio.viewmodels.TempPlaylistViewModelFactory
 import com.chordio.viewmodels.auth.AuthViewModel
 import com.chordio.viewmodels.auth.SessionViewModel
 import com.chordio.viewmodels.main.SearchViewModel
+import com.chordio.viewmodels.seconds.SongViewModel
 import com.chordio.viewmodels.seconds.TempPlaylistViewModel
 import com.chordio.viewmodels.user.SettingsViewModel
 import com.chordio.viewmodels.user.UserViewModel
@@ -57,13 +58,12 @@ import com.chordio.viewmodels.user.UserViewModel
 fun MainNavGraph(
     navController: NavHostController,
     mainViewModel: MainViewModel,
-    sessionViewModel: SessionViewModel
+    sessionViewModel: SessionViewModel,
+    songViewModel: SongViewModel
 ) {
     val homeViewModel: HomeViewModel = viewModel()
     val searchViewModel: SearchViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
-
-
     val appSettingsPreferences = AppSettingsPreferences(navController.context)
     val settingsViewModel = SettingsViewModel(appSettingsPreferences)
     val isMenuOpen by mainViewModel.isMenuOpen
@@ -92,7 +92,8 @@ fun MainNavGraph(
                 searchViewModel = searchViewModel,
                 userViewModel = userViewModel,
                 authViewModel = authViewModel,
-                navController = navController
+                navController = navController,
+                songViewModel = songViewModel
             )
         }
 
@@ -103,7 +104,8 @@ fun MainNavGraph(
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
                 navController = navController,
-                onFullScreenChange = { homeViewModel.setFullScreen(it) }
+                onFullScreenChange = { homeViewModel.setFullScreen(it) },
+                songViewModel = songViewModel
             )
         }
 
@@ -141,11 +143,11 @@ fun MainNavGraph(
         }
 
         composable(AppScreens.Recents.route) {
-            RecentScreen(navController = navController, userViewModel = userViewModel, authViewModel = authViewModel, homeViewModel = homeViewModel, searchViewModel = searchViewModel)
+            RecentScreen(navController = navController, userViewModel = userViewModel, authViewModel = authViewModel, homeViewModel = homeViewModel, searchViewModel = searchViewModel, songViewModel= songViewModel)
         }
 
         composable("recentScreen") {
-            RecentScreen(navController, userViewModel, authViewModel, homeViewModel, searchViewModel)
+            RecentScreen(navController, userViewModel, authViewModel, homeViewModel, searchViewModel, songViewModel)
         }
 
         composable(
@@ -157,6 +159,8 @@ fun MainNavGraph(
             val songTitle = backStackEntry.arguments?.getString("songTitle")
 
             DetailedSongView(
+                songViewModel = songViewModel,
+                repository = TempPlaylistRepository(FirebaseFirestore.getInstance()),
                 songId = songTitle ?: return@composable,
                 onBack = { navController.popBackStack() },
                 navController = navController,
@@ -177,7 +181,8 @@ fun MainNavGraph(
                 homeViewModel = homeViewModel,
                 userViewModel = userViewModel,
                 authViewModel = authViewModel,
-                navController = navController
+                navController = navController,
+                songViewModel = songViewModel
             )
         }
 

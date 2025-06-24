@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.chordio.R
 import com.chordio.components.CardsView
@@ -33,6 +34,7 @@ import com.chordio.viewmodels.MainViewModel
 import com.chordio.viewmodels.auth.AuthViewModel
 import com.chordio.viewmodels.main.HomeViewModel
 import com.chordio.viewmodels.main.SearchViewModel
+import com.chordio.viewmodels.seconds.SongViewModel
 import com.chordio.viewmodels.user.UserViewModel
 import java.time.Instant
 import java.time.ZoneId
@@ -44,7 +46,8 @@ fun RecentScreen(
     userViewModel: UserViewModel,
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
-    searchViewModel: SearchViewModel
+    searchViewModel: SearchViewModel,
+    songViewModel: SongViewModel
 ) {
     val recentSongs by userViewModel.recentSongs
     val artistList by searchViewModel.artistList.collectAsState()
@@ -78,6 +81,7 @@ fun RecentScreen(
 
     if (selectedSongId != null) {
         DetailedSongView(
+            songViewModel = songViewModel,
             songId = selectedSongId!!,
             onBack = {
                 homeViewModel.clearSelectedSong()

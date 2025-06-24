@@ -21,8 +21,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,6 +39,7 @@ import com.chordio.viewmodels.MainViewModel
 import com.chordio.viewmodels.auth.AuthViewModel
 import com.chordio.viewmodels.main.HomeViewModel
 import com.chordio.viewmodels.main.LibraryViewModel
+import com.chordio.viewmodels.seconds.SongViewModel
 import com.chordio.viewmodels.user.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,13 +52,39 @@ fun PlaylistDetailScreen(
     homeViewModel: HomeViewModel,
     userViewModel: UserViewModel,
     authViewModel: AuthViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    songViewModel: SongViewModel
 )
 {
     val playlists by viewModel.playlists.collectAsState()
     val songs = playlists[playlistName] ?: emptyList()
     var selectedSongId by remember { mutableStateOf<String?>(null) }
 
+
+    val songList = remember(songs) { mutableStateListOf<Pair<String, String>>() }
+
+    LaunchedEffect(songs) {
+        songList.clear()
+        songs.forEach { songId ->
+            val song = songViewModel.getSongById(songId)
+            if (song != null) {
+                println("🎵 Loaded song: ${song.title}")
+                songList.add(song.title to song.id)
+            } else {
+                println("⚠️ Song not found for ID: $songId")
+            }
+        }
+    }
+
+    LaunchedEffect(songs) {
+        songList.clear()
+        songs.forEach { songId ->
+            val song = songViewModel.getSongById(songId)
+            if (song != null) {
+                songList.add(song.title to song.id)
+            }
+        }
+    }
 
     DisposableEffect(Unit) {
         homeViewModel.setFullScreen(false)
@@ -66,7 +95,7 @@ fun PlaylistDetailScreen(
 
     if (selectedSongId != null) {
         SwipeableSongViewer(
-            songs = songs,
+            songs = songList.map { it.second },
             initialSongId = selectedSongId!!,
             navController = navController,
             mainViewModel = mainViewModel,
@@ -100,14 +129,13 @@ fun PlaylistDetailScreen(
                         modifier = Modifier.padding(16.dp)
                     )
                 } else {
-                    songs.forEach { songTitle ->
+                    songList.forEach { (title, id) ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                                 .clickable {
-
-                                    selectedSongId = songTitle
+                                    selectedSongId = id
                                 },
                             shape = MaterialTheme.shapes.medium,
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -120,18 +148,19 @@ fun PlaylistDetailScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = songTitle,
+                                    text = title,
                                     style = MaterialTheme.typography.bodyLarge
                                 )
 
                                 TextButton(onClick = {
-                                    viewModel.removeSongFromPlaylist(playlistName, songTitle) {}
+                                    viewModel.removeSongFromPlaylist(playlistName, id) {}
                                 }) {
                                     Text("❌")
                                 }
                             }
                         }
                     }
+
                 }
             }
         }

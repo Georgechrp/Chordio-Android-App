@@ -26,7 +26,7 @@ import com.chordio.viewmodels.MainViewModel
 import com.chordio.viewmodels.auth.AuthViewModel
 import com.chordio.viewmodels.main.HomeViewModel
 import com.chordio.viewmodels.main.SearchViewModel
-import com.chordio.viewmodels.seconds.SongViewModel2
+import com.chordio.viewmodels.seconds.SongViewModel
 import com.chordio.viewmodels.user.UserViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
@@ -38,7 +38,8 @@ fun HomeScreen(
     searchViewModel: SearchViewModel,
     userViewModel: UserViewModel,
     authViewModel: AuthViewModel,
-    navController: NavController
+    navController: NavController,
+    songViewModel: SongViewModel
 ) {
     val selectedSongId by homeViewModel.selectedSongId.collectAsState()
     val songList by homeViewModel.songList.collectAsState()
@@ -52,12 +53,12 @@ fun HomeScreen(
     var showNoResults by remember { mutableStateOf(false) }
     val isFullScreen = remember { mutableStateOf(false) }
     val searchResults by searchViewModel.searchResults.collectAsState()
+    val favoriteGenres = remember { mutableStateListOf<String>() }
+
     LaunchedEffect(isFullScreen.value) {
         mainViewModel.setTopBarVisible(!isFullScreen.value)
         mainViewModel.setBottomBarVisible(!isFullScreen.value)
     }
-
-    val favoriteGenres = remember { mutableStateListOf<String>() }
 
     LaunchedEffect(Unit) {
         val userId = authViewModel.getUserId()
@@ -83,15 +84,6 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         selectedFilter = "All"
-    }
-    val viewModel: SongViewModel2 = viewModel()
-    val songId = remember { mutableStateOf<String?>(null) }
-
-    // ανέβασε τραγούδι και κράτα το id
-    LaunchedEffect(Unit) {
-       // val uploadedId = viewModel.uploadTestSong()
-        //songId.value = uploadedId
-
     }
 
     LaunchedEffect(selectedFilter) {
@@ -148,8 +140,6 @@ fun HomeScreen(
     }
 
 
-    val fetchArtists by homeViewModel.fetchArtists.collectAsState()
-
     LaunchedEffect(Unit) {
         searchViewModel.fetchAllArtists()
     }
@@ -202,48 +192,51 @@ fun HomeScreen(
                         } else {
 
                             val combinedList = when (selectedFilter) {
-                                "All" -> artistList.take(6).map { it to "artist:$it" } + songList
+                                "All" -> {
+                                    val artistCards = artistList.take(6).map { it to "artist:$it" }
+                                    val songCards = songList.take(8)
+                                    val favoritesCard = if (favoriteGenres.isNotEmpty())
+                                        listOf("Αγαπημένα Τραγούδια" to "artist:Αγαπημένα Τραγούδια")
+                                    else emptyList()
+
+                                    artistCards + songCards + favoritesCard
+                                }
+
                                 else -> searchResults.map {
-                                    "${it.first} - ${it.second}" to it.second // ή .first αν το έχεις έτσι στον CardsView
+                                    "${it.first} - ${it.second}" to it.second
                                 }
                             }
 
 
-                            Box(modifier = Modifier.padding(bottom = 40.dp)) {
 
-                                if (!artistMode && favoriteGenres.isNotEmpty()) {
-                                    CardsView(
-                                        songList = listOf("Αγαπημένα Τραγούδια" to "artist:Αγαπημένα Τραγούδια"),
-                                        homeViewModel = homeViewModel,
-                                        selectedTitle = selectedTitle,
-                                        onSongClick = { tag ->
+
+                            Box(modifier = Modifier.padding(bottom = 40.dp)) {
+                                CardsView(
+                                    songList = combinedList,
+                                    homeViewModel = homeViewModel,
+                                    selectedTitle = selectedTitle,
+                                    onSongClick = { tag ->
+                                        if (tag.startsWith("artist:")) {
                                             val artist = tag.removePrefix("artist:")
                                             navController.navigate("artist/${Uri.encode(artist)}")
+                                        } else if (tag.isNotBlank()) {
+                                            Log.d("CardsView", "✅ Selecting song ID: $tag")
+                                            homeViewModel.selectSong(tag)
+                                        } else {
+                                            Log.w("CardsView", "⚠️ Attempted to select empty song ID — ignored")
                                         }
-                                    )
-
-                                }
-
-
-                                CardsView(
-                                songList = combinedList,
-                                homeViewModel = homeViewModel,
-                                selectedTitle = selectedTitle,
-                                onSongClick = { tag ->
-                                    if (tag.startsWith("artist:")) {
-                                        val artist = tag.removePrefix("artist:")
-                                        navController.navigate("artist/${Uri.encode(artist)}")
-                                    } else {
-                                        homeViewModel.selectSong(tag)
                                     }
-                                }
-                            )
+                                )
+
+
+
                         }
                     }
                     }
 
                     else -> {
                         DetailedSongView(
+                            songViewModel = songViewModel,
                             songId = selectedSongId!!,
                             onBack = {
                                 homeViewModel.clearSelectedSong()

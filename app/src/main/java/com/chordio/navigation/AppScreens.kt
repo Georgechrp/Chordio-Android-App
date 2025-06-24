@@ -18,8 +18,6 @@ sealed class AppScreens(val route: String) {
             "forgot_password?email=${Uri.encode(email)}"
     }
 
-
-
     // ---------- Extras ----------
     data object Settings : AppScreens("Settings")
     data object Recents : AppScreens("Recents")

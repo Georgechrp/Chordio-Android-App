@@ -56,6 +56,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -73,6 +74,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.chordio.R
 import com.chordio.components.CardsView
+import com.chordio.components.LoadingView
 import com.chordio.models.song.ChordPosition
 import com.chordio.models.song.Song
 import com.chordio.repository.firestore.SongRepository
@@ -92,6 +94,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun DetailedSongView(
+    songViewModel: SongViewModel,
     songId: String,
     onBack: () -> Unit,
     repository: TempPlaylistRepository = TempPlaylistRepository(FirebaseFirestore.getInstance()),
@@ -116,14 +119,36 @@ fun DetailedSongView(
     val showAddToPlaylistDialog = remember { mutableStateOf(false) }
     val isFullScreen = remember { mutableStateOf(false) }
 
-    val songViewModel: SongViewModel = viewModel(
+   /* val songViewModel: SongViewModel = viewModel(
         factory = SongViewModelFactory(SongRepository(FirebaseFirestore.getInstance()))
-    )
+    )*/
+    val isLoading by songViewModel.isLoading.collectAsState()
     val songState by songViewModel.songState.collectAsState()
+
 
     LaunchedEffect(songState) {
         if (userId != null && songState != null) {
             songViewModel.onSongOpened(userId, songState!!)
+        }
+    }
+    LaunchedEffect(songId) {
+        songViewModel.loadSong(songId)
+    }
+
+    if (songState == null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingView()
+        }
+        return
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            songViewModel.clearSongState()
         }
     }
 
@@ -256,6 +281,7 @@ fun DetailedSongView(
         mainViewModel.setBottomBarVisible(!isFullScreen.value)
         mainViewModel.setTopBarVisible(!isFullScreen.value)
     }
+
     BackHandler {
         if (isFullScreen.value) {
             isFullScreen.value = false
@@ -278,9 +304,9 @@ fun DetailedSongView(
 
     )
     {
-        if (songState == null) {
+        if (isLoading || songState == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Loading...")
+                LoadingView()
             }
         } else {
             val songData = songState!!
@@ -316,7 +342,8 @@ fun DetailedSongView(
                             showDialog = showDialog,
                             showQRCodeDialog = showQRCodeDialog,
                             tempPlaylistViewModel = tempPlaylistViewModel,
-                            homeViewModel = homeViewModel
+                            homeViewModel = homeViewModel,
+                            userId = userId
                         )
 
                     }
@@ -475,9 +502,9 @@ fun OptionsPlace(
     showDialog: MutableState<Boolean>,
     showQRCodeDialog: MutableState<Boolean>,
     tempPlaylistViewModel : TempPlaylistViewModel,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    userId: String?
 ) {
-    val userId = UserViewModel().userId
     LaunchedEffect(userId) {
         if (userId != null) {
             tempPlaylistViewModel.loadPlaylist(userId)

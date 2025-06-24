@@ -13,6 +13,11 @@ import kotlinx.coroutines.tasks.await
 class SongRepository(private val db: FirebaseFirestore) {
 
     suspend fun getSongDataAsync(songId: String): Song? {
+        if (songId.isBlank()) {
+            Log.w("Firestore", "⚠️ getSongDataAsync called with empty song ID — skipping Firestore call.")
+            return null
+        }
+
         Log.d("Firestore", "Fetching song data for ID: $songId")
 
         return try {
@@ -30,8 +35,6 @@ class SongRepository(private val db: FirebaseFirestore) {
             val createdAt = document.getString("createdAt") ?: ""
             val creatorId = document.getString("creatorId") ?: ""
 
-
-            // 🔹 Μετατροπή lyrics σε List<SongLine>
             val lyricsList = document.get("lyrics") as? List<Map<String, Any>>
             val lyrics = lyricsList?.map { item ->
                 SongLine(
@@ -58,10 +61,11 @@ class SongRepository(private val db: FirebaseFirestore) {
                 lyrics = lyrics
             )
         } catch (e: Exception) {
-            Log.e("Firestore", " Firestore Error: ${e.message}")
+            Log.e("Firestore", "Firestore Error: ${e.message}")
             return null
         }
     }
+
 
     suspend fun addSongData(songId: String, song: Song) {
         val songMap = hashMapOf(
@@ -149,8 +153,8 @@ class SongRepository(private val db: FirebaseFirestore) {
                 val songs = result.mapNotNull {
                     try {
                         val dto = it.toObject(FirestoreSongDTO::class.java)
-                        val viewsCount = it.getLong("viewsCount")?.toInt() ?: 0
-                        dto?.toSong()?.copy(viewsCount = viewsCount)
+                        val viewsCount = it.getLong("viewsCount")?.toInt()
+                        dto?.toSong()?.copy(id = it.id, viewsCount = viewsCount)
                     } catch (e: Exception) {
                         println("Error parsing song: ${e.localizedMessage}")
                         null
@@ -195,6 +199,16 @@ class SongRepository(private val db: FirebaseFirestore) {
             null
         }
     }
+
+    suspend fun getSongById(songId: String): Song? {
+        return try {
+            val doc = db.collection("songs").document(songId).get().await()
+            doc.toObject(FirestoreSongDTO::class.java)?.toSong()?.copy(id = doc.id)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 
     suspend fun incrementSongViewCount(songId: String) {
         try {
