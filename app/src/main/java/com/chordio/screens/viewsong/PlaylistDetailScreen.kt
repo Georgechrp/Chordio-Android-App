@@ -24,7 +24,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,29 +60,20 @@ fun PlaylistDetailScreen(
     var selectedSongId by remember { mutableStateOf<String?>(null) }
 
 
-    val songList = remember(songs) { mutableStateListOf<Pair<String, String>>() }
+    var songList by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
 
     LaunchedEffect(songs) {
-        songList.clear()
-        songs.forEach { songId ->
-            val song = songViewModel.getSongById(songId)
-            if (song != null) {
-                println("🎵 Loaded song: ${song.title}")
-                songList.add(song.title to song.id)
-            } else {
-                println("⚠️ Song not found for ID: $songId")
-            }
-        }
-    }
+        println("🔁 Rebuilding songList for playlist: $playlistName")
 
-    LaunchedEffect(songs) {
-        songList.clear()
-        songs.forEach { songId ->
-            val song = songViewModel.getSongById(songId)
-            if (song != null) {
-                songList.add(song.title to song.id)
+        val fetched = songs.distinct().mapNotNull { id ->
+            val song = songViewModel.getSongById(id)
+            song?.let {
+                println("✅ Adding to songList: ${it.title}")
+                it.title to it.id
             }
         }
+
+        songList = fetched
     }
 
     DisposableEffect(Unit) {
@@ -93,8 +83,9 @@ fun PlaylistDetailScreen(
         }
     }
 
-    if (selectedSongId != null) {
+    /*if (selectedSongId != null) {
         SwipeableSongViewer(
+            songViewModel = songViewModel,
             songs = songList.map { it.second },
             initialSongId = selectedSongId!!,
             navController = navController,
@@ -104,7 +95,20 @@ fun PlaylistDetailScreen(
             authViewModel = authViewModel,
             onExit = { selectedSongId = null },
         )
+    }*/
+    if (selectedSongId != null) {
+        DetailedSongView(
+            songViewModel = songViewModel,
+            songId = selectedSongId!!,
+            onBack = { selectedSongId = null },
+            navController = navController,
+            mainViewModel = mainViewModel,
+            homeViewModel = homeViewModel,
+            userViewModel = userViewModel,
+            authViewModel = authViewModel
+        )
     }
+
     else {
         Scaffold(
             topBar = {

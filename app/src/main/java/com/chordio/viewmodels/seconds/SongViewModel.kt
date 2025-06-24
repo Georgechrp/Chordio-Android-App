@@ -35,6 +35,7 @@ class SongViewModel(private val songRepo: SongRepository, private val userStatsR
 
     // SongViewModel.kt
     suspend fun getSongById(songId: String): Song? {
+        println("📥 [getSongById] Looking up: $songId")
         return songRepo.getSongDataAsync(songId)
     }
 
