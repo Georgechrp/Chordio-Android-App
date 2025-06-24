@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.google.firebase.firestore.FirebaseFirestore
 import com.chordio.navigation.AppScreens
 import com.chordio.repository.firestore.TempPlaylistRepository
+import com.chordio.screens.GenreArtistsScreen
 import com.chordio.screens.TempPlaylistManagerScreen
 import com.chordio.screens.main.HomeScreen
 import com.chordio.screens.main.LibraryScreen
@@ -199,6 +200,16 @@ fun MainNavGraph(
                 navController = navController
             )
         }
+
+        composable("genre_artists/{genre}") { backStackEntry ->
+            val genre = backStackEntry.arguments?.getString("genre") ?: return@composable
+            GenreArtistsScreen(
+                genre = genre,
+                songViewModel = songViewModel,
+                navController = navController
+            )
+        }
+
 
     }
 }

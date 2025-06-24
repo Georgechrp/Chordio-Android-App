@@ -101,7 +101,7 @@ fun LibraryScreen(
 
 
             if (playlists.isEmpty()) {
-                Text(R.string.not_playlists_yet.toString())
+                Text(stringResource(R.string.not_playlists_yet))
             } else {
                 playlists.forEach { (playlist, id) ->
                     Card(

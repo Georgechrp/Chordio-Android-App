@@ -360,4 +360,22 @@ class SongRepository(private val db: FirebaseFirestore) {
     }
 
 
+    suspend fun getAllSongsOfGenre(genre: String): List<Song> {
+        return try {
+            db.collection("songs")
+                .whereArrayContains("genres", genre)
+                .get()
+                .await()
+                .documents
+                .mapNotNull { doc ->
+                    val id = doc.id
+                    val song = getSongDataAsync(id)
+                    song
+                }
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error fetching songs of genre '$genre': ${e.message}")
+            emptyList()
+        }
+    }
+
 }

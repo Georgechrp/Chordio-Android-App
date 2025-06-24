@@ -1,5 +1,6 @@
 package com.chordio.screens.main
 
+import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -108,7 +109,8 @@ fun SearchScreen(
                 },
                 searchResults = searchResults,
                 onSongSelect = { viewModel.selectSong(it) },
-                viewModel = viewModel
+                viewModel = viewModel,
+                navController = navController
             )
         } else {
             DetailedSongView(
@@ -138,6 +140,7 @@ fun SearchContent(
     searchResults: List<Triple<String, String, String>>,
     onSongSelect: (String) -> Unit,
     viewModel: SearchViewModel,
+    navController: NavController
 ) {
     val topSongs by viewModel.topSongs.collectAsState()
     val genres by viewModel.genres.collectAsState()
@@ -198,9 +201,13 @@ fun SearchContent(
                             homeViewModel = remember { HomeViewModel() },
                             selectedTitle = remember { mutableStateOf<String?>(null) },
                             columns = 2,
-                            onSongClick = { genreId ->
-                                viewModel.searchByGenre(genreId.removePrefix("genre:"))
+                            onSongClick = { tag ->
+                                if (tag.startsWith("genre:")) {
+                                    val genre = tag.removePrefix("genre:")
+                                    navController.navigate("genre_artists/${Uri.encode(genre)}")
+                                }
                             }
+
                         )
                     }
                 }
