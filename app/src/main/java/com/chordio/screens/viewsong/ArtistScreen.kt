@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.chordio.components.CardsView
+import com.chordio.components.LoadingView
 import com.chordio.models.song.Song
 import com.chordio.repository.firestore.SongRepository
 import com.chordio.utils.ArtistInfo
@@ -43,6 +44,7 @@ fun ArtistScreen(
     val songViewModel: SongViewModel = viewModel(
         factory = SongViewModelFactory(SongRepository(FirebaseFirestore.getInstance()))
     )
+    var isLoading by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(selectedSongId.value) {
@@ -58,12 +60,20 @@ fun ArtistScreen(
 
         if (artistName == "Αγαπημένα Τραγούδια") {
             val userId = authViewModel.getUserId()
+            isLoading = true
             if (userId != null) {
                 userViewModel.fetchTopGenres(userId) { topGenres ->
+                    isLoading = false
                     songViewModel.getSongsByGenres(topGenres) { fetchedSongs ->
                         songs = fetchedSongs.sortedByDescending { it.viewsCount ?: 0 }
                     }
                 }
+            }
+        } else if (artistName == "Τα Κορυφαία Hits") {
+            isLoading = true
+            songViewModel.getTopSongs(limit = 20) { fetchedSongs ->
+                songs = fetchedSongs
+                isLoading = false
             }
         } else {
             songViewModel.getSongsByArtistName(artistName) { fetchedSongs ->
@@ -109,11 +119,13 @@ fun ArtistScreen(
                     }
                 },
                 actions = {
-                    if (artistName != "Αγαπημένα Τραγούδια") {
+                    val shouldShowInfo = artistName != "Αγαπημένα Τραγούδια" && artistName != "Τα Κορυφαία Hits"
+                    if (shouldShowInfo) {
                         IconButton(onClick = { showInfoSheet = true }) {
                             Icon(Icons.Default.Info, contentDescription = "Info")
                         }
                     }
+
 
                 }
             )
@@ -126,28 +138,32 @@ fun ArtistScreen(
                 .padding(innerPadding),
             contentAlignment = Alignment.TopCenter
         ) {
-            CardsView(
-                songs.mapNotNull { song ->
-                    println("🎧 DEBUG: ${song.title} => '${song.id}'")
-                    val title = song.title
-                    val id = song.id
-                    if (title.isNotBlank() && id.isNotBlank()) title to id else null
-                },
-                homeViewModel = homeViewModel,
-                selectedTitle = selectedTitle,
-                columns = 1,
-                cardHeight = 60.dp,
-                cardElevation = 4.dp,
-                cardPadding = 12.dp,
-                gridPadding = 16.dp,
-                fontSize = 16.sp,
-                onSongClick = { clickedId ->
-                    songViewModel.clearSongState()
-                    selectedSongId.value = clickedId
-                }
+            if (isLoading) {
+                LoadingView()
+            } else {
+                CardsView(
+                    songs.mapNotNull { song ->
+                        println("🎧 DEBUG: ${song.title} => '${song.id}'")
+                        val title = song.title
+                        val id = song.id
+                        if (title.isNotBlank() && id.isNotBlank()) title to id else null
+                    },
+                    homeViewModel = homeViewModel,
+                    selectedTitle = selectedTitle,
+                    columns = 1,
+                    cardHeight = 60.dp,
+                    cardElevation = 4.dp,
+                    cardPadding = 12.dp,
+                    gridPadding = 16.dp,
+                    fontSize = 16.sp,
+                    onSongClick = { clickedId ->
+                        songViewModel.clearSongState()
+                        selectedSongId.value = clickedId
+                    }
 
-            )
 
+                )
+            }
         }
     }
 

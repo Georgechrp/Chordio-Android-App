@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import com.chordio.screens.FavoritePlaylistCard
 import com.chordio.utils.ArtistImageOnly
 
 /*
@@ -58,7 +59,26 @@ fun CardsView(
                 val titleText = parts.first()
                 val artistText = if (parts.size > 1) parts[1] else null
 
-                if (songId.startsWith("artist:")) {
+                if (title == "Αγαπημένα Τραγούδια") {
+                    FavoritePlaylistCard(
+                        title = "For you ",
+                        onClick = {
+                            Log.d("CardsView", "▶️ Opening favorite songs")
+                            onSongClick?.invoke(songId)
+                        }
+                    )
+
+                } else if (title == "Hits") {
+                    FavoritePlaylistCard(
+                        title = "Hits ",
+                        onClick = {
+                            Log.d("CardsView", "▶️ Opening favorite songs")
+                            onSongClick?.invoke(songId)
+                        }
+                    )
+                }
+
+                else if (songId.startsWith("artist:")) {
                     ArtistCardWithImage(
                         artistName = titleText,
                         onClick = {
@@ -67,7 +87,7 @@ fun CardsView(
                         }
                     )
                 } else {
-                    SongCard(
+                SongCard(
                         title = titleText,
                         artistName = artistText,
                         backgroundColor = backgroundColor,

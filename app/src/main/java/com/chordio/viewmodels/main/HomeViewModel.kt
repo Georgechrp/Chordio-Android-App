@@ -2,6 +2,7 @@ package com.chordio.viewmodels.main
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.chordio.models.song.Song
 import com.google.firebase.firestore.FirebaseFirestore
 import com.chordio.models.song.SongLine
 import com.chordio.repository.firestore.SongRepository
@@ -29,6 +30,13 @@ class HomeViewModel : ViewModel() {
 
     private val _fetchArtists = MutableStateFlow<String?>(null)
     val fetchArtists: StateFlow<String?> get() = _fetchArtists
+
+    private val _favoriteGenreSongs = MutableStateFlow<List<Song>>(emptyList())
+    val favoriteGenreSongs: StateFlow<List<Song>> = _favoriteGenreSongs
+
+    fun setFavoriteGenreSongs(songs: List<Song>) {
+        _favoriteGenreSongs.value = songs
+    }
 
     fun getAllArtists() {
         _fetchArtists.value = "trigger"

@@ -54,6 +54,7 @@ fun HomeScreen(
     val isFullScreen = remember { mutableStateOf(false) }
     val searchResults by searchViewModel.searchResults.collectAsState()
     val favoriteGenres = remember { mutableStateListOf<String>() }
+    val favoriteGenreSongs by homeViewModel.favoriteGenreSongs.collectAsState()
 
     LaunchedEffect(isFullScreen.value) {
         mainViewModel.setTopBarVisible(!isFullScreen.value)
@@ -67,9 +68,15 @@ fun HomeScreen(
                 favoriteGenres.clear()
                 favoriteGenres.addAll(genres)
                 Log.d("UI", "Loaded favorite genres: $genres")
+
+                // 🎯 Φόρτωσε τραγούδια με αυτά τα genres
+                songViewModel.getSongsByGenres(genres) { songs ->
+                    homeViewModel.setFavoriteGenreSongs(songs)
+                }
             }
         }
     }
+
 
 
     val nestedScrollConnection = remember {
@@ -199,7 +206,8 @@ fun HomeScreen(
                                         listOf("Αγαπημένα Τραγούδια" to "artist:Αγαπημένα Τραγούδια")
                                     else emptyList()
 
-                                    artistCards + songCards + favoritesCard
+                                    val hitsCard = listOf("Hits" to "artist:HITS")
+                                    artistCards + songCards + favoritesCard + hitsCard
                                 }
 
                                 else -> searchResults.map {
@@ -218,14 +226,23 @@ fun HomeScreen(
                                     onSongClick = { tag ->
                                         if (tag.startsWith("artist:")) {
                                             val artist = tag.removePrefix("artist:")
-                                            navController.navigate("artist/${Uri.encode(artist)}")
+
+                                            when (artist) {
+                                                "Αγαπημένα Τραγούδια" -> {
+                                                    navController.navigate("artist/${Uri.encode("Αγαπημένα Τραγούδια")}")
+                                                }
+                                                "HITS" -> {
+                                                    navController.navigate("artist/${Uri.encode("Τα Κορυφαία Hits")}")
+                                                }
+                                                else -> {
+                                                    navController.navigate("artist/${Uri.encode(artist)}")
+                                                }
+                                            }
                                         } else if (tag.isNotBlank()) {
-                                            Log.d("CardsView", "✅ Selecting song ID: $tag")
                                             homeViewModel.selectSong(tag)
-                                        } else {
-                                            Log.w("CardsView", "⚠️ Attempted to select empty song ID — ignored")
                                         }
                                     }
+
                                 )
 
 

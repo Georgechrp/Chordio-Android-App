@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.chordio.models.song.Song
 import com.chordio.repository.UserStatsRepository
 import com.chordio.repository.firestore.SongRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -66,6 +67,24 @@ class SongViewModel(private val songRepo: SongRepository, private val userStatsR
     fun clearSongState() {
         _songState.value = null
     }
+
+    fun getTopSongs(limit: Int = 20, callback: (List<Song>) -> Unit) {
+        viewModelScope.launch {
+            songRepo.getTopSongs(limit) { songCardItems ->
+                viewModelScope.launch {
+                    val fullSongs = songCardItems.mapNotNull { item ->
+                        async {
+                            songRepo.getSongById(item.id)
+                        }
+                    }.mapNotNull { deferred ->
+                        deferred.await()
+                    }
+                    callback(fullSongs)
+                }
+            }
+        }
+    }
+
 
     suspend fun uploadSong(song: Song): Boolean {
         return songRepo.uploadSong(song)
