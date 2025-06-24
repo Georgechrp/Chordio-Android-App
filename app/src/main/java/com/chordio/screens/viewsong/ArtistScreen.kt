@@ -58,14 +58,19 @@ fun ArtistScreen(
     LaunchedEffect(artistName) {
         homeViewModel.clearSelectedSong()
 
-        if (artistName == "Αγαπημένα Τραγούδια") {
+        if (artistName == "For you") {
             val userId = authViewModel.getUserId()
             isLoading = true
             if (userId != null) {
                 userViewModel.fetchTopGenres(userId) { topGenres ->
                     isLoading = false
                     songViewModel.getSongsByGenres(topGenres) { fetchedSongs ->
-                        songs = fetchedSongs.sortedByDescending { it.viewsCount ?: 0 }
+                        val groupedByGenre = fetchedSongs.groupBy { it.genres }
+                        val topPerGenre = groupedByGenre.flatMap { (_, songs) ->
+                            songs.sortedByDescending { it.viewsCount ?: 0 }.take(2)
+                        }
+                        songs = topPerGenre
+
                     }
                 }
             }
@@ -119,7 +124,7 @@ fun ArtistScreen(
                     }
                 },
                 actions = {
-                    val shouldShowInfo = artistName != "Αγαπημένα Τραγούδια" && artistName != "Τα Κορυφαία Hits"
+                    val shouldShowInfo = artistName != "For you" && artistName != "Τα Κορυφαία Hits"
                     if (shouldShowInfo) {
                         IconButton(onClick = { showInfoSheet = true }) {
                             Icon(Icons.Default.Info, contentDescription = "Info")

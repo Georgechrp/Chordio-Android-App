@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -27,6 +26,9 @@ import com.chordio.viewmodels.main.LibraryViewModel
 import com.chordio.viewmodels.MainViewModel
 import com.chordio.viewmodels.main.HomeViewModel
 import com.chordio.viewmodels.main.SearchViewModel
+import kotlinx.coroutines.launch
+import androidx.compose.ui.Alignment
+
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -51,6 +53,8 @@ fun LibraryScreen(
     val searchResults by searchViewModel.searchResults.collectAsState()
     val homeViewModel: HomeViewModel = viewModel()
     val isFullScreenState by homeViewModel.isFullScreen.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
 
     DisposableEffect(Unit) {
@@ -76,6 +80,20 @@ fun LibraryScreen(
             }
         }
     }
+    val downloadsFilter = stringResource(R.string.downloads_filter)
+
+    LaunchedEffect(selectedFilter, downloadsFilter) {
+        if (selectedFilter == downloadsFilter) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(
+                    message = "Το Downloads έρχεται σύντομα!",
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
+    }
+
+
 
 
 
@@ -149,6 +167,48 @@ fun LibraryScreen(
                 }
             }
             Spacer(modifier = Modifier.height(104.dp))
+
+        }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 80.dp)
+        ) { data ->
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                shape = MaterialTheme.shapes.medium,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = data.visuals.message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+
+                    if (data.visuals.actionLabel != null) {
+                        TextButton(onClick = { data.performAction() }) {
+                            Text(
+                                text = data.visuals.actionLabel!!,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -382,7 +442,10 @@ fun LibraryScreen(
                 }
             }
         )
+
+
     }
+
 
 }
 

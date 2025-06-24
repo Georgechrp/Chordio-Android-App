@@ -59,9 +59,9 @@ fun CardsView(
                 val titleText = parts.first()
                 val artistText = if (parts.size > 1) parts[1] else null
 
-                if (title == "Αγαπημένα Τραγούδια") {
+                if (title == "For you") {
                     FavoritePlaylistCard(
-                        title = "For you ",
+                        title = "For you",
                         onClick = {
                             Log.d("CardsView", "▶️ Opening favorite songs")
                             onSongClick?.invoke(songId)

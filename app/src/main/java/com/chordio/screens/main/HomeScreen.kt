@@ -5,9 +5,17 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -29,6 +37,7 @@ import com.chordio.viewmodels.main.SearchViewModel
 import com.chordio.viewmodels.seconds.SongViewModel
 import com.chordio.viewmodels.user.UserViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
@@ -55,6 +64,8 @@ fun HomeScreen(
     val searchResults by searchViewModel.searchResults.collectAsState()
     val favoriteGenres = remember { mutableStateListOf<String>() }
     val favoriteGenreSongs by homeViewModel.favoriteGenreSongs.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(isFullScreen.value) {
         mainViewModel.setTopBarVisible(!isFullScreen.value)
@@ -97,14 +108,25 @@ fun HomeScreen(
         artistMode = selectedFilter == "Artists"
 
         when (selectedFilter) {
-            "Artists" -> homeViewModel.getAllArtists()
-
-            else -> {
-                searchViewModel.searchByGenre(selectedFilter)
+            "Artists" -> {
+                searchViewModel.clearSearchResults()
                 homeViewModel.getAllArtists()
+            }
+            "All" -> {
+                searchViewModel.clearSearchResults()
+                homeViewModel.fetchFilteredSongs("All")
+            }
+            else -> {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = "Το Downloads έρχεται σύντομα!",
+                        duration = SnackbarDuration.Short
+                    )
+                }
             }
         }
     }
+
 
     LaunchedEffect(songList, selectedFilter) {
         showNoResults = false
@@ -130,22 +152,6 @@ fun HomeScreen(
             mainViewModel.setTopBarContent {}
         }
     }
-
-    LaunchedEffect(selectedFilter) {
-        artistMode = selectedFilter == "Artists"
-
-        when (selectedFilter) {
-            "Artists" -> homeViewModel.getAllArtists()
-            "All" -> {
-                searchViewModel.clearSearchResults()
-                homeViewModel.fetchFilteredSongs("All")
-            }
-            else -> {
-                searchViewModel.searchByGenre(selectedFilter)
-            }
-        }
-    }
-
 
     LaunchedEffect(Unit) {
         searchViewModel.fetchAllArtists()
@@ -203,7 +209,7 @@ fun HomeScreen(
                                     val artistCards = artistList.take(6).map { it to "artist:$it" }
                                     val songCards = songList.take(8)
                                     val favoritesCard = if (favoriteGenres.isNotEmpty())
-                                        listOf("Αγαπημένα Τραγούδια" to "artist:Αγαπημένα Τραγούδια")
+                                        listOf("For you" to "artist:For you")
                                     else emptyList()
 
                                     val hitsCard = listOf("Hits" to "artist:HITS")
@@ -228,8 +234,8 @@ fun HomeScreen(
                                             val artist = tag.removePrefix("artist:")
 
                                             when (artist) {
-                                                "Αγαπημένα Τραγούδια" -> {
-                                                    navController.navigate("artist/${Uri.encode("Αγαπημένα Τραγούδια")}")
+                                                "For you" -> {
+                                                    navController.navigate("artist/${Uri.encode("For you")}")
                                                 }
                                                 "HITS" -> {
                                                     navController.navigate("artist/${Uri.encode("Τα Κορυφαία Hits")}")
@@ -269,6 +275,48 @@ fun HomeScreen(
                 }
             }
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 80.dp)
+        ) { data ->
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                shape = MaterialTheme.shapes.medium,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = data.visuals.message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+
+                    if (data.visuals.actionLabel != null) {
+                        TextButton(onClick = { data.performAction() }) {
+                            Text(
+                                text = data.visuals.actionLabel!!,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
 }
