@@ -32,7 +32,7 @@ fun AuthNav(
     val startDestination = if (isLoggedIn.value) {
         AppScreens.Home.route
     } else {
-        AppScreens.Login.route
+        AppScreens.SignUp.route
     }
 
     NavHost(

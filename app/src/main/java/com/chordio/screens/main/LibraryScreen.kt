@@ -323,6 +323,13 @@ fun LibraryScreen(
                                                 showAddSongDialog = false
                                                 searchText.value = TextFieldValue("")
                                                 searchViewModel.clearSearchResults()
+                                                coroutineScope.launch {
+                                                    snackbarHostState.showSnackbar("Το τραγούδι προστέθηκε με επιτυχία!")
+                                                }
+                                            } else {
+                                                coroutineScope.launch {
+                                                    snackbarHostState.showSnackbar("Αποτυχία προσθήκης τραγουδιού.")
+                                                }
                                             }
                                         }
                                     }

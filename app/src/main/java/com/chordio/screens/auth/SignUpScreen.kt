@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.chordio.R
+import com.chordio.components.LoadingOverlay
 import com.chordio.components.LoadingView
 import com.chordio.navigation.AppScreens
 import com.chordio.viewmodels.auth.AuthViewModel
@@ -40,7 +41,7 @@ fun SignUpScreen(navController: NavController, onLoginSuccess: () -> Unit) {
     val password = remember { mutableStateOf("") }
     val confirmPassword = remember { mutableStateOf("") }
     val context = LocalContext.current
-
+    val isLoading = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -64,8 +65,12 @@ fun SignUpScreen(navController: NavController, onLoginSuccess: () -> Unit) {
             confirmPassword = confirmPassword,
             navController = navController,
             context = context,
-            onLoginSuccess = onLoginSuccess
+            onLoginSuccess = onLoginSuccess,
+            isLoading = isLoading
         )
+    }
+    if (isLoading.value) {
+        LoadingOverlay()
     }
 }
 
@@ -130,9 +135,9 @@ fun SignUpActions(
     confirmPassword: MutableState<String>,
     navController: NavController,
     context: Context,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    isLoading: MutableState<Boolean>
 ) {
-    val isLoading = remember { mutableStateOf(false) }
 
 
     Button(onClick = {
@@ -163,10 +168,7 @@ fun SignUpActions(
     }) {
         Text(stringResource(R.string.create_account))
     }
-    if (isLoading.value) {
-        LoadingView()
-        return
-    }
+
     Spacer(modifier = Modifier.height(8.dp))
 
     TextButton(onClick = {
@@ -180,3 +182,5 @@ fun SignUpActions(
 
 
 }
+
+

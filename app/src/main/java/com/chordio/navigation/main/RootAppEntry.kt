@@ -12,8 +12,10 @@ import com.chordio.components.LoadingView
 import com.chordio.navigation.auth.AuthNav
 import com.chordio.repository.firestore.SongRepository
 import com.chordio.screens.auth.welcomeuser.WelcomeScreen
+import com.chordio.screens.slidemenu.viewprofile.getProfileImageUrl
 import com.chordio.ui.theme.ChordsHubTheme
 import com.chordio.utils.ObserveUserSession
+import com.chordio.viewmodels.MainViewModel
 import com.chordio.viewmodels.SettingsViewModelFactory
 import com.chordio.viewmodels.SongViewModelFactory
 import com.chordio.viewmodels.StorageViewModel
@@ -59,6 +61,16 @@ fun RootAppEntry(sessionViewModel: SessionViewModel) {
         authViewModel.validateSession { isValid ->
             isUserLoggedInState.value = isValid
             isCheckingSession.value = false
+        }
+    }
+    val userId = authViewModel.getUserId()
+    val mainViewModel: MainViewModel = viewModel()
+
+    LaunchedEffect(userId) {
+        userId?.let {
+            getProfileImageUrl(it)?.let { url ->
+                mainViewModel.setProfileImageUrl(url)
+            }
         }
     }
 

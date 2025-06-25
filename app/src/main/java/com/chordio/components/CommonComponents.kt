@@ -44,7 +44,20 @@ fun LoadingView() {
 
     }
 }
-
+@Composable
+fun LoadingOverlay() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.6f)),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(50.dp),
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+}
 @Composable
 fun SettingsHeads(text: String, settingsViewModel: SettingsViewModel, modifier: Modifier = Modifier) {
     Text(

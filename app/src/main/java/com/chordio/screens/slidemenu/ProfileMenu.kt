@@ -66,7 +66,7 @@ fun ProfileMenuContent(
     navController: NavController
 ) {
     val userId = authViewModel.getUserId()
-    val username = authViewModel.username.value ?: "Loading..."
+    val username = authViewModel.username.value ?: "Username"
     var profileImageUrl by remember { mutableStateOf<String?>(null) }
     var selectedImage by rememberSaveable { mutableStateOf<Uri?>(null) }
     val coroutineScope = rememberCoroutineScope()

@@ -222,7 +222,7 @@ fun SearchContent(
                 modifier = Modifier.clickable { onSongSelect(song.second) },
                 headlineContent = { Text(song.first, color = MaterialTheme.colorScheme.onSurface) },
                 supportingContent = {
-                    Text("🔍 Αντιστοίχιση: ${song.third}\nID: ${song.second}")
+                    Text("🔍 Αντιστοίχιση: ${song.third}") // \nID: ${song.second}")
                 }
             )
         }
