@@ -59,22 +59,15 @@ fun ArtistScreen(
         homeViewModel.clearSelectedSong()
 
         if (artistName == "For you") {
-            val userId = authViewModel.getUserId()
-            isLoading = true
-            if (userId != null) {
-                userViewModel.fetchTopGenres(userId) { topGenres ->
-                    isLoading = false
-                    songViewModel.getSongsByGenres(topGenres) { fetchedSongs ->
-                        val groupedByGenre = fetchedSongs.groupBy { it.genres }
-                        val topPerGenre = groupedByGenre.flatMap { (_, songs) ->
-                            songs.sortedByDescending { it.viewsCount ?: 0 }.take(2)
-                        }
-                        songs = topPerGenre
+            val personalizedSongs = homeViewModel.favoriteGenreSongs.value
+            val sortedByPopularity = personalizedSongs.sortedByDescending { it.viewsCount ?: 0 }
+            val topPerGenre = sortedByPopularity
+                .groupBy { it.genres }
+                .flatMap { (_, songs) -> songs.take(2) }
 
-                    }
-                }
-            }
-        } else if (artistName == "Τα Κορυφαία Hits") {
+            songs = topPerGenre
+        }
+        else if (artistName == "Τα Κορυφαία Hits") {
             isLoading = true
             songViewModel.getTopSongs(limit = 20) { fetchedSongs ->
                 songs = fetchedSongs
@@ -101,6 +94,7 @@ fun ArtistScreen(
             onBack = {
                 songViewModel.clearSongState()
                 selectedSongId.value = null
+                homeViewModel.clearSelectedSong()
             },
             navController = navController,
             mainViewModel = mainViewModel,
@@ -119,8 +113,12 @@ fun ArtistScreen(
             TopAppBar(
                 title = { Text(text = artistName) },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                    IconButton(onClick = {
+                        homeViewModel.clearSelectedSong()
+                        navController.popBackStack()
+                    }) {
+
+                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
                     }
                 },
                 actions = {

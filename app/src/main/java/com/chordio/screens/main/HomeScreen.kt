@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import com.chordio.components.FilterRow
 import com.chordio.components.CardsView
 import com.chordio.components.LoadingView
+import com.chordio.models.song.Song
 import com.chordio.screens.viewsong.DetailedSongView
 import com.chordio.viewmodels.MainViewModel
 import com.chordio.viewmodels.auth.AuthViewModel
@@ -76,17 +77,47 @@ fun HomeScreen(
         val userId = authViewModel.getUserId()
         if (userId != null) {
             userViewModel.fetchTopGenres(userId) { genres ->
-                favoriteGenres.clear()
-                favoriteGenres.addAll(genres)
-                Log.d("UI", "Loaded favorite genres: $genres")
+                userViewModel.fetchTopArtists(userId) { artists ->
 
-                // 🎯 Φόρτωσε τραγούδια με αυτά τα genres
-                songViewModel.getSongsByGenres(genres) { songs ->
-                    homeViewModel.setFavoriteGenreSongs(songs)
+                    val combinedSongs = mutableListOf<Song>()
+
+                    // 1. Φέρε τραγούδια από genres
+                    songViewModel.getSongsByGenres(genres) { genreSongs ->
+                        combinedSongs.addAll(genreSongs)
+
+                        // 2. Για κάθε artist, φέρνουμε τραγούδια μέσω callback
+                        val allArtistSongs = mutableListOf<Song>()
+                        var loadedCount = 0
+
+                        if (artists.isEmpty()) {
+                            homeViewModel.setFavoriteGenreSongs(combinedSongs.distinctBy { it.id })
+                            return@getSongsByGenres
+                        }
+
+                        artists.forEach { artist ->
+                            songViewModel.getSongsByArtistName(artist) { artistSongs ->
+                                allArtistSongs.addAll(artistSongs)
+                                loadedCount++
+
+                                if (loadedCount == artists.size) {
+                                    combinedSongs.addAll(allArtistSongs)
+                                    val unique = combinedSongs.distinctBy { it.id }
+                                    homeViewModel.setFavoriteGenreSongs(unique)
+                                    if (unique.isNotEmpty()) {
+                                        favoriteGenres.clear()
+                                        favoriteGenres.add("For you")
+                                    }
+
+                                }
+                            }
+                        }
+
+                    }
                 }
             }
         }
     }
+
 
 
 
@@ -136,9 +167,42 @@ fun HomeScreen(
         }
     }
 
-    BackHandler(enabled = isMenuOpen) {
+/*    BackHandler(enabled = isMenuOpen) {
         mainViewModel.setMenuOpen(false)
+    }*/
+    var backPressedTime by remember { mutableStateOf(0L) }
+
+    BackHandler {
+        when {
+            isMenuOpen -> {
+                mainViewModel.setMenuOpen(false)
+            }
+
+            selectedFilter == "Artists" || selectedFilter == "Downloads" -> {
+                selectedFilter = "All"
+            }
+
+            selectedSongId != null -> {
+                homeViewModel.clearSelectedSong()
+                homeViewModel.setFullScreen(false)
+            }
+
+            else -> {
+                val now = System.currentTimeMillis()
+                if (now - backPressedTime < 2000) {
+                    navController.popBackStack()
+                } else {
+                    backPressedTime = now
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Πάτα ξανά για έξοδο")
+                    }
+                }
+            }
+        }
     }
+
+
+
 
     LaunchedEffect(selectedSongId, isFullScreenState) {
         if (selectedSongId == null && !isFullScreenState) {

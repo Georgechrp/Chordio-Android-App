@@ -120,6 +120,7 @@ fun SearchScreen(
                 onBack = {
                     onFullScreenChange(false)
                     viewModel.clearSelectedSong()
+                    homeViewModel.clearSelectedSong()
                 },
                 navController = navController,
                 mainViewModel = mainViewModel,
@@ -221,7 +222,7 @@ fun SearchContent(
                 modifier = Modifier.clickable { onSongSelect(song.second) },
                 headlineContent = { Text(song.first, color = MaterialTheme.colorScheme.onSurface) },
                 supportingContent = {
-                    Text("Καλλιτέχνης: ${song.second}\n🔍 Αντιστοίχιση: ${song.third}")
+                    Text("🔍 Αντιστοίχιση: ${song.third}\nID: ${song.second}")
                 }
             )
         }

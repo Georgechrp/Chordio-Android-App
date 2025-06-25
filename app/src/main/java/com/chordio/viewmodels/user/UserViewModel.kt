@@ -112,6 +112,17 @@ class UserViewModel : ViewModel() {
     }
 
 
+    fun fetchTopArtists(userId: String, callback: (List<String>) -> Unit) {
+        val userRef = FirebaseFirestore.getInstance().collection("users").document(userId)
+        userRef.get().addOnSuccessListener { doc ->
+            val prefs = doc.get("userPreferences.artistClicks") as? Map<String, Long>
+            val topArtists = prefs?.entries
+                ?.sortedByDescending { it.value }
+                ?.take(3)
+                ?.map { it.key } ?: emptyList()
+            callback(topArtists)
+        }
+    }
 
 
 
