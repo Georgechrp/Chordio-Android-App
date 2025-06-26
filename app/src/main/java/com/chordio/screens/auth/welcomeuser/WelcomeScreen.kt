@@ -114,6 +114,7 @@ fun WelcomeScreen(onAnimationEnd: () -> Unit) {
                 }
                 .size(200.dp)
         )
+
     }
 }
 

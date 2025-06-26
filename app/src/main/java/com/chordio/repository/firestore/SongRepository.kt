@@ -378,4 +378,38 @@ class SongRepository(private val db: FirebaseFirestore) {
         }
     }
 
+
+
+    suspend fun uploadSongWithId(song: Song, songId: String): Boolean {
+        return try {
+            val songMap = hashMapOf(
+                "title" to song.title,
+                "artist" to song.artist,
+                "key" to song.key,
+                "bpm" to song.bpm,
+                "genres" to song.genres,
+                "createdAt" to song.createdAt,
+                "creatorId" to song.creatorId,
+                "lyrics" to song.lyrics.map { line ->
+                    mapOf(
+                        "lineNumber" to line.lineNumber,
+                        "text" to line.text,
+                        "chords" to line.chords.map { chord ->
+                            mapOf(
+                                "chord" to chord.chord,
+                                "position" to chord.position
+                            )
+                        }
+                    )
+                }
+            )
+
+            db.collection("songs").document(songId).set(songMap).await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+
 }

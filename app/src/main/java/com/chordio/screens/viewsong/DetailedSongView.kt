@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.chordio.models.song.SongLine
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.ClickableText
@@ -68,6 +67,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -76,14 +76,13 @@ import com.chordio.R
 import com.chordio.components.CardsView
 import com.chordio.components.LoadingView
 import com.chordio.models.song.ChordPosition
-import com.chordio.models.song.Song
 import com.chordio.repository.firestore.SongRepository
 import com.chordio.repository.firestore.TempPlaylistRepository
 import com.chordio.sharedpreferences.TransposePreferences
 import com.chordio.utils.QRCodeDialog
+import com.chordio.utils.uploadTestSong
 import com.chordio.viewmodels.main.HomeViewModel
 import com.chordio.viewmodels.MainViewModel
-import com.chordio.viewmodels.SongViewModelFactory
 import com.chordio.viewmodels.auth.AuthViewModel
 import com.chordio.viewmodels.main.LibraryViewModel
 import com.chordio.viewmodels.seconds.SongViewModel
@@ -124,6 +123,15 @@ fun DetailedSongView(
     )*/
     val isLoading by songViewModel.isLoading.collectAsState()
     val songState by songViewModel.songState.collectAsState()
+
+
+    LaunchedEffect(Unit) {
+        val userId = authViewModel.getUserId()
+        if (userId != null) {
+           // val success = uploadTestSong(SongRepository(FirebaseFirestore.getInstance()), userId)
+            //println("Upload success: $success")
+        }
+    }
 
 
     LaunchedEffect(songState) {
@@ -757,47 +765,46 @@ fun getNewKey(originalChord: String, transpose: Int): String {
 
 
 @Composable
-fun ChordText(
-    songLine: SongLine,
-    onChordClick: (String) -> Unit
-) {
-    val text = songLine.text
-    val chordsInLine = songLine.chords.sortedBy { it.position }
+fun ChordText(songLine: SongLine, onChordClick: (String) -> Unit) {
+    val chordLine = generateChordLine(songLine.text, songLine.chords)
+    val lyricsLine = songLine.text
 
-    val annotatedString = buildAnnotatedString {
-        var currentPos = 0
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 8.dp, vertical = 4.dp)) {
 
-        chordsInLine.forEach { chord ->
-            val relativePosition = chord.position.coerceAtMost(text.length)
-            while (currentPos < relativePosition) {
-                append(" ")
-                currentPos++
+        Text(
+            text = chordLine,
+            fontSize = 16.sp,
+            color = Color.Red,
+            fontFamily = FontFamily.Monospace
+        )
+
+        Text(
+            text = lyricsLine,
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontFamily = FontFamily.Monospace
+        )
+    }
+}
+fun generateChordLine(text: String, chords: List<ChordPosition>): String {
+    val lineLength = text.length
+    val chordLineArray = CharArray(lineLength.coerceAtLeast(1)) { ' ' }
+
+    for (chord in chords.sortedBy { it.position }) {
+        val pos = chord.position.coerceIn(0, lineLength - 1)
+        val chordText = chord.chord
+
+        // Τοποθετούμε το chord στο string, χωρίς να ξεχειλίζει
+        for (i in chordText.indices) {
+            if (pos + i < chordLineArray.size) {
+                chordLineArray[pos + i] = chordText[i]
             }
-            pushStringAnnotation(tag = "chord", annotation = chord.chord)
-            withStyle(style = SpanStyle(color = Color.Red, fontSize = 18.sp)) {
-                append(chord.chord)
-            }
-            pop()
-            currentPos += chord.chord.length + 1
         }
-        append("\n$text")
     }
 
-    ClickableText(
-        text = annotatedString,
-        style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
-        modifier = Modifier.fillMaxWidth().padding(4.dp),
-        onClick = { offset ->
-            val clickedAnnotations = annotatedString.getStringAnnotations(
-                tag = "chord",
-                start = offset,
-                end = offset
-            )
-            if (clickedAnnotations.isNotEmpty()) {
-                onChordClick(clickedAnnotations.first().item)
-            }
-        }
-    )
+    return String(chordLineArray)
 }
 
 
