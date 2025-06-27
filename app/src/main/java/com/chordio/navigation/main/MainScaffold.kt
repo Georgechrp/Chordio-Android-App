@@ -60,11 +60,14 @@ fun MainScaffold(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { _ ->
+        val topBarVisible by mainViewModel.topBarVisible.collectAsState()
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .systemBarsPadding()
-        ) {
+                .then(if (topBarVisible) Modifier.systemBarsPadding() else Modifier)
+        )
+        {
             MainNavGraph(
                 navController = navController,
                 mainViewModel = mainViewModel,
@@ -72,7 +75,9 @@ fun MainScaffold(
                 songViewModel = songViewModel
             )
 
-            if (currentRoute in topBarScreens && !isFullScreen) {
+            val showTopBar by mainViewModel.topBarVisible.collectAsState()
+
+            if (currentRoute in topBarScreens && showTopBar) {
                 MyAppTopBar(
                     imageUrl = profileImageUrl,
                     onMenuClick = { mainViewModel.setMenuOpen(true) }
@@ -80,6 +85,7 @@ fun MainScaffold(
                     topBarContent?.invoke(this)
                 }
             }
+
 
 
             val showBottomBar by homeViewModel.showBottomBar.collectAsState()

@@ -1,7 +1,6 @@
 package com.chordio.screens.main
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -24,7 +23,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.chordio.components.FilterRow
 import com.chordio.components.CardsView
@@ -64,9 +62,9 @@ fun HomeScreen(
     val isFullScreen = remember { mutableStateOf(false) }
     val searchResults by searchViewModel.searchResults.collectAsState()
     val favoriteGenres = remember { mutableStateListOf<String>() }
-    val favoriteGenreSongs by homeViewModel.favoriteGenreSongs.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    var backPressedTime by remember { mutableStateOf(0L) }
 
     LaunchedEffect(isFullScreen.value) {
         mainViewModel.setTopBarVisible(!isFullScreen.value)
@@ -118,9 +116,6 @@ fun HomeScreen(
         }
     }
 
-
-
-
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -158,7 +153,6 @@ fun HomeScreen(
         }
     }
 
-
     LaunchedEffect(songList, selectedFilter) {
         showNoResults = false
         if (songList.isEmpty()) {
@@ -167,10 +161,22 @@ fun HomeScreen(
         }
     }
 
-/*    BackHandler(enabled = isMenuOpen) {
-        mainViewModel.setMenuOpen(false)
-    }*/
-    var backPressedTime by remember { mutableStateOf(0L) }
+    LaunchedEffect(selectedSongId, isFullScreenState) {
+        if (selectedSongId == null && !isFullScreenState) {
+            mainViewModel.setTopBarContent {
+                FilterRow(
+                    selectedFilter = selectedFilter,
+                    onFilterChange = { selectedFilter = it }
+                )
+            }
+        } else {
+            mainViewModel.setTopBarContent {}
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        searchViewModel.fetchAllArtists()
+    }
 
     BackHandler {
         when {
@@ -202,31 +208,10 @@ fun HomeScreen(
     }
 
 
-
-
-    LaunchedEffect(selectedSongId, isFullScreenState) {
-        if (selectedSongId == null && !isFullScreenState) {
-            mainViewModel.setTopBarContent {
-                FilterRow(
-                    selectedFilter = selectedFilter,
-                    onFilterChange = { selectedFilter = it }
-                )
-            }
-        } else {
-            mainViewModel.setTopBarContent {}
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        searchViewModel.fetchAllArtists()
-    }
-
-
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = if (isFullScreenState) 0.dp else 60.dp)
+            .padding(top = if (isFullScreenState) 0.dp else 50.dp)
             .nestedScroll(nestedScrollConnection)
             .background(MaterialTheme.colorScheme.background)
     ) {
@@ -242,7 +227,6 @@ fun HomeScreen(
                         .zIndex(1f)
                 ) {}
             }
-
             Box(modifier = Modifier.fillMaxSize()) {
                 when {
                     selectedSongId == null && songList.isEmpty() && showNoResults -> {
@@ -254,7 +238,7 @@ fun HomeScreen(
                     selectedSongId == null -> {
                         if (artistMode) {
                             val artistCards = artistList
-                                //.take(7) // μόνο 6 αν θες
+                                //.take(7)
                                 .map { it to "artist:$it" }
 
                             CardsView(

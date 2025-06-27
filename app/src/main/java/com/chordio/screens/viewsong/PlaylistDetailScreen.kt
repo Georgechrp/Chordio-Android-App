@@ -33,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.chordio.R
-import com.chordio.screens.SwipeableSongViewer
 import com.chordio.viewmodels.MainViewModel
 import com.chordio.viewmodels.auth.AuthViewModel
 import com.chordio.viewmodels.main.HomeViewModel
@@ -58,21 +57,18 @@ fun PlaylistDetailScreen(
     val playlists by viewModel.playlists.collectAsState()
     val songs = playlists[playlistName] ?: emptyList()
     var selectedSongId by remember { mutableStateOf<String?>(null) }
-
-
     var songList by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
 
     LaunchedEffect(songs) {
-        println("🔁 Rebuilding songList for playlist: $playlistName")
+        println("Rebuilding songList for playlist: $playlistName")
 
         val fetched = songs.distinct().mapNotNull { id ->
             val song = songViewModel.getSongById(id)
             song?.let {
-                println("✅ Adding to songList: ${it.title}")
+                println("Adding to songList: ${it.title}")
                 it.title to it.id
             }
         }
-
         songList = fetched
     }
 
@@ -83,19 +79,6 @@ fun PlaylistDetailScreen(
         }
     }
 
-    /*if (selectedSongId != null) {
-        SwipeableSongViewer(
-            songViewModel = songViewModel,
-            songs = songList.map { it.second },
-            initialSongId = selectedSongId!!,
-            navController = navController,
-            mainViewModel = mainViewModel,
-            homeViewModel = homeViewModel,
-            userViewModel = userViewModel,
-            authViewModel = authViewModel,
-            onExit = { selectedSongId = null },
-        )
-    }*/
     if (selectedSongId != null) {
         DetailedSongView(
             songViewModel = songViewModel,
@@ -107,9 +90,7 @@ fun PlaylistDetailScreen(
             userViewModel = userViewModel,
             authViewModel = authViewModel
         )
-    }
-
-    else {
+    }else {
         Scaffold(
             topBar = {
                 TopAppBar(

@@ -38,7 +38,6 @@ fun LibraryScreen(
 ) {
     val viewModel: LibraryViewModel = viewModel()
     val playlists by viewModel.playlists.collectAsState()
-
     var showDialog by remember { mutableStateOf(false) }
     var playlistName by remember { mutableStateOf("") }
     var showAddSongDialog by remember { mutableStateOf(false) }
@@ -55,14 +54,12 @@ fun LibraryScreen(
     val isFullScreenState by homeViewModel.isFullScreen.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-
+    val downloadsFilter = stringResource(R.string.downloads_filter)
 
     DisposableEffect(Unit) {
         homeViewModel.setFullScreen(false) // ensure TopBar is restored
         onDispose { }
     }
-
-
 
     LaunchedEffect(searchText.value.text) {
         if (searchText.value.text.isBlank()) {
@@ -72,7 +69,6 @@ fun LibraryScreen(
         }
     }
 
-
     LaunchedEffect(isFullScreenState) {
         mainViewModel.setTopBarContent {
             if (!isFullScreenState) {
@@ -80,7 +76,6 @@ fun LibraryScreen(
             }
         }
     }
-    val downloadsFilter = stringResource(R.string.downloads_filter)
 
     LaunchedEffect(selectedFilter, downloadsFilter) {
         if (selectedFilter == downloadsFilter) {
@@ -93,11 +88,7 @@ fun LibraryScreen(
         }
     }
 
-
-
-
-
-    Box(modifier = Modifier.fillMaxSize().padding(top = if (isFullScreenState) 0.dp else 56.dp)) {
+    Box(modifier = Modifier.fillMaxSize().padding(top = if (isFullScreenState) 0.dp else 50.dp)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -117,9 +108,30 @@ fun LibraryScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-
             if (playlists.isEmpty()) {
-                Text(stringResource(R.string.not_playlists_yet))
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    TextButton(
+                        onClick = {
+                            val existingNames = playlists.keys
+                            var nextNumber = 1
+                            while (existingNames.contains("My Playlist #$nextNumber")) {
+                                nextNumber++
+                            }
+                            playlistName = "My Playlist #$nextNumber"
+                            showDialog = true
+                        }
+                    ) {
+                        Text(
+                            text = "➕ Δημιούργησε την πρώτη σου λίστα",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             } else {
                 playlists.forEach { (playlist, id) ->
                     Card(
@@ -167,7 +179,6 @@ fun LibraryScreen(
                 }
             }
             Spacer(modifier = Modifier.height(104.dp))
-
         }
         SnackbarHost(
             hostState = snackbarHostState,
@@ -211,32 +222,27 @@ fun LibraryScreen(
             }
         }
 
+        val fabAlignment = if (playlists.isEmpty()) Alignment.Center else Alignment.BottomEnd
 
-        // FloatingActionButton
-        FloatingActionButton(onClick = {
-            val existingNames = playlists.keys
-
-            // Βρίσκουμε το μικρότερο διαθέσιμο όνομα
-            var nextNumber = 1
-            while (existingNames.contains("My Playlist #$nextNumber")) {
-                nextNumber++
-            }
-
-            playlistName = "My Playlist #$nextNumber"
-            showDialog = true
-        },
+        FloatingActionButton(
+            onClick = {
+                val existingNames = playlists.keys
+                var nextNumber = 1
+                while (existingNames.contains("My Playlist #$nextNumber")) {
+                    nextNumber++
+                }
+                playlistName = "My Playlist #$nextNumber"
+                showDialog = true
+            },
             modifier = Modifier
                 .padding(bottom = 86.dp, end = 16.dp)
                 .align(Alignment.BottomEnd),
             containerColor = MaterialTheme.colorScheme.surface
-        )
-        {
+        ) {
             Text("+", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
-
         }
+
     }
-
-
 
     // Διάλογος για δημιουργία playlist
     if (showDialog) {

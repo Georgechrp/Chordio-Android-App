@@ -88,10 +88,11 @@ class SongRepository(private val db: FirebaseFirestore) {
         )
 
         try {
+            println("Uploading song to Firestore: $songId")
             db.collection("songs").document(songId).set(songMap).await()
-            Log.d("Firestore", " Song added successfully: $songId")
+            println("Song added to Firestore: $songId")
         } catch (e: Exception) {
-            Log.e("Firestore", " Error adding song", e)
+            println("Firestore error: ${e.message}")
         }
     }
 

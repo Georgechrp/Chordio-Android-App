@@ -49,6 +49,8 @@ import com.chordio.models.song.SongLine
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.filled.QueueMusic
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -70,6 +72,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.chordio.R
@@ -89,7 +92,9 @@ import com.chordio.viewmodels.seconds.SongViewModel
 import com.chordio.viewmodels.seconds.TempPlaylistViewModel
 import com.chordio.viewmodels.user.UserViewModel
 import kotlinx.coroutines.delay
-
+import android.app.Activity
+import android.view.WindowInsets
+import androidx.core.view.WindowInsetsControllerCompat
 
 @Composable
 fun DetailedSongView(
@@ -117,22 +122,8 @@ fun DetailedSongView(
     val userId = authViewModel.getUserId()
     val showAddToPlaylistDialog = remember { mutableStateOf(false) }
     val isFullScreen = remember { mutableStateOf(false) }
-
-   /* val songViewModel: SongViewModel = viewModel(
-        factory = SongViewModelFactory(SongRepository(FirebaseFirestore.getInstance()))
-    )*/
     val isLoading by songViewModel.isLoading.collectAsState()
     val songState by songViewModel.songState.collectAsState()
-
-
-    LaunchedEffect(Unit) {
-        val userId = authViewModel.getUserId()
-        if (userId != null) {
-           // val success = uploadTestSong(SongRepository(FirebaseFirestore.getInstance()), userId)
-            //println("Upload success: $success")
-        }
-    }
-
 
     LaunchedEffect(songState) {
         if (userId != null && songState != null) {
@@ -142,7 +133,6 @@ fun DetailedSongView(
     LaunchedEffect(songId) {
         songViewModel.loadSong(songId)
     }
-
     if (songState == null) {
         Box(
             modifier = Modifier
@@ -160,7 +150,6 @@ fun DetailedSongView(
         }
     }
 
-
     LaunchedEffect(songId) {
         val savedTranspose = transposePreferences.getTransposeValue(songId)
         transposeValue.value = savedTranspose
@@ -173,9 +162,6 @@ fun DetailedSongView(
         songViewModel.registerSongView(songId)
     }
 
-
-
-
     LaunchedEffect(isScrolling.value, scrollSpeed.floatValue) {
         while (isScrolling.value) {
             val step = (scrollSpeed.floatValue / 10).coerceIn(1f, 20f)
@@ -184,87 +170,20 @@ fun DetailedSongView(
         }
     }
 
-   /* LaunchedEffect(Unit) {
-        val testSong = userId?.let {
-            Song(
-                title = "Μια συνουσία μυστική",
-                artist = "Πυξ Λαξ",
-                key = "Am",
-                bpm = 88,
-                genres = listOf("Greek", "Rock", "Alternative"),
-                createdAt = System.currentTimeMillis().toString(),
-                creatorId = it,
-                lyrics = listOf(
-                    SongLine(
-                        lineNumber = 0,
-                        text = "Άγνωστοι φόβοι στο μυαλό σου πολεμούν",
-                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 11), ChordPosition("F", 16), ChordPosition("G", 18), ChordPosition("Am", 20), ChordPosition("G", 29), ChordPosition("F", 41), ChordPosition("G", 43)),
-                        chordLine = null
-                    ),
-                    SongLine(
-                        lineNumber = 1,
-                        text = "με τις σκιές που θολά σε καλύπτουν κάθε βράδυ",
-                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 10), ChordPosition("F", 20), ChordPosition("G", 30), ChordPosition("Am", 42), ChordPosition("G", 45), ChordPosition("F", 49), ChordPosition("G", 51)),
-                        chordLine = null
-                    ),
-                    SongLine(
-                        lineNumber = 2,
-                        text = "Ανυποψίαστοι περαστικοί γελούν μαζί σου",
-                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 11), ChordPosition("F", 25), ChordPosition("G", 27), ChordPosition("Am", 39), ChordPosition("G", 41), ChordPosition("F", 45), ChordPosition("G", 47)),
-                        chordLine = null
-                    ),
-                    SongLine(
-                        lineNumber = 3,
-                        text = "μα τους ανέχεσαι παθητικά με τη σιωπή σου",
-                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 10), ChordPosition("F", 26), ChordPosition("G", 28), ChordPosition("Am", 43), ChordPosition("G", 45), ChordPosition("F", 49), ChordPosition("G", 51)),
-                        chordLine = null
-                    ),
-                    SongLine(
-                        lineNumber = 4,
-                        text = "Μια συνουσία μυστική μια συνουσία μυστική της διαφθοράς",
-                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 17), ChordPosition("F", 30), ChordPosition("G", 32), ChordPosition("Am", 35), ChordPosition("G", 51), ChordPosition("F", 55), ChordPosition("G", 60)),
-                        chordLine = null
-                    ),
-                    SongLine(
-                        lineNumber = 5,
-                        text = "χώροι στενοί μες στη μιζέρια δε νιώθεις τίποτα",
-                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 24), ChordPosition("F", 37), ChordPosition("G", 44), ChordPosition("Am", 54), ChordPosition("G", 58), ChordPosition("F", 62), ChordPosition("G", 64)),
-                        chordLine = null
-                    ),
-                    SongLine(
-                        lineNumber = 6,
-                        text = "Πετάς τα ρούχα σου ψηλά γυμνός μες τη χαρά σου",
-                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 23), ChordPosition("F", 35), ChordPosition("G", 38), ChordPosition("Am", 42), ChordPosition("G", 54), ChordPosition("F", 57), ChordPosition("G", 60)),
-                        chordLine = null
-                    ),
-                    SongLine(
-                        lineNumber = 7,
-                        text = "κρατάς τη λύπη σου μακριά δε νιώθεις τίποτα",
-                        chords = listOf(ChordPosition("Am", 0), ChordPosition("G", 20), ChordPosition("F", 34), ChordPosition("G", 38), ChordPosition("Am", 49), ChordPosition("G", 53), ChordPosition("F", 56), ChordPosition("G", 58)),
-                        chordLine = null
-                    )
-                )
-            )
+    LaunchedEffect(isFullScreen.value) {
+        mainViewModel.setBottomBarVisible(!isFullScreen.value)
+        mainViewModel.setTopBarVisible(!isFullScreen.value)
+    }
+
+    BackHandler {
+        if (isFullScreen.value) {
+            isFullScreen.value = false
+            mainViewModel.setBottomBarVisible(true)
+            mainViewModel.setTopBarVisible(true)
+        } else {
+            onBack()
         }
-
-        testSong?.let { song ->
-            val firestore = FirebaseFirestore.getInstance()
-            val docId = "pyx_lax_den_niotheis_tipota"
-
-            firestore.collection("songs").document(docId).set(song)
-                .addOnSuccessListener {
-                    Log.d("Upload", " Uploaded 'Δεν Νιώθεις Τίποτα' with ID: $docId")
-                }
-                .addOnFailureListener { e ->
-                    Log.e("Upload", "❌ Failed to upload 'Δεν Νιώθεις Τίποτα': $e")
-                }
-        }
-    }*/
-
-
-
-
-
+    }
 
     fun applyTranspose() {
         val updated = songState?.lyrics?.map { line ->
@@ -285,33 +204,18 @@ fun DetailedSongView(
 
     }
 
-    LaunchedEffect(isFullScreen.value) {
-        mainViewModel.setBottomBarVisible(!isFullScreen.value)
-        mainViewModel.setTopBarVisible(!isFullScreen.value)
-    }
-
-    BackHandler {
-        if (isFullScreen.value) {
-            isFullScreen.value = false
-            mainViewModel.setBottomBarVisible(true)
-            mainViewModel.setTopBarVisible(true)
-        } else {
-            onBack()
-        }
-    }
-
-
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background )
+            .then(
+                if (isFullScreen.value) Modifier.background(MaterialTheme.colorScheme.background)
+                else Modifier.padding(top = 3.dp).background(MaterialTheme.colorScheme.background)
+            )
+            .background(MaterialTheme.colorScheme.background)
             .clickable {
                 isFullScreen.value = !isFullScreen.value
             }
-
-    )
-    {
+    ){
         if (isLoading || songState == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 LoadingView()
@@ -320,10 +224,22 @@ fun DetailedSongView(
             val songData = songState!!
 
             Card(
-                modifier = if (isFullScreen.value) Modifier.fillMaxSize() else Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier
+                .then(
+                        if (isFullScreen.value) {
+                            Modifier
+                                .fillMaxSize()
+                                .zIndex(1f)
+                                .statusBarsPadding()
+                        } else {
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        }
+                        ),
                 shape = RoundedCornerShape(if (isFullScreen.value) 0.dp else 16.dp),
                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = if (isFullScreen.value) 0.dp else 8.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = if (isFullScreen.value) 0.dp else 10.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -762,8 +678,6 @@ fun getNewKey(originalChord: String, transpose: Int): String {
     return newRoot + suffix
 }
 
-
-
 @Composable
 fun ChordText(songLine: SongLine, onChordClick: (String) -> Unit) {
     val chordLine = generateChordLine(songLine.text, songLine.chords)
@@ -788,6 +702,7 @@ fun ChordText(songLine: SongLine, onChordClick: (String) -> Unit) {
         )
     }
 }
+
 fun generateChordLine(text: String, chords: List<ChordPosition>): String {
     val lineLength = text.length
     val chordLineArray = CharArray(lineLength.coerceAtLeast(1)) { ' ' }
@@ -806,5 +721,4 @@ fun generateChordLine(text: String, chords: List<ChordPosition>): String {
 
     return String(chordLineArray)
 }
-
 

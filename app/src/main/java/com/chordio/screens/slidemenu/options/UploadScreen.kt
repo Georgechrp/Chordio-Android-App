@@ -158,6 +158,8 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
                         creatorId = currentUserId,
                         lyrics = songLines
                     )
+                    val currentId = userViewModel.userId ?: return@Button
+                    println("👤 User ID: $currentId")
 
                     uploadViewModel.uploadSong(songId, song)
                 }
