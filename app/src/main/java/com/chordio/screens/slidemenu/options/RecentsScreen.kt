@@ -66,16 +66,7 @@ fun RecentScreen(
     LaunchedEffect(Unit) {
         searchViewModel.fetchAllArtists()
     }
-    fun testAddFakeRecentSongs(userId: String) {
-       // userViewModel.addRecentSongWithDate(userId, "Every_Breath_You_Take_Chords", 0)  // Today
-         //userViewModel.addRecentSongWithDate(userId, "fur_elise_beethoven", 0)  // Today
-        //userViewModel.addRecentSongWithDate(userId, "autumn_leaves_jazz", 1)  // Yesterday
-        //userViewModel.addRecentSongWithDate(userId, "bohemian_rhapsody_queen", 3)  // 3 days ago
-    }
-    LaunchedEffect(Unit) {
-       // testAddFakeRecentSongs(userId ?: return@LaunchedEffect)
-        //searchViewModel.fetchAllArtists()
-    }
+
 
 
 

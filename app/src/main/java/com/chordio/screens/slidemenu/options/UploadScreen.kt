@@ -20,12 +20,13 @@ import com.chordio.R
 import com.chordio.models.song.ChordPosition
 import com.chordio.models.song.Song
 import com.chordio.models.song.SongLine
+import com.chordio.viewmodels.auth.AuthViewModel
 import com.chordio.viewmodels.seconds.UploadViewModel
 import com.chordio.viewmodels.user.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
+fun UploadScreen(navController: NavController, authViewModel: AuthViewModel) {
     var title by remember { mutableStateOf("") }
     var artist by remember { mutableStateOf("") }
     var key by remember { mutableStateOf("") }
@@ -38,6 +39,7 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
 
     LaunchedEffect(uploadSuccess) {
         if (uploadSuccess) {
+            println("✅ Upload completed successfully!")
             uploadViewModel.resetStatus()
             navController.popBackStack()
         }
@@ -45,12 +47,10 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
 
     val errorMessage by uploadViewModel.errorMessage.collectAsState()
     errorMessage?.let {
-        Text(
-            text = it,
-            color = MaterialTheme.colorScheme.error,
-            modifier = Modifier.padding(top = 8.dp)
-        )
+        println("❌ Upload error: $it")
+        Text(text = it, color = MaterialTheme.colorScheme.error)
     }
+
 
 
     val scrollState = rememberScrollState()
@@ -128,9 +128,16 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
 
             Button(
                 onClick = {
-                    val currentUserId = userViewModel.userId ?: return@Button
+                    println("📤 Button clicked!")  // 1. Βεβαιώσου ότι πατήθηκε το κουμπί
+
+                    val currentUserId = authViewModel.getUserId()
+                    if (currentUserId == null) {
+                        println("⚠️ currentUserId is null! Cannot upload.")
+                        return@Button
+                    }
 
                     val songId = title.replace(" ", "_").lowercase()
+                    println("🆔 songId = $songId")
 
                     val songLines = lyrics.split("\n").mapIndexed { index, line ->
                         SongLine(
@@ -141,7 +148,10 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
                                 if (parts.size == 2) {
                                     val chord = parts[0]
                                     val position = parts[1].toIntOrNull()
-                                    if (position != null) ChordPosition(chord, position) else null
+                                    if (position != null) {
+                                        println("🎸 Found chord: $chord at position: $position")
+                                        ChordPosition(chord, position)
+                                    } else null
                                 } else null
                             }
                         )
@@ -158,20 +168,19 @@ fun UploadScreen(navController: NavController, userViewModel: UserViewModel) {
                         creatorId = currentUserId,
                         lyrics = songLines
                     )
-                    val currentId = userViewModel.userId ?: return@Button
-                    println("👤 User ID: $currentId")
+
+                    println("✅ Created song: $song")
 
                     uploadViewModel.uploadSong(songId, song)
-                }
-                ,
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = stringResource(R.string.submit_song),
                     color = MaterialTheme.colorScheme.onPrimary
                 )
-
             }
+
         }
     }
 }

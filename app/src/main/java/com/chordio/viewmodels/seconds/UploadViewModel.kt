@@ -21,13 +21,17 @@ class UploadViewModel : ViewModel() {
     fun uploadSong(songId: String, song: Song) {
         viewModelScope.launch {
             try {
+                println("🚀 Trying to upload song with ID: $songId")
                 songRepo.addSongData(songId, song)
+                println("✅ Upload succeeded for song ID: $songId")
                 _uploadSuccess.value = true
             } catch (e: Exception) {
+                println("❌ Upload failed: ${e.message}")
                 _errorMessage.value = "Σφάλμα κατά το ανέβασμα: ${e.localizedMessage}"
             }
         }
     }
+
 
     fun resetStatus() {
         _uploadSuccess.value = false

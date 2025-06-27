@@ -113,7 +113,7 @@ fun MainNavGraph(
         composable(AppScreens.Upload.route) {
             UploadScreen(
                 navController = navController,
-                userViewModel
+                authViewModel = authViewModel
             )
         }
 

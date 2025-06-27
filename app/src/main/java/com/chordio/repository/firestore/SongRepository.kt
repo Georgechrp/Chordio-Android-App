@@ -76,7 +76,7 @@ class SongRepository(private val db: FirebaseFirestore) {
             "genres" to song.genres,
             "createdAt" to song.createdAt,
             "creatorId" to song.creatorId,
-            "lyrics" to song.lyrics?.map { line ->
+            "lyrics" to song.lyrics.map { line ->
                 mapOf(
                     "lineNumber" to line.lineNumber,
                     "text" to line.text,
@@ -87,14 +87,14 @@ class SongRepository(private val db: FirebaseFirestore) {
             }
         )
 
-        try {
-            println("Uploading song to Firestore: $songId")
-            db.collection("songs").document(songId).set(songMap).await()
-            println("Song added to Firestore: $songId")
-        } catch (e: Exception) {
-            println("Firestore error: ${e.message}")
-        }
+        println("Uploading song to Firestore: $songId")
+
+        // ✅ Πετάμε το exception ώστε να το πιάσει ο ViewModel
+        db.collection("songs").document(songId).set(songMap).await()
+
+        println("✅ Song added to Firestore: $songId")
     }
+
 
     fun getFilteredSongs(filter: String, callback: (List<Pair<String, String>>) -> Unit) {
         println("🔍 Querying Firestore with filter: $filter")

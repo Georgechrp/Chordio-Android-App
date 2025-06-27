@@ -67,8 +67,9 @@ class UserViewModel : ViewModel() {
 
         userRef.get().addOnSuccessListener { document ->
             val recentData = document.get("recentSongs") as? List<Map<String, Any>> ?: emptyList()
+
             val recentEntries = recentData.mapNotNull {
-                val id = it["songId"] as? String
+                val id = (it["songId"] as? String)?.takeIf { it.isNotBlank() }
                 val ts = (it["timestamp"] as? Long) ?: System.currentTimeMillis()
                 if (id != null) RecentSongEntry(id, ts) else null
             }.sortedByDescending { it.timestamp }
@@ -80,11 +81,16 @@ class UserViewModel : ViewModel() {
                 return@addOnSuccessListener
             }
 
-            // Σπάμε σε chunks των 10
-            val chunks = ids.chunked(10)
-            val allSongs = mutableListOf<Song>()
+            val validIds = ids.filter { it.isNotBlank() }
+            if (validIds.isEmpty()) {
+                _recentSongs.value = emptyList()
+                return@addOnSuccessListener
+            }
 
+            val chunks = validIds.chunked(10)
+            val allSongs = mutableListOf<Song>()
             var loadedCount = 0
+
             for (chunk in chunks) {
                 db.collection("songs")
                     .whereIn(FieldPath.documentId(), chunk)
@@ -127,13 +133,18 @@ class UserViewModel : ViewModel() {
 
 
     fun addRecentSong(userId: String, songId: String) {
+        if (songId.isBlank()) {
+            Log.w("Firestore", "Tried to add recent song with blank ID — skipping")
+            return
+        }
+
         val userRef = db.collection("users").document(userId)
 
         userRef.get().addOnSuccessListener { document ->
             val recentData = document.get("recentSongs") as? List<Map<String, Any>> ?: emptyList()
 
             val existing = recentData.mapNotNull {
-                val id = it["songId"] as? String
+                val id = (it["songId"] as? String)?.takeIf { it.isNotBlank() }
                 val ts = (it["timestamp"] as? Long) ?: System.currentTimeMillis()
                 if (id != null) RecentSongEntry(id, ts) else null
             }
