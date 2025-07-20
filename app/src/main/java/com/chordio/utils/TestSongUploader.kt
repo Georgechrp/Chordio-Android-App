@@ -48,10 +48,10 @@ suspend fun uploadTestSong(songRepository: SongRepository, userId: String): Bool
 
     return try {
         val success = songRepository.uploadSongWithId(testSong, customId)
-        println("✅ Uploaded test song with ID: $customId")
+        println("Uploaded test song with ID: $customId")
         success
     } catch (e: Exception) {
-        println("❌ Upload error: ${e.message}")
+        println("Upload error: ${e.message}")
         false
     }
 }

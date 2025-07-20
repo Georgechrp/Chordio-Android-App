@@ -50,8 +50,6 @@ import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.filled.QueueMusic
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -67,11 +65,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -79,11 +73,9 @@ import com.chordio.R
 import com.chordio.components.CardsView
 import com.chordio.components.LoadingView
 import com.chordio.models.song.ChordPosition
-import com.chordio.repository.firestore.SongRepository
 import com.chordio.repository.firestore.TempPlaylistRepository
 import com.chordio.sharedpreferences.TransposePreferences
 import com.chordio.utils.QRCodeDialog
-import com.chordio.utils.uploadTestSong
 import com.chordio.viewmodels.main.HomeViewModel
 import com.chordio.viewmodels.MainViewModel
 import com.chordio.viewmodels.auth.AuthViewModel
@@ -92,9 +84,8 @@ import com.chordio.viewmodels.seconds.SongViewModel
 import com.chordio.viewmodels.seconds.TempPlaylistViewModel
 import com.chordio.viewmodels.user.UserViewModel
 import kotlinx.coroutines.delay
-import android.app.Activity
-import android.view.WindowInsets
-import androidx.core.view.WindowInsetsControllerCompat
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 
 @Composable
 fun DetailedSongView(
@@ -355,7 +346,7 @@ fun DetailedSongView(
                                     onClick = {
                                         selectedPlaylist.value?.let { playlist ->
                                             songState?.title?.let { title ->
-                                                libraryViewModel.addSongToPlaylist(playlist, title) {
+                                                libraryViewModel.addSongToPlaylist(playlist, songId) {
                                                     showAddToPlaylistDialog.value = false
                                                 }
                                             }
@@ -597,7 +588,10 @@ fun OptionsDialog(
                             },
                             modifier = Modifier.padding(end = 8.dp)
                         ) {
-                            Text("🔽")
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = "Transpose Down"
+                            )
                         }
 
                         TextField(
@@ -617,7 +611,10 @@ fun OptionsDialog(
                             },
                             modifier = Modifier.padding(start = 8.dp)
                         ) {
-                            Text("🔼")
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowUp,
+                                contentDescription = "Transpose Up"
+                            )
                         }
                     }
 

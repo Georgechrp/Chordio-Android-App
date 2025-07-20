@@ -22,7 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.chordio.R
 import com.chordio.components.CardsView
-import com.chordio.components.SongCard
+import com.chordio.components.SongCardModern
 import com.chordio.screens.viewsong.DetailedSongView
 import com.chordio.utils.QRCodeScannerButton
 import com.chordio.viewmodels.main.SearchViewModel
@@ -172,7 +172,7 @@ fun SearchContent(
             }
 
             items(topSongs) { song ->
-                SongCard(
+                SongCardModern(
                     title = song.title,
                     artistName = song.artist,
                     backgroundColor = MaterialTheme.colorScheme.surface,

@@ -39,7 +39,7 @@ fun UploadScreen(navController: NavController, authViewModel: AuthViewModel) {
 
     LaunchedEffect(uploadSuccess) {
         if (uploadSuccess) {
-            println("✅ Upload completed successfully!")
+            println("Upload completed successfully!")
             uploadViewModel.resetStatus()
             navController.popBackStack()
         }
@@ -169,7 +169,7 @@ fun UploadScreen(navController: NavController, authViewModel: AuthViewModel) {
                         lyrics = songLines
                     )
 
-                    println("✅ Created song: $song")
+                    println("Created song: $song")
 
                     uploadViewModel.uploadSong(songId, song)
                 },

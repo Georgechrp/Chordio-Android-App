@@ -66,8 +66,7 @@ fun ArtistScreen(
                 .flatMap { (_, songs) -> songs.take(2) }
 
             songs = topPerGenre
-        }
-        else if (artistName == "Τα Κορυφαία Hits") {
+        } else if (artistName == "Τα Κορυφαία Hits") {
             isLoading = true
             songViewModel.getTopSongs(limit = 20) { fetchedSongs ->
                 songs = fetchedSongs
@@ -118,7 +117,7 @@ fun ArtistScreen(
                         navController.popBackStack()
                     }) {
 
-                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
                     }
                 },
                 actions = {

@@ -87,13 +87,17 @@ class SongRepository(private val db: FirebaseFirestore) {
             }
         )
 
-        println("Uploading song to Firestore: $songId")
+        println("Uploading song to flat user_songs collection: $songId")
 
-        // ✅ Πετάμε το exception ώστε να το πιάσει ο ViewModel
-        db.collection("songs").document(songId).set(songMap).await()
+        db.collection("user_songs")
+            .document(songId)
+            .set(songMap)
+            .await()
 
-        println("✅ Song added to Firestore: $songId")
+        println("Song added to Firestore: user_songs/$songId")
     }
+
+
 
 
     fun getFilteredSongs(filter: String, callback: (List<Pair<String, String>>) -> Unit) {
