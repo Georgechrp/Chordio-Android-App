@@ -4,15 +4,18 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -43,34 +46,37 @@ fun SignUpScreen(navController: NavController, onLoginSuccess: () -> Unit) {
     val context = LocalContext.current
     val isLoading = remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        SignUpInputFields(
-            fullName = fullName,
-            email = email,
-            password = password,
-            confirmPassword = confirmPassword
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            SignUpInputFields(
+                fullName = fullName,
+                email = email,
+                password = password,
+                confirmPassword = confirmPassword
+            )
+            Spacer(modifier = Modifier.height(24.dp))
 
-        SignUpActions(
-            fullName = fullName,
-            email = email,
-            password = password,
-            confirmPassword = confirmPassword,
-            navController = navController,
-            context = context,
-            onLoginSuccess = onLoginSuccess,
-            isLoading = isLoading
-        )
-    }
-    if (isLoading.value) {
-        LoadingOverlay()
+            SignUpActions(
+                fullName = fullName,
+                email = email,
+                password = password,
+                confirmPassword = confirmPassword,
+                navController = navController,
+                context = context,
+                onLoginSuccess = onLoginSuccess,
+                isLoading = isLoading
+            )
+        }
+
+        if (isLoading.value) {
+            LoadingOverlay()
+        }
     }
 }
 
@@ -83,46 +89,54 @@ fun SignUpInputFields(
 ) {
     Text(
         text = stringResource(R.string.sign_in_to),
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Bold
+        fontSize = 28.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = 8.dp)
     )
-    Spacer(modifier = Modifier.height(50.dp))
-    TextField(
+    Spacer(modifier = Modifier.height(40.dp))
+
+    OutlinedTextField(
         value = fullName.value,
         onValueChange = { fullName.value = it },
         label = { Text(stringResource(R.string.full_name)) },
         singleLine = true,
-        maxLines = 1
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp)
     )
 
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(16.dp))
 
-    TextField(
+    OutlinedTextField(
         value = email.value,
         onValueChange = { email.value = it },
         label = { Text(stringResource(R.string.email)) },
         singleLine = true,
-        maxLines = 1
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp)
     )
-    Spacer(modifier = Modifier.height(8.dp))
 
-    TextField(
+    Spacer(modifier = Modifier.height(16.dp))
+
+    OutlinedTextField(
         value = password.value,
         onValueChange = { password.value = it },
         label = { Text("Password") },
         visualTransformation = PasswordVisualTransformation(),
         singleLine = true,
-        maxLines = 1
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp)
     )
-    Spacer(modifier = Modifier.height(8.dp))
 
-    TextField(
+    Spacer(modifier = Modifier.height(16.dp))
+
+    OutlinedTextField(
         value = confirmPassword.value,
         onValueChange = { confirmPassword.value = it },
         label = { Text("Confirm Password") },
         visualTransformation = PasswordVisualTransformation(),
         singleLine = true,
-        maxLines = 1
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp)
     )
 }
 
@@ -139,47 +153,49 @@ fun SignUpActions(
     isLoading: MutableState<Boolean>
 ) {
 
-
-    Button(onClick = {
-        if (fullName.value.isBlank() || email.value.isBlank() || password.value.isBlank() || confirmPassword.value.isBlank()) {
-            Toast.makeText(context, context.getString(R.string.please_fill_fields), Toast.LENGTH_SHORT).show()
-            return@Button
-        }
-
-        if (password.value != confirmPassword.value) {
-            Toast.makeText(context, context.getString(R.string.passwords_do_not_match), Toast.LENGTH_SHORT).show()
-            return@Button
-        }
-        isLoading.value = true
-        authViewModel.signUpUser(
-            fullName.value,
-            email.value,
-            password.value
-        ) { success, error ->
-            isLoading.value = false
-            if (success) {
-                Toast.makeText(context, "Account created!", Toast.LENGTH_SHORT).show()
-                onLoginSuccess()
-            } else {
-                Toast.makeText(context, error ?: "Sign up failed.", Toast.LENGTH_SHORT).show()
+    Button(
+        onClick = {
+            if (fullName.value.isBlank() || email.value.isBlank() || password.value.isBlank() || confirmPassword.value.isBlank()) {
+                Toast.makeText(context, context.getString(R.string.please_fill_fields), Toast.LENGTH_SHORT).show()
+                return@Button
             }
-        }
 
-    }) {
-        Text(stringResource(R.string.create_account))
+            if (password.value != confirmPassword.value) {
+                Toast.makeText(context, context.getString(R.string.passwords_do_not_match), Toast.LENGTH_SHORT).show()
+                return@Button
+            }
+            isLoading.value = true
+            authViewModel.signUpUser(
+                fullName.value,
+                email.value,
+                password.value
+            ) { success, error ->
+                isLoading.value = false
+                if (success) {
+                    Toast.makeText(context, "Account created!", Toast.LENGTH_SHORT).show()
+                    onLoginSuccess()
+                } else {
+                    Toast.makeText(context, error ?: "Sign up failed.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Text(stringResource(R.string.create_account), fontSize = 16.sp)
     }
 
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(16.dp))
 
     TextButton(onClick = {
         Log.d("SignUpScreen", "Navigating to Login: ${AppScreens.Login.route}")
         navController.navigate(AppScreens.Login.route)
     }) {
-        Text(stringResource(R.string.already_have_account))
+        Text(stringResource(R.string.already_have_account), fontSize = 14.sp)
     }
-
-
-
 
 }
 
